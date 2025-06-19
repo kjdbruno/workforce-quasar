@@ -1,0 +1,105 @@
+// app global css in SCSS form
+// app global css in SCSS form
+@font-face {
+    font-family: Urbanist;
+    src: url(./Font/Urbanist-Regular.ttf);
+}
+* {
+    font-family: 'Urbanist';
+    letter-spacing: .3mm;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    background: linear-gradient(to bottom, #e8edf7, #d5deee); /* light to slightly darker gradient */
+    margin: 0;
+}
+
+.radius-xl {
+    border-radius: 35px;
+}
+
+.status-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: white;
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+.dialog-feedback .q-dialog__inner,
+.dialog-office .q-dialog__inner
+{
+    padding: 0px !important;
+}
+
+.dialog-feedback .card-dialog,
+.dialog-office .card-dialog
+{
+    width: 650px;
+    max-width: 100vw;
+}
+
+.dialog-office .card-dialog .q-field__bottom {
+    padding: 3px 0px !important;
+}
+
+//Nav bar
+.header .tabs .tab {
+    text-decoration: none;
+    background: transparent;
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 0px;
+    color: #333; /* Replace with your $dark color */
+    margin: 0 2px;
+    position: relative;
+    font-size: 0.80em;
+    transition: background-color 500ms;
+}
+  
+.header .tabs .tab:hover {
+    background-color: #F5F5F5;
+}
+  
+.header .tabs .tab.active {
+    background: #004EA8; /* Replace with your $primary color */
+    color: #F6F9FC;      /* Replace with your $accent color */
+    z-index: 1;
+    pointer-events: none;
+}
+  
+.header .tabs .tab.active::after {
+    content: "";
+    position: absolute;
+    background-image: radial-gradient(
+        circle at top right,
+        transparent,
+        transparent 10px,
+        #004EA8 10px,
+        #004EA8 50px
+    );
+}
+  
+.header .tabs .tab.active::before {
+    content: "";
+    position: absolute;
+    background-image: radial-gradient(
+        circle at top left,
+        transparent,
+        transparent 10px,
+        #004EA8 10px,
+        #004EA8 50px
+    );
+}
+
+//input
+.q-field--outlined .q-field__control:after,
+.q-field--outlined.q-field--highlighted .q-field__control:after
+{
+  border-width: 1px !important;
+}
