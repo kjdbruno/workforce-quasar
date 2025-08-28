@@ -1,109 +1,37 @@
 <template>
-    <q-page 
-        class="full-height flex flex-center"
-    >
-        <q-card 
-            class="justify-center items-center no-shadow q-pa-xl radius-xl" 
-            style="width: 600px;"
-        >
+    <q-page class="full-height flex flex-center">
+        <q-card class="justify-center items-center no-shadow q-pa-xl radius-xl border" style="width: 600px;">
             <q-card-section>
-                <div 
-                    class="text-center"
-                >
-                    <div v-html="indexStore.logo_text" />
+                <div class="text-center">
+                    <div v-html="indexStore.brand"/>
                 </div>
             </q-card-section>
             <q-card-section>
-                <div 
-                    class="row q-col-gutter-sm"
-                >
-                    <div 
-                        class="col-6"
-                    >
-                        <q-input 
-                            v-model="username" 
-                            :error="formErrors.username.type" 
-                            :error-message="formErrors.username.msg" 
-                            outlined 
-                            rounded
-                            label="Username" 
-                            class="full-width" 
-                            autofocus
-                            @keyup.enter="login"
-                        >
-                            <template v-slot:prepend>
-                                <q-icon 
-                                    name="account_circle" 
-                                    size="xs" 
-                                    color="grey" 
-                                />
-                            </template>
-                        </q-input>
+                <div class="row q-col-gutter-sm">
+                    <div class="col-6">
+                        <q-input v-model="username" :error="formErrors.username.type" :error-message="formErrors.username.msg" outlined rounded label="Username" class="full-width" autofocus @keyup.enter="login" />
                     </div>
-                    <div 
-                        class="col-6"
-                    >
-                        <q-input 
-                            v-model="password" 
-                            :error="formErrors.password.type" 
-                            :error-message="formErrors.password.msg" 
-                            :type="showPassword ? 'text' : 'password'" 
-                            outlined 
-                            rounded
-                            label="Password" 
-                            class="full-width"
-                            @keyup.enter="login"
-                        >
-                            <template v-slot:prepend>
-                                <q-icon 
-                                    name="lock" 
-                                    size="xs" 
-                                    color="grey" />
-                            </template>
+                    <div class="col-6">
+                        <q-input v-model="password" :error="formErrors.password.type" :error-message="formErrors.password.msg" :type="showPassword ? 'text' : 'password'" outlined rounded label="Password" class="full-width" @keyup.enter="login">
                             <template v-slot:append>
-                                <q-icon 
-                                    :name="showPassword ? 'visibility' : 'visibility_off'" 
-                                    class="cursor-pointer" 
-                                    @click="showPassword = !showPassword" 
-                                    style="font-size: 1rem;" 
-                                />
+                                <q-icon :name="showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" @click="showPassword = !showPassword" style="font-size: 1rem;" />
                             </template>
                         </q-input>
                     </div>
                 </div>
             </q-card-section>
             <q-card-section>
-                <q-btn 
-                    unelevated 
-                    rounded
-                    color="primary" 
-                    label="login" 
-                    size="lg" 
-                    class="full-width" 
-                    :loading="loading" 
-                    @click="login"
-                >
+                <q-btn unelevated rounded color="primary" label="login" size="lg" class="full-width" :loading="loading" @click="login">
                     <template v-slot:loading>
-                        <q-spinner-ios 
-                            size=".5em"
-                        />
+                        <q-spinner-ios size=".5em"/>
                     </template>
                 </q-btn>
-                <q-banner 
-                    v-if="errors.length"
-                    class="bg-red-1 text-negative rounded-lg shadow-md banner-radius q-pa-sm q-mt-md"
-                    dense
-                    inline-actions
-                >
+                <q-banner v-if="errors.length" class="bg-red-1 text-negative rounded-lg shadow-md banner-radius q-pa-sm q-mt-md"dense inline-actions>
                     <template v-slot:avatar>
                         <q-icon name="error" color="negative" />
                     </template>
                     <div>
-                        <div 
-                            v-for="(dt, index) in errors" 
-                            :key="index"
-                            class="text-caption"
-                        >
+                        <div v-for="(dt, index) in errors" :key="index" class="text-caption">
                             {{ dt.msg }}
                         </div>
                     </div>
@@ -178,3 +106,7 @@ const login = async () => {
     }
 }
 </script>
+
+<style scoped>
+
+</style>

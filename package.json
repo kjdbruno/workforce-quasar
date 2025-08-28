@@ -1,8 +1,8 @@
 {
-  "name": "feedback-internal-quasar",
+  "name": "workforce-quasar",
   "version": "0.0.1",
-  "description": "Community Engagement Platform",
-  "productName": "Feedback App",
+  "description": "HRIS with Payroll System",
+  "productName": "Workforce",
   "author": "Kenneth Jay Bruno",
   "type": "module",
   "private": true,

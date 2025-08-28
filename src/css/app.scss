@@ -9,12 +9,17 @@
     letter-spacing: .3mm;
 }
 
+.border
+{
+    border: 1px solid #EAEAEA;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
 
 body {
-    background: linear-gradient(to bottom, #e8edf7, #d5deee); /* light to slightly darker gradient */
+    // background: linear-gradient(to bottom, #e8edf7, #d5deee); /* light to slightly darker gradient */
     margin: 0;
 }
 
@@ -102,4 +107,9 @@ body {
 .q-field--outlined.q-field--highlighted .q-field__control:after
 {
   border-width: 1px !important;
+}
+
+.q-field--outlined .q-field__control:hover::before
+{
+    border: 1px solid rgba(0, 0, 0, 0.24);
 }

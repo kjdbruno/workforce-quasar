@@ -37,6 +37,7 @@ import axios from 'axios';
 import { useAuthStore } from 'src/stores/auth-store'; // Import your auth store
 
 const api = axios.create({
+  // baseURL: `${process.env.VUE_APP_BACKEND_URL}/api`, // Producxtion
   baseURL: `${process.env.VUE_APP_BACKEND_URL}/api`, // Your Express.js backend API URL
   // No `withCredentials: true` needed here for JWTs, as it's not cookie-based session
 });
