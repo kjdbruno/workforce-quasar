@@ -1,18 +1,18 @@
 <template>
     <q-page class="full-height flex flex-center">
-        <q-card class="justify-center items-center no-shadow q-pa-xl radius-xl border" style="width: 600px;">
+        <q-card class="justify-center items-center no-shadow q-pa-xl radius-md border" style="width: 600px;">
             <q-card-section>
                 <div class="text-center">
                     <div v-html="indexStore.brand"/>
                 </div>
             </q-card-section>
             <q-card-section>
-                <div class="row q-col-gutter-sm">
+                <div class="row q-col-gutter-xs">
                     <div class="col-6">
-                        <q-input v-model="username" :error="formErrors.username.type" :error-message="formErrors.username.msg" outlined rounded label="Username" class="full-width" autofocus @keyup.enter="login" />
+                        <q-input v-model="username" :error="formErrors.username.type" :error-message="formErrors.username.msg" outlined label="Username" class="full-width" autofocus @keyup.enter="login" />
                     </div>
                     <div class="col-6">
-                        <q-input v-model="password" :error="formErrors.password.type" :error-message="formErrors.password.msg" :type="showPassword ? 'text' : 'password'" outlined rounded label="Password" class="full-width" @keyup.enter="login">
+                        <q-input v-model="password" :error="formErrors.password.type" :error-message="formErrors.password.msg" :type="showPassword ? 'text' : 'password'" outlined label="Password" class="full-width" @keyup.enter="login">
                             <template v-slot:append>
                                 <q-icon :name="showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" @click="showPassword = !showPassword" style="font-size: 1rem;" />
                             </template>
@@ -21,20 +21,22 @@
                 </div>
             </q-card-section>
             <q-card-section>
-                <q-btn unelevated rounded color="primary" label="login" size="lg" class="full-width" :loading="loading" @click="login">
+                <q-btn unelevated color="primary" label="login" size="lg" class="full-width" :loading="loading" @click="login">
                     <template v-slot:loading>
-                        <q-spinner-ios size=".5em"/>
+                        <q-spinner-puff size=".5em"/>
                     </template>
                 </q-btn>
-                <q-banner v-if="errors.length" class="bg-red-1 text-negative rounded-lg shadow-md banner-radius q-pa-sm q-mt-md"dense inline-actions>
-                    <template v-slot:avatar>
-                        <q-icon name="error" color="negative" />
-                    </template>
-                    <div>
-                        <div v-for="(dt, index) in errors" :key="index" class="text-caption">
-                            {{ dt.msg }}
-                        </div>
-                    </div>
+                <q-banner v-if="errors.length" class="bg-red-1 text-negative shadow-md banner-radius q-pa-sm q-mt-md radius-md"dense inline-actions>
+                    <q-list>
+                        <q-item clickable v-ripple>
+                            <q-item-section avatar>
+                                <q-icon name="error" color="negative" />
+                            </q-item-section>
+                            <q-item-section v-for="(dt, index) in errors" :key="index">
+                                {{ dt.msg }}
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
                 </q-banner>
             </q-card-section>
         </q-card>
@@ -100,9 +102,11 @@ const login = async () => {
     try {
         await authStore.login(username.value, password.value);
         router.push('/home');
-        loading.value = true;
+        loading.value = false;
     } catch (e) {
-        console.log(e);
+        loading.value = false;
+        errors.value = e.response.data.errors;
+        console.log(e.response.data.errors);
     }
 }
 </script>

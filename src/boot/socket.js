@@ -52,13 +52,13 @@ export default boot(({ app, router }) => {
         }
 
         // Handle all users logs
-        socket.on('loadLogs', (users) => {
-            authStore.loggedUsers = users;
+        socket.on('EmitOnlineUsers', (users) => {
+            authStore.onlineUsers = users;
             console.log(`users logs loaded:`, users);
         });
 
         // Handle notifications
-        socket.on('loadNotifications', (notificationCount, notifications) => {
+        socket.on('EmitNotifications', (notificationCount, notifications) => {
             authStore.notificationCount = notificationCount;
             authStore.notificationList = notifications;
             console.log(`notifications loaded:`, notifications);
@@ -70,9 +70,9 @@ export default boot(({ app, router }) => {
                         <div class="text-caption;">You have ${notificationCount} new notifications.<div>
                     `
                 });
-                authStore.hasNotifications = true; // Update store state for UI
+                authStore.hasNotifications = true;
             } else {
-                authStore.hasNotifications = false; // No new notifications
+                authStore.hasNotifications = false;
             }
             
         });

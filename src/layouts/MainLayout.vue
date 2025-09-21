@@ -1,171 +1,124 @@
 <template>
     <q-layout view="lHh Lpr lFf">
-        <q-drawer
-            v-model="leftDrawerOpen"
-            show-if-above
-            class="transparent"
-            :width="150"
-            v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'"
-        >
-            <div class="full-height">
-                <div>
-                    <div v-html="indexStore.logo" />
+
+        <q-header class="bg-white no-shadow q-mx-lg q-mt-md q-py-sm radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
+            <q-toolbar class="header">
+
+                <q-btn flat round dense icon="menu" class="text-grey custom-border" @click="drawerClick"/>
+
+                <q-toolbar-title class="text-grey text-uppercase">
+                    {{ route.name }}
+                </q-toolbar-title>
+
+                <div class="q-gutter-sm">
+                    <q-btn flat round dense class="text-white">
+                        <q-avatar size="md" text-color="grey-8">
+                            <img :src="messageSecondary" />
+                            <q-badge color="red" floating>2</q-badge>
+                        </q-avatar>
+                    </q-btn>
+
+                    <q-btn flat round dense class="text-white">
+                        <q-avatar size="md" text-color="grey-8">
+                            <img :src="notificationSecondary" />
+                            <q-badge color="red" floating>2</q-badge>
+                        </q-avatar>
+                    </q-btn>
+
+                    <q-btn flat round dense class="text-white">
+                        <q-avatar size="md">
+                            <img :src="account" />
+                        </q-avatar>
+                    </q-btn>
+                </div>
+
+            </q-toolbar>
+        </q-header>
+        
+        <q-drawer v-model="drawer" show-if-above :mini="!drawer || miniState" :width="300" :mini-width="125" :breakpoint="500" bordered v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
+
+            <div class="text-center">
+                <div class="q-pt-lg q-pb-lg">
+                    <div v-if="miniState">
+                        <q-avatar>
+                            <img :src="logo">
+                        </q-avatar>
+                    </div>
+                    <div v-if="!miniState">
+                        <q-avatar>
+                            <img :src="logo">
+                        </q-avatar>
+                        <span class="text-primary">workforce</span>
+                    </div>
                 </div>
             </div>
-            
-        </q-drawer>
-        <q-page-container class="">
-            <q-page padding>
-                <q-card 
-                    square
-                    v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'"
-                    class="no-shadow card-radius q-mb-md"
-                    >
-                    <q-card-section>
-                        <div 
-                        class="row items-center no-wrap"
-                        >
-                        <div 
-                            class="col"
-                        >
-                            <div 
-                            class="text-h5 text-capitalize"
-                            >
-                            <q-btn 
-                                round 
-                                flat 
-                                size="sm" 
-                                icon="arrow_back" 
-                                @click="router.push('/home')" 
-                                class="q-mr-sm"
-                                v-if="router.currentRoute.value.name != 'home'"
-                            />
-                            {{ router.currentRoute.value.name.split('-').join(' ') }}
-                            </div>
-                        </div>
-                        <div 
-                            class="col-auto q-gutter-xs"
-                        >
-                        
-                        <q-btn 
-                            size="1em" 
-                            icon="notifications" 
-                            text-color="grey" 
-                            class="bg-accent" 
-                            flat 
-                            round
-                            >
-                            <q-badge 
-                                color="negative" 
-                                floating 
-                                rounded
-                            >
-                                {{ authStore.notificationCount }}
-                            </q-badge>
-                            <q-menu
-                                :offset="[5, 5]"
-                                class="card-radius card-shadow" 
-                                square
-                                @hide="readNotification()"
-                            >
-                                <q-card 
-                                square
-                                class="no-shadow card-radius card-border-top card-border-left" 
-                                style="width: 350px;"
-                                >
-                                <q-card-section>
-                                    <div 
-                                    class="text-uppercase text-h6 text-center"
-                                    >
-                                    my notifications
-                                    </div>
-                                </q-card-section>
-                                <q-separator />
-                                <q-card-section
-                                    class="q-pa-none"
-                                >
-                                    <q-list>
-                                    <q-item v-for="(dt, index) in authStore.notificationList" :key="index" class="q-mb-sm">
-                                        <q-item-section avatar>
-                                        <q-avatar>
-                                            <q-icon name="account_circle" size="lg" color="grey"/>
-                                        </q-avatar>
-                                        </q-item-section>
-                                        <q-item-section>
-                                            <q-item-label>{{ dt.content }}</q-item-label>
-                                            <q-item-label caption lines="1">{{ formatDate(dt.createdAt) }}</q-item-label>
-                                        </q-item-section>
-                                        <!-- <q-item-section side>
-                                        <q-icon :name="dt.type == 'chat' ? 'mail' : (dt.type == 'alert' ? 'error' : (dt.type == 'reminder' ? 'alarm' : null)) " size="xs" />
-                                        </q-item-section> -->
-                                    </q-item>
-                                    </q-list>
-                                </q-card-section>
-                                </q-card>
-                            </q-menu>
-                        </q-btn>
-                            <q-btn 
-                            size="1em" 
-                            icon="mail" 
-                            text-color="grey" 
-                            class="bg-accent" 
-                            flat 
-                            round
-                            >
-                            <!-- <q-badge 
-                                color="negative" 
-                                floating 
-                                rounded
-                                v-if="(Object.values(socketStore.unread).reduce((sum, value) => sum + value, 0))"
-                            >
-                                {{ Object.values(socketStore.unread).reduce((sum, value) => sum + value, 0) }}
-                            </q-badge> -->
-                            <!-- <q-menu>
-                                <q-card 
-                                class="no-shadow" 
-                                style="width: 350px;"
-                                >
-                                <q-card-section>
-                                    <div 
-                                    class="text-uppercase text-h6 text-center"
-                                    >
-                                    my notifications
-                                    </div>
-                                </q-card-section>
-                                <q-card-section
-                                    class="q-pa-none"
-                                >
-                                    {{ socketStore.messages }}
-                                </q-card-section>
-                                </q-card>
-                            </q-menu> -->
-                            </q-btn>
-                            <q-btn 
-                            size="1em" 
-                            text-color="grey" 
-                            class="relative-position q-ml-lg" 
-                            flat 
-                            round
-                            >
-                            <q-avatar>
-                                <img 
-                                :src="`${baseURL}/${authStore.user.profile.avatar}`"
-                                >
+
+            <q-scroll-area v-if="!miniState" class="fit q-pl-lg q-pr-lg" :horizontal-thumb-style="{ opacity: 0 }">
+                <q-list padding>
+
+                    <q-item clickable v-ripple class="q-pa-md q-pb-sm radius-xl" v-for="item in menuItems" :key="item.label" @click="router.push(item.to)">
+                        <q-item-section avatar>
+                            <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
+                        </q-item-section>
+                        <q-item-section class="text-uppercase text-caption" :class="isActive(item.label) ? 'text-primary' : 'text-secondary'">
+                            {{ item.label }}
+                        </q-item-section>
+                    </q-item>
+
+                </q-list>
+            </q-scroll-area>
+
+            <q-scroll-area v-if="miniState" class="fit" :horizontal-thumb-style="{ opacity: 0 }">
+                
+                <div class="text-center">
+                    <div v-for="item in menuItems" :key="item.label" class="q-pa-sm q-pb-sm">
+                        <q-btn flat round @click="router.push(item.to)">
+                            <q-avatar size="sm">
+                                <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
                             </q-avatar>
-                            <q-icon 
-                                :name="socket.connected ? 'check_circle' : 'cancel'" 
-                                :color="socket.connected ? 'positive' : 'negative'" 
-                                class="status-icon" 
-                                size="xs"
-                            />
-                            </q-btn>
-                        </div>
-                        </div>
-                    </q-card-section>
-                    </q-card>
+                        </q-btn>
+                    </div>
+                </div>
+
+            </q-scroll-area>
+
+            <div class="absolute-bottom q-pa-md">
+                <div v-if="!miniState">
+                    <q-list>
+                        <q-item class="q-mb-sm">
+                            <q-item-section avatar>
+                                <q-avatar>
+                                    <img :src="authStore.user.avatar">
+                                </q-avatar>
+                            </q-item-section>
+
+                            <q-item-section>
+                                <q-item-label class="text-uppercase">{{ authStore.user.name }}</q-item-label>
+                                <q-item-label caption lines="1">{{ authStore.user.username }}</q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </div>
+                <div v-if="miniState" class="text-center">
+                    <q-avatar class="q-mb-sm">
+                        <img :src="authStore.user.avatar">
+                    </q-avatar>
+                </div>
+            </div>
+
+            <div class="absolute" style="top: 30px; right: -17px">
+                <q-btn dense round unelevated color="primary" style="border: 6px solid #f2f2f7" :icon="miniState ? 'chevron_right' : 'chevron_left'" @click="miniState = !miniState"/>
+            </div>
+        </q-drawer>
+
+        <q-page-container>
+            
+            <div class="q-mx-lg q-mt-lg">
                 <router-view />
-            </q-page>
+            </div>
+                
         </q-page-container>
+        
     </q-layout>
 </template>
 
@@ -174,36 +127,91 @@ import { ref, computed, onMounted } from 'vue';
 import { useIndexStore } from 'src/stores/index-store';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth-store';
-import { useSocketStore } from 'src/stores/socket-store';
-import moment from 'moment';
-import { socket } from 'src/boot/socket';
+// import moment from 'moment';
+import logo from 'src/assets/workforce-logo.png';
+import homePrimary from 'src/assets/icons/home_primary.png';
+import homeSecondary from 'src/assets/icons/home_secondary.png';
+import recruitmentPrimary from 'src/assets/icons/recruitment_primary.png';
+import recruitmentSecondary from 'src/assets/icons/recruitment_secondary.png';
+import employeePrimary from 'src/assets/icons/employee_primary.png';
+import employeeSecondary from 'src/assets/icons/employee_secondary.png';
+import leavePrimary from 'src/assets/icons/leave_primary.png';
+import leaveSecondary from 'src/assets/icons/leave_secondary.png';
+import dtrPrimary from 'src/assets/icons/dtr_primary.png';
+import dtrSecondary from 'src/assets/icons/dtr_secondary.png';
+import performancePrimary from 'src/assets/icons/performance_primary.png';
+import performanceSecondary from 'src/assets/icons/performance_secondary.png';
+import trainingPrimary from 'src/assets/icons/training_primary.png';
+import trainingSecondary from 'src/assets/icons/training_secondary.png';
+import disciplinaryPrimary from 'src/assets/icons/disciplinary_primary.png';
+import disciplinarySecondary from 'src/assets/icons/disciplinary_secondary.png';
+import exitPrimary from 'src/assets/icons/exit_primary.png';
+import exitSecondary from 'src/assets/icons/exit_secondary.png';
+import payrollPrimary from 'src/assets/icons/payroll_primary.png';
+import payrollSecondary from 'src/assets/icons/payroll_secondary.png';
+import preferencePrimary from 'src/assets/icons/preference_primary.png';
+import preferenceSecondary from 'src/assets/icons/preference_secondary.png';
+import notificationPrimary from 'src/assets/icons/notification_primary.png';
+import notificationSecondary from 'src/assets/icons/notification_secondary.png';
+import messagePrimary from 'src/assets/icons/message_primary.png';
+import messageSecondary from 'src/assets/icons/message_secondary.png';
+import logoutPrimary from 'src/assets/icons/logout_primary.png';
+import logoutSecondary from 'src/assets/icons/logout_secondary.png';
+import account from 'src/assets/icons/account.png';
 
 const indexStore = useIndexStore();
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const socketStore = useSocketStore();
+// const socketStore = useSocketStore();
 
-const baseURL = process.env.VUE_APP_BACKEND_URL;
+// const baseURL = process.env.VUE_APP_BACKEND_URL;
 
-const leftDrawerOpen = ref(false)
+// const leftDrawerOpen = ref(false)
 
-function toggleLeftDrawer () {
-    leftDrawerOpen.value = !leftDrawerOpen.value
+// function toggleLeftDrawer () {
+//     leftDrawerOpen.value = !leftDrawerOpen.value
+// }
+
+// // const isOnline = computed(() => socketStore.isOnline(authStore.id));
+
+// const formatDate = (timestamp) => {
+//     return moment(timestamp).fromNow();
+// };
+
+// const readNotification = () => {
+//     authStore.readNotification();
+// }
+
+// onMounted(() => {
+//     console.log(process.env.VUE_APP_BACKEND_URL);
+// });
+
+const drawer = ref(true)
+const miniState = ref(true)
+
+
+function drawerClick(e) {
+  if (miniState.value) {
+    miniState.value = false
+    e.stopPropagation()
+  }
 }
 
-// const isOnline = computed(() => socketStore.isOnline(authStore.id));
+const menuItems = [
+    { iconPrimary: homePrimary, iconSecondary: homeSecondary, label: 'home', to: '/home' },
+    { iconPrimary: recruitmentPrimary, iconSecondary: recruitmentSecondary, label: 'recruitment', to: '/recruitment'},
+    { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee' },
+    { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave' },
+    { iconPrimary: dtrPrimary, iconSecondary: dtrSecondary, label: 'dtr', to: '/dtr' },
+    { iconPrimary: performancePrimary, iconSecondary: performanceSecondary, label: 'performance', to: '/performance' },
+    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'training', to: '/training' },
+    { iconPrimary: disciplinaryPrimary, iconSecondary: disciplinarySecondary, label: 'disciplinary', to: '/disciplinary' },
+    { iconPrimary: exitPrimary, iconSecondary: exitSecondary, label: 'separation', to: '/separation' },
+    { iconPrimary: payrollPrimary, iconSecondary: payrollSecondary, label: 'payroll', to: '/payroll' },
+    { iconPrimary: preferencePrimary, iconSecondary: preferenceSecondary, label: 'preferences', to: '/preferences' }
+]
 
-const formatDate = (timestamp) => {
-    return moment(timestamp).fromNow();
-};
-
-const readNotification = () => {
-    authStore.readNotification();
-}
-
-onMounted(() => {
-    console.log(process.env.VUE_APP_BACKEND_URL);
-});
+const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase()
 
 </script>

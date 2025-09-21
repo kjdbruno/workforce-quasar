@@ -2,13 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 export const usePreferenceStore = defineStore('preferenceStore', {
   state: () => ({
-    component: null,
-    filter: null,
-    isEdit: false,
-    dialog: false,
-    isLoading: false,
-    isLoadingTable: false,
-    office: null,
+    component: null
   }),
 
   getters: {

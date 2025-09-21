@@ -24,7 +24,7 @@ const routes = [
     ]
   },
   {
-    path: '/analytics',
+    path: '/preferences',
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore();
@@ -35,11 +35,11 @@ const routes = [
       }
     },
     children: [
-      { path: '', component: () => import('src/pages/AnalyticsPage.vue'), name: 'analytics' }
+      { path: '', component: () => import('src/pages/PreferencePage.vue'), name: 'preferences' }
     ]
   },
   {
-    path: '/complaint',
+    path: '/recruitment',
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore();
@@ -50,97 +50,7 @@ const routes = [
       }
     },
     children: [
-      { path: '', component: () => import('src/pages/ComplaintPage.vue'), name: 'complaint' }
-    ]
-  },
-  {
-    path: '/feedback',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/FeedbackPage.vue'), name: 'feedback' }
-    ]
-  },
-  {
-    path: '/discussion',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/DiscussionPage.vue'), name: 'discussion' }
-    ]
-  },
-  {
-    path: '/preference',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/PreferencePage.vue'), name: 'preference' }
-    ]
-  },
-  {
-    path: '/report',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/ReportPage.vue'), name: 'report' }
-    ]
-  },
-  {
-    path: '/me',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/MePage.vue'), name: 'me' }
-    ]
-  },
-  {
-    path: '/log',
-    component: () => import('layouts/MainLayout.vue'),
-    beforeEnter: (to, from, next) => {
-      const auth = useAuthStore();
-      if (!auth.isAuthenticated) {
-        next('/')
-      } else {
-        next()
-      }
-    },
-    children: [
-      { path: '', component: () => import('src/pages/LogPage.vue'), name: 'log' }
+      { path: '', component: () => import('src/pages/RecruitmentPage.vue'), name: 'recruitment' }
     ]
   },
 

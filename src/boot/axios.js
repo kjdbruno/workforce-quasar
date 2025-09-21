@@ -43,13 +43,14 @@ const api = axios.create({
 });
 
 export default boot(({ app, router }) => {
+  const authStore = useAuthStore();
   // Inject axios instance for global use
   app.config.globalProperties.$axios = axios;
   app.config.globalProperties.$api = api;
 
   // Request Interceptor: Add JWT to every request
   api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token'); // Assuming you store the JWT in localStorage
+    const token = authStore.token; // Assuming you store the JWT in localStorage
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       // If you have an API key that needs to be sent with every request:
