@@ -25,10 +25,11 @@
                         </q-avatar>
                     </q-btn>
 
-                    <q-btn flat round dense class="text-white">
+                    <q-btn flat round dense class="text-white" @click="meDialog = !meDialog">
                         <q-avatar size="md">
                             <img :src="account" />
                         </q-avatar>
+                        <q-badge color="positive" rounded floating />
                     </q-btn>
                 </div>
 
@@ -88,12 +89,11 @@
                         <q-item class="q-mb-sm">
                             <q-item-section avatar>
                                 <q-avatar>
-                                    <img :src="authStore.user.avatar">
+                                    <img :src="authStore.user?.profile?.photos.photo">
                                 </q-avatar>
                             </q-item-section>
-
                             <q-item-section>
-                                <q-item-label class="text-uppercase">{{ authStore.user.name }}</q-item-label>
+                                <q-item-label caption class="text-uppercase text-bold">{{ formatName(authStore.user?.profile) }}</q-item-label>
                                 <q-item-label caption lines="1">{{ authStore.user.username }}</q-item-label>
                             </q-item-section>
                         </q-item>
@@ -101,7 +101,7 @@
                 </div>
                 <div v-if="miniState" class="text-center">
                     <q-avatar class="q-mb-sm">
-                        <img :src="authStore.user.avatar">
+                        <img :src="formatPhoto(authStore.user?.profile?.photos.photo)">
                     </q-avatar>
                 </div>
             </div>
@@ -118,6 +118,18 @@
             </div>
                 
         </q-page-container>
+
+        <q-dialog v-model="meDialog" full-height position="right" square class="profile-dialog">
+            <q-card class="dialog-card column full-height">
+                <q-card-section class="q-pa-lg">
+                    <q-avatar>
+                        <img :src="authStore.user?.profile?.photos.photo">
+                    </q-avatar>
+                </q-card-section>
+                <q-separator inset />
+                
+            </q-card>
+        </q-dialog>
         
     </q-layout>
 </template>
@@ -190,12 +202,25 @@ const authStore = useAuthStore();
 const drawer = ref(true)
 const miniState = ref(true)
 
+const formatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.firstname || '';
+    const middlename = profile.middlename
+        ? profile.middlename.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.lastname || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+const meDialog = ref(false);
+
 
 function drawerClick(e) {
-  if (miniState.value) {
-    miniState.value = false
-    e.stopPropagation()
-  }
+    if (miniState.value) {
+        miniState.value = false
+        e.stopPropagation()
+    }
 }
 
 const menuItems = [
@@ -212,6 +237,10 @@ const menuItems = [
     { iconPrimary: preferencePrimary, iconSecondary: preferenceSecondary, label: 'preferences', to: '/preferences' }
 ]
 
-const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase()
+const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase();
+
+const formatPhoto = (photo) => {
+    return `${process.env.VUE_APP_BACKEND_URL}${photo}`
+}
 
 </script>

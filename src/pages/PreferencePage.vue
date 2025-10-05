@@ -62,6 +62,8 @@ import IncidentRoleComponent from 'src/components/Preferences/IncidentRoleCompon
 import PayrollTaxBracketComponent from 'src/components/Preferences/PayrollTaxBracketComponent.vue';
 import PayrollTaxDeductionComponent from 'src/components/Preferences/PayrollTaxDeductionComponent.vue';
 import SchedulePremiumPayComponent from 'src/components/Preferences/SchedulePremiumPayComponent.vue';
+import SignatoryTypeComponent from 'src/components/Preferences/SignatoryTypeComponent.vue';
+import SignatoryProfileComponent from 'src/components/Preferences/SignatoryProfileComponent.vue';
 
 const PreferenceStore = usePreferenceStore();
 
@@ -98,11 +100,21 @@ const components = {
     AddressBarangayComponent,
     IncidentClassComponent,
     IncidentRoleComponent,
+    SignatoryTypeComponent,
+    SignatoryProfileComponent
 };
 
 const tabs = [
     { 
         name: 'User' 
+    },
+    { 
+        name: 'Signatory', 
+        subTabs: 
+        [
+            'Type', 
+            'Profile'
+        ] 
     },
     { 
         name: 'Employee', 

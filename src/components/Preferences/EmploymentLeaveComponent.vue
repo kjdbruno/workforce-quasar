@@ -47,93 +47,124 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-4">
-                                <q-input 
-                                    v-model="name" 
-                                    outlined 
-                                    label="Name" 
-                                    :error="Errors.name.type"
-                                    :no-error-icon="true"
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">leave name</span>
+                                <q-icon
+                                    :name="Errors.name.type ? 'error' : 'info'"
+                                    :color="Errors.name.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.name.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.name.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.name.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.name.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.name.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-1">
-                                <q-input 
-                                    v-model="credit" 
-                                    outlined 
-                                    label="Credit" 
-                                    :error="Errors.credit.type"
-                                    :no-error-icon="true"
-                                >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.credit.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.credit.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
-                            </div>
-                            <div class="col-2">
-                                <q-select 
-                                    outlined 
-                                    v-model="accrual" 
-                                    emit-value 
-                                    map-options 
-                                    use-input 
-                                    input-debounce="300" 
-                                    :options="filteredAccruals" 
-                                    label="Choose Accrual" 
-                                    @filter="filterAccrualFn" 
-                                    :error="formErrors.accrual.type"
-                                    :no-error-icon="true"
-                                >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.accrual.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.accrual.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-select>
-                            </div>
-                            <div class="col-3">
-                                <q-checkbox right-label v-model="carryOver" label="Carry Over" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="q-mt-sm"/>
-                            </div>
+                            <q-input 
+                                v-model="name" 
+                                outlined 
+                                :error="Errors.name.type"
+                                :no-error-icon="true"
+                            />
                         </div>
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">credit</span>
+                                <q-icon
+                                    :name="Errors.credit.type ? 'error' : 'info'"
+                                    :color="Errors.credit.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.credit.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.credit.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.credit.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="credit" 
+                                outlined 
+                                :error="Errors.credit.type"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">accrual</span>
+                            <q-icon
+                                :name="Errors.accrual.type ? 'error' : 'info'"
+                                :color="Errors.accrual.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.accrual.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.accrual.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.accrual.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-radio
+                            v-for="(v, index) in accruals" 
+                            right-label 
+                            v-model="accrual" 
+                            :label="v.label"
+                            :val="v.value" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye"
+                        />
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">Carry over unused leave to next accrual</span>
+                        </div>
+                        <q-checkbox 
+                            right-label 
+                            v-model="carryOver" 
+                            label="Carry Over" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye"
+                        />
                     </div>
                 </q-card-section>
                 
@@ -251,7 +282,7 @@ const Validations = () => {
     const creditPattern = /^[0-9]+(\.[0-9]+)?$/;
     if (!credit.value) {
         Errors.credit.type = true
-        Errors.credit.messages.push('Name is required')
+        Errors.credit.messages.push('credit is required')
         isError = true
     } else if (!creditPattern.test(credit.value)) {
         Errors.credit.type = true
@@ -391,7 +422,6 @@ const ResetForm = () => {
 }
 
 const Save = async () => {
-
     if (!Validations()) return;
     submitLoading.value = true;
     try {
@@ -433,22 +463,18 @@ const Save = async () => {
             })
         }
     } finally {
-        ResetForm();
         submitLoading.value = false;
     }
 }
 
 const applyBackendErrors = (backendErrors) => {
-
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
-        
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
         Errors[key].messages = []
     })
-    
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
@@ -465,7 +491,6 @@ const UpdateList = (data) => {
 }
 
 const Toggle = async () => {
-
     submitLoading.value = true;
     try {
         const response = isActive.value
@@ -510,25 +535,6 @@ const accruals = ref([
         value: 'Daily' 
     }
 ]);
-
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        update(() => {
-            if (!val) {
-                targetRef.value = sourceRef.value.slice(0, 5)
-            } else {
-                const needle = val.toLowerCase().trim()
-                targetRef.value = sourceRef.value
-                    .filter(v => (v.label ?? '').toLowerCase().includes(needle))
-                    .slice(0, 5)
-            }
-        })
-    }
-}
-
-const filteredAccruals = ref([])
-
-const filterAccrualFn = createFilterFn(accruals, filteredAccruals)
 
 onMounted(() => {
     LoadAll();

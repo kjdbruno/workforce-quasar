@@ -46,117 +46,147 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-6">
-                                <q-input 
-                                    v-model="name" 
-                                    outlined 
-                                    label="Name" 
-                                    :error="Errors.name.type"
-                                    :no-error-icon="true"
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-4">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">school name</span>
+                                <q-icon
+                                    :name="Errors.name.type ? 'error' : 'info'"
+                                    :color="Errors.name.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.name.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.name.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.name.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.name.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.name.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-2">
-                                <q-select 
-                                    outlined 
-                                    v-model="type" 
-                                    emit-value 
-                                    map-options 
-                                    use-input 
-                                    input-debounce="300" 
-                                    :options="filteredTypes" 
-                                    label="Choose Type" 
-                                    @filter="filterTypeFn" 
-                                    :error="Errors.type.type"
-                                    dropdown-icon="keyboard_arrow_down"
-                                    :no-error-icon="true"
-                                >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.type.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.type.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-select>
-                            </div>
+                            <q-input 
+                                v-model="name" 
+                                outlined
+                                :error="Errors.name.type"
+                                :no-error-icon="true"
+                            />
                         </div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-3">
-                                <q-input 
-                                    v-model="website" 
-                                    outlined 
-                                    label="Website" 
-                                    :error="Errors.website.type"
-                                    :no-error-icon="true"
-                                >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.website.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">school type</span>
+                            <q-icon
+                                :name="Errors.type.type ? 'error' : 'info'"
+                                :color="Errors.type.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.type.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.type.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.type.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
                                         >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.website.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
                                     </template>
-                                </q-input>
-                            </div>
-                            <div class="col-3">
-                                <q-input 
-                                    v-model="contactNo" 
-                                    outlined 
-                                    label="Contact No." 
-                                    :error="Errors.contactNo.type"
-                                    :no-error-icon="true"
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-radio 
+                            v-for="(v, index) in types" 
+                            v-model="type" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye" 
+                            :val="v.value" 
+                            :label="v.label"
+                            class="text-uppercase" 
+                        />
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">school website</span>
+                                <q-icon
+                                    :name="Errors.website.type ? 'error' : 'info'"
+                                    :color="Errors.website.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.contactNo.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.contactNo.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.website.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.website.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.website.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
+                            <q-input 
+                                v-model="website" 
+                                outlined 
+                                :error="Errors.website.type"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">school contact number</span>
+                                <q-icon
+                                    :name="Errors.contactNo.type ? 'error' : 'info'"
+                                    :color="Errors.contactNo.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.contactNo.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.contactNo.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.contactNo.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="contactNo" 
+                                outlined 
+                                :error="Errors.contactNo.type"
+                                :no-error-icon="true"
+                            />
                         </div>
                     </div>
                 </q-card-section>
@@ -463,7 +493,6 @@ const Save = async () => {
             `
         });
     } catch (e) {
-
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
             Toast.fire({
@@ -474,17 +503,12 @@ const Save = async () => {
                 `
             })
         }
-
     } finally {
-
-        ResetForm();
         submitLoading.value = false;
-
     }
 }
 
 const applyBackendErrors = (backendErrors) => {
-
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
@@ -503,16 +527,13 @@ const applyBackendErrors = (backendErrors) => {
 }
 
 const UpdateList = (data) => {
-
     const index = rows.value.findIndex(item => item.id === data.id)
     if (index !== -1) {
         rows.value[index] = data
     }
-
 }
 
 const Toggle = async () => {
-
     submitLoading.value = true;
     try {
         const response = isActive.value
@@ -539,11 +560,8 @@ const Toggle = async () => {
                 `
             })
         }
-
     } finally {
-
         submitLoading.value = false;
-
     }
 }
 

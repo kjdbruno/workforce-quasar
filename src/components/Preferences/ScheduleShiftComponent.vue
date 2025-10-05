@@ -46,94 +46,127 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-3">
-                                <q-select 
-                                    outlined 
-                                    v-model="classId" 
-                                    emit-value 
-                                    map-options 
-                                    use-input 
-                                    input-debounce="300" 
-                                    :options="filteredClasses" 
-                                    label="Choose Position" 
-                                    @filter="filterClassFn" 
-                                    :error="Errors.classId.type"
-                                    dropdown-icon="keyboard_arrow_down"
-                                    :no-error-icon="true"
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">choose class</span>
+                                <q-icon
+                                    :name="Errors.classId.type ? 'error' : 'info'"
+                                    :color="Errors.classId.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.classId.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.classId.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-select>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.classId.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.classId.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.classId.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-2">
-                                <q-input 
-                                    v-model="timeStart" 
-                                    outlined 
-                                    label="Time Start" 
-                                    mask="##:##"
-                                    fill-mask
-                                    :error="Errors.timeStart.type"
-                                    :no-error-icon="true"
+                            <q-select 
+                                outlined 
+                                v-model="classId" 
+                                emit-value 
+                                map-options 
+                                use-input 
+                                input-debounce="300" 
+                                :options="filteredClasses" 
+                                @filter="filterClassFn" 
+                                :error="Errors.classId.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">time start</span>
+                                <q-icon
+                                    :name="Errors.timeStart.type ? 'error' : 'info'"
+                                    :color="Errors.timeStart.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.timeStart.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.timeStart.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.timeStart.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.timeStart.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.timeStart.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-2">
-                                <q-input 
-                                    v-model="timeEnd" 
-                                    outlined 
-                                    label="Time End"
-                                    mask="##:##"
-                                    fill-mask 
-                                    :error="Errors.timeEnd.type"
-                                    :no-error-icon="true"
+                            <q-input 
+                                v-model="timeStart" 
+                                outlined 
+                                mask="##:##"
+                                fill-mask
+                                :error="Errors.timeStart.type"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">time end</span>
+                                <q-icon
+                                    :name="Errors.timeEnd.type ? 'error' : 'info'"
+                                    :color="Errors.timeEnd.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.timeEnd.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.timeEnd.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.timeEnd.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.timeEnd.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.timeEnd.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
+                            <q-input 
+                                v-model="timeEnd" 
+                                outlined 
+                                mask="##:##"
+                                fill-mask 
+                                :error="Errors.timeEnd.type"
+                                :no-error-icon="true"
+                            />
                         </div>
                     </div>
                 </q-card-section>
@@ -198,7 +231,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -433,22 +467,18 @@ const Save = async () => {
             })
         }
     } finally {
-        ResetForm();
         submitLoading.value = false;
     }
 }
 
 const applyBackendErrors = (backendErrors) => {
-
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
-        
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
         Errors[key].messages = []
     })
-    
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
@@ -515,10 +545,10 @@ const createFilterFn = (sourceRef, targetRef) => {
 const filteredClasses = ref([]);
 const filterClassFn = createFilterFn(classes, filteredClasses);
 
-const LoadOptions = async () => {
+const LoadScheduleClasses = async () => {
     try {
-        const response = await api.get(`/option`);
-        classes.value = response.data.scheduleclass
+        const response = await api.get(`/option/scheduleclasses`);
+        classes.value = response.data
     } catch (error) {
         console.error("Error fetching options:", error);
     }
@@ -529,9 +559,12 @@ const formatTime = (time) => {
     return moment(time, 'HH:mm').format('hh:mm A')
 }
 
+onBeforeMount(() => {
+    LoadScheduleClasses();
+})
+
 onMounted(() => {
     LoadAll();
-    LoadOptions();
 })
 
 </script>

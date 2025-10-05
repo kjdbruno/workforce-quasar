@@ -47,91 +47,124 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-4">
-                                <q-input 
-                                    v-model="name" 
-                                    outlined 
-                                    label="Name" 
-                                    :error="Errors.name.type"
-                                    :no-error-icon="true"
+                    <div class="row q-col-gutter-xs q-mb-xs">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">holiday name</span>
+                                <q-icon
+                                    :name="Errors.name.type ? 'error' : 'info'"
+                                    :color="Errors.name.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.name.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.name.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.name.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.name.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.name.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-2">
-                                <q-input 
-                                    v-model="date" 
-                                    outlined 
-                                    label="Date" 
-                                    :error="Errors.date.type" 
-                                    type="date"
-                                    :no-error-icon="true"
+                            <q-input 
+                                v-model="name" 
+                                outlined 
+                                :error="Errors.name.type"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">date</span>
+                                <q-icon
+                                    :name="Errors.date.type ? 'error' : 'info'"
+                                    :color="Errors.date.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.date.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.date.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.date.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.date.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.date.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
-                            <div class="col-2">
-                                <q-select 
-                                    outlined 
-                                    v-model="payId" 
-                                    emit-value 
-                                    map-options 
-                                    use-input 
-                                    input-debounce="300" 
-                                    :options="filteredPays" 
-                                    label="Choose Premium Pay" 
-                                    @filter="filterPayFn" 
-                                    :error="formErrors.payId.type"
-                                    dropdown-icon="keyboard_arrow_down"
-                                    :no-error-icon="true"
+                            <q-input 
+                                v-model="date" 
+                                outlined 
+                                :error="Errors.date.type" 
+                                type="date"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">premium pay</span>
+                                <q-icon
+                                    :name="Errors.payId.type ? 'error' : 'info'"
+                                    :color="Errors.payId.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
                                 >
-                                    <template v-slot:append>
-                                        <q-icon 
-                                            v-if="Errors.payId.type" 
-                                            name="error" 
-                                            color="negative" 
-                                            class="cursor-pointer"
-                                            size="xs"
-                                        >
-                                            <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                                <div v-for="(msg, i) in Errors.payId.messages" :key="i" class="text-capitalize">
-                                                    <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </q-tooltip>
-                                        </q-icon>
-                                    </template>
-                                </q-select>
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.payId.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.payId.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.payId.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
                             </div>
+                            <q-select 
+                                outlined 
+                                v-model="payId" 
+                                emit-value 
+                                map-options 
+                                use-input 
+                                input-debounce="300" 
+                                :options="filteredPays" 
+                                @filter="filterPayFn" 
+                                :error="Errors.payId.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
                     </div>
                 </q-card-section>
@@ -196,7 +229,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import moment from 'moment'
@@ -248,7 +282,7 @@ const Validations = () => {
 
     if (!date.value) {
         Errors.date.type = true
-        Errors.name.messages.push('date is required')
+        Errors.date.messages.push('date is required')
         isError = true
     } else {
         Errors.date.type = null
@@ -256,7 +290,7 @@ const Validations = () => {
 
     if (!payId.value) {
         Errors.payId.type = true
-        Errors.name.messages.push('premium pay is required')
+        Errors.payId.messages.push('premium pay is required')
         isError = true
     } else {
         Errors.payId.type = null
@@ -356,7 +390,7 @@ const LastPage = () => {
 
 const NewDialog = () => {
     ResetForm();
-    LoadOptions();
+    LoadPremiumPays();
     dialog.value = true;
     isEdit.value = false;
 }
@@ -369,7 +403,7 @@ const ModifyDialog = async (data) => {
     name.value = data.name;
     date.value = data.date;
     if (!premiumpays.value.length) {
-        await LoadOptions();
+        await LoadPremiumPays();
     }
     filteredPays.value = [...premiumpays.value];
     payId.value = premiumpays.value.find(p => p.value === data.payId)?.value || null;
@@ -427,22 +461,18 @@ const Save = async () => {
             })
         }
     } finally {
-        ResetForm();
         submitLoading.value = false;
     }
 }
 
 const applyBackendErrors = (backendErrors) => {
-
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
-        
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
         Errors[key].messages = []
     })
-    
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
@@ -509,19 +539,20 @@ const createFilterFn = (sourceRef, targetRef) => {
 const filteredPays = ref([]);
 const filterPayFn = createFilterFn(premiumpays, filteredPays);
 
-const LoadOptions = async () => {
+const LoadPremiumPays = async () => {
     try {
-        const response = await api.get(`/option`);
-        premiumpays.value = response.data.premiumpay;
+        const response = await api.get(`/option/premiumpays`);
+        premiumpays.value = response.data;
     } catch (error) {
         console.error("Error fetching all options:", error);
-    } finally {
-
     }
 }
 
+onBeforeMount(() => {
+    LoadPremiumPays();
+})
+
 onMounted(() => {
-    LoadOptions();
     LoadAll();
 })
 

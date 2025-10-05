@@ -98,7 +98,7 @@ body {
 }
 
 /* Fixed card size */
-.card {
+.card-anim-wrapper .card {
     width: 225px;
     height: 250px;
     display: flex;
@@ -115,7 +115,38 @@ body {
 }
 
 /* Hover zoom */
-.card-hover-animate:hover {
+.card-anim-wrapper .card-hover-animate:hover {
+    transform: translateY(-4px) scale(1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Wrapper for animation */
+.recruitment-card-anim-wrapper {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: fadeSlideUp 0.52s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+/* Fixed card size */
+.recruitment-card-anim-wrapper .card {
+    width: 225px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+
+    transform: translateY(0) scale(1);
+    transition: transform 220ms cubic-bezier(.2,.8,.2,1), 
+                box-shadow 220ms ease;
+    will-change: transform, box-shadow;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Hover zoom */
+.recruitment-card-anim-wrapper .card-hover-animate:hover {
     transform: translateY(-4px) scale(1);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
@@ -136,7 +167,7 @@ body {
     }
 }
 
-// .q-field__append i
-// {
-//     display: none;
-// }
+.q-dialog.profile-dialog .dialog-card {
+    width: 30vw;
+    max-width: 100%;
+}

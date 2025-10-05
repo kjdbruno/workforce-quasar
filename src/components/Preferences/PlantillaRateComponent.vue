@@ -1,44 +1,44 @@
 <template>
   <div>
         <div class="card-grid">
-        <div class="card-anim-wrapper">
-            <q-card
-                key="data-add"
-                class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                v-ripple
-                @click="NewDialog()"
-            >
-                <q-card-section class="text-center">
-                    <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
-                </q-card-section>
-            </q-card>
-        </div>
+            <div class="card-anim-wrapper">
+                <q-card
+                    key="data-add"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    @click="NewDialog()"
+                >
+                    <q-card-section class="text-center">
+                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                    </q-card-section>
+                </q-card>
+            </div>
 
-        <div
-            v-for="(data, index) in rows"
-            :key="`data-${data.id}`"
-            class="card-anim-wrapper"
-            :style="{ animationDelay: `${index * 120}ms` }"
-        >
-            <q-card
-                @click="ModifyDialog(data)"
-                class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                v-ripple
+            <div
+                v-for="(data, index) in rows"
+                :key="`data-${data.id}`"
+                class="card-anim-wrapper"
+                :style="{ animationDelay: `${index * 120}ms` }"
             >
-                    <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data.class?.name }}</div>
-                    </q-card-section>
-                    <q-card-section class="full-width">
-                        <div class="text-caption text-grey">{{ data.grade?.name }}</div>
-                    </q-card-section>
-                    <div
-                        class="absolute-top-left q-ma-sm"
-                        style="width: 7px; height: 7px; border-radius: 50%;"
-                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
-                    ></div>
-            </q-card>
+                <q-card
+                    @click="ModifyDialog(data)"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                >
+                        <q-card-section class="text-center full-width">
+                            <div class="text-subtitle2 text-uppercase">{{ data.class?.name }}</div>
+                        </q-card-section>
+                        <q-card-section class="full-width">
+                            <div class="text-caption text-grey">{{ data.grade?.name }}</div>
+                        </q-card-section>
+                        <div
+                            class="absolute-top-left q-ma-sm"
+                            style="width: 7px; height: 7px; border-radius: 50%;"
+                            :class="data.isActive ? 'bg-positive' : 'bg-negative'"
+                        ></div>
+                </q-card>
+            </div>
         </div>
-    </div>
 
     <!-- Dialog -->
     <q-dialog v-model="dialog" full-height position="right" persistent square>
@@ -48,167 +48,240 @@
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                <div>
-                    <div class="row q-col-gutter-xs q-mb-xs">
-                        <div class="col-4">
-                            <q-select
-                                outlined
-                                v-model="classId"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredClasses"
-                                label="Choose Salary Class"
-                                @filter="filterClassFn"
-                                :error="Errors.classId.type"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
+                <div class="row q-col-gutter-xs q-mb-md">
+                    <div class="col-3">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose salary class</span>
+                            <q-icon
+                                :name="Errors.classId.type ? 'error' : 'info'"
+                                :color="Errors.classId.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
                             >
-                                <template v-slot:append>
-                                    <q-icon
-                                        v-if="Errors.classId.type"
-                                        name="error"
-                                        color="negative"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                            <div v-for="(msg, i) in Errors.classId.messages" :key="i" class="text-capitalize">
-                                                <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </template>
-                            </q-select>
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.classId.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.classId.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.classId.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
                         </div>
-                        <div class="col-4">
-                            <q-select
-                                outlined
-                                v-model="gradeId"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredGrades"
-                                label="Choose Salary Grade"
-                                @filter="filterGradeFn"
-                                :error="Errors.gradeId.type"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
+                        <q-select
+                            outlined
+                            v-model="classId"
+                            emit-value
+                            map-options
+                            use-input
+                            input-debounce="300"
+                            :options="filteredClasses"
+                            @filter="filterClassFn"
+                            :error="Errors.classId.type"
+                            dropdown-icon="keyboard_arrow_down"
+                            :no-error-icon="true"
+                        >
+                            <template v-slot:no-option>
+                                <q-item>
+                                    <q-item-section class="text-italic text-grey">
+                                    No options
+                                    </q-item-section>
+                                </q-item>
+                            </template>
+                        </q-select>
+                    </div>
+                    <div class="col-3">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose salary grade</span>
+                            <q-icon
+                                :name="Errors.gradeId.type ? 'error' : 'info'"
+                                :color="Errors.gradeId.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
                             >
-                                <template v-slot:append>
-                                    <q-icon
-                                        v-if="Errors.gradeId.type"
-                                        name="error"
-                                        color="negative"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                            <div v-for="(msg, i) in Errors.gradeId.messages" :key="i" class="text-capitalize">
-                                                <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </template>
-                            </q-select>
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.gradeId.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.gradeId.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.gradeId.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-select
+                            outlined
+                            v-model="gradeId"
+                            emit-value
+                            map-options
+                            use-input
+                            input-debounce="300"
+                            :options="filteredGrades"
+                            @filter="filterGradeFn"
+                            :error="Errors.gradeId.type"
+                            dropdown-icon="keyboard_arrow_down"
+                            :no-error-icon="true"
+                        >
+                            <template v-slot:no-option>
+                                <q-item>
+                                    <q-item-section class="text-italic text-grey">
+                                    No options
+                                    </q-item-section>
+                                </q-item>
+                            </template>
+                        </q-select>
+                    </div>
+                </div>
+                <div class="row q-col-gutter-xs">
+                    <div class="col-2">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">step increment</span>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">Monthly Compensation</span>
+                            <q-icon
+                                :name="Errors.globalMessages?.monthly?.length ? 'error' : 'info'"
+                                :color="Errors.globalMessages?.monthly?.length ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip
+                                    anchor="top middle"
+                                    self="center middle"
+                                    :class="Errors.globalMessages?.monthly?.length ? 'bg-negative' : 'bg-grey'"
+                                >
+                                    <template v-if="Errors.globalMessages?.monthly?.length">
+                                        <div
+                                            v-for="(msg, i) in Errors.globalMessages.monthly"
+                                            :key="i"
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">daily Compensation</span>
+                            <q-icon
+                                :name="Errors.globalMessages?.daily?.length ? 'error' : 'info'"
+                                :color="Errors.globalMessages?.daily?.length ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip
+                                    anchor="top middle"
+                                    self="center middle"
+                                    :class="Errors.globalMessages?.daily?.length ? 'bg-negative' : 'bg-grey'"
+                                >
+                                    <template v-if="Errors.globalMessages?.daily?.length">
+                                        <div
+                                            v-for="(msg, i) in Errors.globalMessages.daily"
+                                            :key="i"
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">hourly Compensation</span>
+                            <q-icon
+                                :name="Errors.globalMessages?.hourly?.length ? 'error' : 'info'"
+                                :color="Errors.globalMessages?.hourly?.length ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip
+                                    anchor="top middle"
+                                    self="center middle"
+                                    :class="Errors.globalMessages?.hourly?.length ? 'bg-negative' : 'bg-grey'"
+                                >
+                                    <template v-if="Errors.globalMessages?.hourly?.length">
+                                        <div
+                                            v-for="(msg, i) in Errors.globalMessages.hourly"
+                                            :key="i"
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
                         </div>
                     </div>
                 </div>
-
-                <div class="q-mt-xl">
-                    <div class="row q-col-gutter-xs q-mb-xs" v-for="(value, index) in steps" :key="index">
-                        <div class="col-2">
-                            <q-input v-model="value.name" outlined label="Step Increment" readonly />
-                        </div>
-                        <div class="col-2">
-                            <q-input
-                                v-model="value.monthlyCompensation"
-                                outlined
-                                label="Monthly"
-                                :error="Errors.rates[index]?.monthlyCompensation?.type"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:append>
-                                    <q-icon
-                                        v-if="Errors.rates[index]?.monthlyCompensation?.type"
-                                        name="error"
-                                        color="negative"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                            <div
-                                                v-for="(msg, i) in Errors.rates[index]?.monthlyCompensation?.messages"
-                                                :key="i"
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg }}
-                                            </div>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </template>
-                            </q-input>
-                        </div>
-                        <div class="col-2">
-                            <q-input
-                                v-model="value.dailyCompensation"
-                                outlined
-                                label="Daily"
-                                :error="Errors.rates[index]?.dailyCompensation?.type"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:append>
-                                    <q-icon
-                                        v-if="Errors.rates[index]?.dailyCompensation?.type"
-                                        name="error"
-                                        color="negative"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                            <div
-                                                v-for="(msg, i) in Errors.rates[index]?.dailyCompensation?.messages"
-                                                :key="i"
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg }}
-                                            </div>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </template>
-                            </q-input>
-                        </div>
-                        <div class="col-2">
-                            <q-input
-                                v-model="value.hourlyCompensation"
-                                outlined
-                                label="Hourly"
-                                :error="Errors.rates[index]?.hourlyCompensation?.type"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:append>
-                                    <q-icon
-                                        v-if="Errors.rates[index]?.hourlyCompensation?.type"
-                                        name="error"
-                                        color="negative"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" class="bg-negative">
-                                            <div
-                                                v-for="(msg, i) in Errors.rates[index]?.hourlyCompensation?.messages"
-                                                :key="i"
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs"/>&nbsp;{{ msg }}
-                                            </div>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </template>
-                            </q-input>
-                        </div>
+                <div class="row q-col-gutter-xs q-mb-xs" v-for="(value, index) in steps" :key="index">
+                    <div class="col-2">
+                        <q-input 
+                            v-model="value.name" 
+                            outlined  
+                            readonly 
+                        />
+                    </div>
+                    <div class="col-2">
+                        <q-input
+                            v-model="value.monthlyCompensation"
+                            outlined
+                            :error="Errors.rates[index]?.monthlyCompensation?.type"
+                            :no-error-icon="true"
+                        />
+                    </div>
+                    <div class="col-2">
+                        <q-input
+                            v-model="value.dailyCompensation"
+                            outlined
+                            :error="Errors.rates[index]?.dailyCompensation?.type"
+                            :no-error-icon="true"
+                        />
+                    </div>
+                    <div class="col-2">
+                        <q-input
+                            v-model="value.hourlyCompensation"
+                            outlined
+                            :error="Errors.rates[index]?.hourlyCompensation?.type"
+                            :no-error-icon="true"
+                        />
                     </div>
                 </div>
             </q-card-section>
@@ -267,7 +340,7 @@
 
 <script setup>
 import { usePreferenceStore } from 'src/stores/preference-store';
-import { reactive, ref, watch, onMounted } from 'vue';
+import { reactive, ref, watch, onMounted, onBeforeMount } from 'vue';
 import { api } from 'src/boot/axios';
 import { Toast } from 'src/boot/sweetalert';
 
@@ -330,23 +403,37 @@ const Validations = () => {
         isError = true;
     }
 
+    const globalMessages = {
+        monthly: new Set(),
+        daily: new Set(),
+        hourly: new Set()
+    };
+
     steps.value.forEach((q, index) => {
         if (!q.monthlyCompensation || isNaN(q.monthlyCompensation) || Number(q.monthlyCompensation) <= 0) {
-            Errors.rates[index].monthlyCompensation.type = true;
-            Errors.rates[index].monthlyCompensation.messages.push('Monthly compensation is required and must be valid');
-            isError = true;
+        Errors.rates[index].monthlyCompensation.type = true;
+        globalMessages.monthly.add('Monthly compensation is required and must be valid');
+        isError = true;
         }
+
         if (!q.dailyCompensation || isNaN(q.dailyCompensation) || Number(q.dailyCompensation) <= 0) {
-            Errors.rates[index].dailyCompensation.type = true;
-            Errors.rates[index].dailyCompensation.messages.push('Daily compensation is required and must be valid');
-            isError = true;
+        Errors.rates[index].dailyCompensation.type = true;
+        globalMessages.daily.add('Daily compensation is required and must be valid');
+        isError = true;
         }
+
         if (!q.hourlyCompensation || isNaN(q.hourlyCompensation) || Number(q.hourlyCompensation) <= 0) {
-            Errors.rates[index].hourlyCompensation.type = true;
-            Errors.rates[index].hourlyCompensation.messages.push('Hourly compensation is required and must be valid');
-            isError = true;
+        Errors.rates[index].hourlyCompensation.type = true;
+        globalMessages.hourly.add('Hourly compensation is required and must be valid');
+        isError = true;
         }
     });
+
+    Errors.globalMessages = {
+        monthly: Array.from(globalMessages.monthly),
+        daily: Array.from(globalMessages.daily),
+        hourly: Array.from(globalMessages.hourly)
+    };
 
     if (isError) {
         Toast.fire({
@@ -409,10 +496,33 @@ watch(filter, () => {
     LoadAll();
 });
 
-const NextPage = () => { if (page.value < meta.value.TotalPages) { page.value++; LoadAll(); } };
-const PreviousPage = () => { if (page.value > 1) { page.value--; LoadAll(); } };
-const FirstPage = () => { if (page.value > 1) { page.value = 1; LoadAll(); } };
-const LastPage = () => { if (page.value < meta.value.TotalPages) { page.value = meta.value.TotalPages; LoadAll(); } };
+const NextPage = () => { 
+    if (page.value < meta.value.TotalPages) { 
+        page.value++; 
+        LoadAll(); 
+    }
+};
+
+const PreviousPage = () => { 
+    if (page.value > 1) { 
+        page.value--; 
+        LoadAll(); 
+    } 
+};
+
+const FirstPage = () => { 
+    if (page.value > 1) { 
+        page.value = 1; 
+        LoadAll(); 
+    } 
+};
+
+const LastPage = () => { 
+    if (page.value < meta.value.TotalPages) { 
+        page.value = meta.value.TotalPages;
+        LoadAll(); 
+    } 
+};
 
 const increments = ref([]);
 const classes = ref([]);
@@ -432,8 +542,11 @@ const ModifyDialog = async (data) => {
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
-    if (!classes.value.length || !grades.value.length) {
-        await LoadOptions();
+    if (!classes.value.length) {
+        await LoadSalaryClasses();
+    }
+    if (!grades.value.length) {
+        await LoadSalaryGrades();
     }
     filteredClasses.value = [...classes.value];
     filteredGrades.value = [...grades.value];
@@ -451,6 +564,17 @@ const ResetForm = () => {
     Errors.classId.type = null;
     Errors.gradeId.type = null;
     Errors.rates = [];
+    Errors.rates = steps.value.map(() => ({
+        monthlyCompensation: { type: null, messages: [] },
+        dailyCompensation: { type: null, messages: [] },
+        hourlyCompensation: { type: null, messages: [] }
+    }));
+
+    Errors.globalMessages = {
+        monthly: [],
+        daily: [],
+        hourly: []
+    };
 };
 
 const Save = async () => {
@@ -482,7 +606,6 @@ const Save = async () => {
             Toast.fire({ icon: "error", html: `<div class="text-h6 text-bold text-uppercase">Request Failed</div><div class="text-caption">Something went wrong.</div>` });
         }
     } finally {
-        ResetForm();
         submitLoading.value = false;
     }
 };
@@ -515,11 +638,17 @@ const Toggle = async () => {
             : await api.post(`/rate/${id.value}/enable`);
         dialog.value = false;
         UpdateList(response.data.rate);
-        Toast.fire({ icon: "success", html: `<div class="text-h6 text-bold text-uppercase">granted!</div><div class="text-caption text-capitalize;">${response.data.message}<div>` });
+        Toast.fire({ 
+            icon: "success", 
+            html: `<div class="text-h6 text-bold text-uppercase">granted!</div><div class="text-caption text-capitalize;">${response.data.message}<div>` 
+        });
     } catch (e) {
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
-            Toast.fire({ icon: "error", html: `<div class="text-h6 text-bold text-uppercase">Request Failed</div><div class="text-caption">Something went wrong.</div>` });
+            Toast.fire({ 
+                icon: "error", 
+                html: `<div class="text-h6 text-bold text-uppercase">Request Failed</div><div class="text-caption">Something went wrong.</div>` 
+            });
         }
     } finally {
         submitLoading.value = false;
@@ -541,27 +670,44 @@ const createFilterFn = (sourceRef, targetRef) => {
 const filterClassFn = createFilterFn(classes, filteredClasses);
 const filterGradeFn = createFilterFn(grades, filteredGrades);
 
-const LoadOptions = async () => {
+const LoadSalaryClasses = async () => {
     try {
-        const response = await api.get(`/option`);
-        classes.value = response.data.salaryclass;
-        grades.value = response.data.salarygrade;
-        increments.value = response.data.increment || [];
+        const response = await api.get(`/option/salaryclasses`);
+        classes.value = response.data;
     } catch (error) {
         console.error("Error fetching options:", error);
     }
 };
 
+const LoadSalaryGrades = async () => {
+    try {
+        const response = await api.get(`/option/salarygrades`);
+        grades.value = response.data;
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+const LoadIncrements = async () => {
+    try {
+        const response = await api.get(`/option/increments`);
+        increments.value = response.data || [];
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+onBeforeMount(() => {
+    LoadSalaryClasses();
+    LoadSalaryGrades();
+    LoadIncrements();
+})
+
 onMounted(() => {
     LoadAll();
-    LoadOptions();
 });
 </script>
 
 <style scoped>
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-}
+
 </style>

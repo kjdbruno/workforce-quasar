@@ -26,10 +26,10 @@
                     v-ripple
                     >
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data.user?.profile) }}</div>
                     </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption text-grey">{{ data.alias }}</div>
+                    <q-card-section class="full-width">
+                        <div class="text-caption text-grey">{{ data.type?.name }}</div>
                     </q-card-section>
                     <div
                         class="absolute-top-left q-ma-sm"
@@ -42,24 +42,24 @@
         <q-dialog v-model="dialog" full-height position="right" persistent square>
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify department' : 'create new department' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify signatory profile' : 'create new signatory profile' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">department name</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select employee</span>
                                 <q-icon
-                                    :name="Errors.name.type ? 'error' : 'info'"
-                                    :color="Errors.name.type ? 'negative' : 'grey'"
+                                    :name="Errors.userId.type ? 'error' : 'info'"
+                                    :color="Errors.userId.type ? 'negative' : 'grey'"
                                     class="cursor-pointer"
                                     size="xs"
                                 >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.name.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.name.type">
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.userId.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.userId.type">
                                             <div 
-                                                v-for="(msg, i) in Errors.name.messages" 
+                                                v-for="(msg, i) in Errors.userId.messages" 
                                                 :key="i" 
                                                 class="text-capitalize"
                                             >
@@ -74,26 +74,33 @@
                                     </q-tooltip>
                                 </q-icon>
                             </div>
-                            <q-input 
-                                v-model="name" 
+                            <q-select 
                                 outlined 
-                                :error="Errors.name.type"
+                                v-model="userId" 
+                                emit-value 
+                                map-options 
+                                use-input 
+                                input-debounce="300" 
+                                :options="filteredUsers" 
+                                @filter="filterUserFn" 
+                                :error="Errors.userId.type"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             />
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">department alias</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">upload signature</span>
                                 <q-icon
-                                    :name="Errors.alias.type ? 'error' : 'info'"
-                                    :color="Errors.alias.type ? 'negative' : 'grey'"
+                                    :name="Errors.signature.type ? 'error' : 'info'"
+                                    :color="Errors.signature.type ? 'negative' : 'grey'"
                                     class="cursor-pointer"
                                     size="xs"
                                 >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.alias.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.alias.type">
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.signature.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.signature.type">
                                             <div 
-                                                v-for="(msg, i) in Errors.alias.messages" 
+                                                v-for="(msg, i) in Errors.signature.messages" 
                                                 :key="i" 
                                                 class="text-capitalize"
                                             >
@@ -108,19 +115,58 @@
                                     </q-tooltip>
                                 </q-icon>
                             </div>
-                            <q-input 
-                                v-model="alias" 
+                            <q-file 
                                 outlined 
-                                :error="Errors.alias.type"
+                                v-model="signature"
+                                accept=".jpg,.jpeg,.png"
+                                :error="Errors.signature.type"
                                 :no-error-icon="true"
+                                clearable
                             />
                         </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">document type</span>
+                            <q-icon
+                                :name="Errors.typeId.type ? 'error' : 'info'"
+                                :color="Errors.typeId.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.typeId.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.typeId.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.typeId.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-radio 
+                            v-for="(v, index) in types" 
+                            v-model="typeId" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye" 
+                            :val="v.value" 
+                            :label="v.label"
+                            class="text-uppercase" 
+                        />
                     </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
+                        <q-btn v-if="!isEdit && !isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
@@ -178,7 +224,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -192,21 +239,28 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const name = ref('');
-const alias = ref('');
+const userId = ref('');
+const typeId = ref('');
+const signature = ref(null);
 const isActive = ref(false);
 
 const Errors = reactive({
-    name: { 
+    userId: { 
         type: null, messages: []
     },
-    alias: {
+    typeId: { 
+        type: null, messages: []
+    },
+    level: { 
+        type: null, messages: []
+    },
+    signature: { 
         type: null, messages: []
     }
 });
 
 const Validations = () => {
-    
+
     let isError = false;
 
     Object.keys(Errors).forEach(key => {
@@ -214,19 +268,28 @@ const Validations = () => {
         Errors[key].messages = [];
     });
 
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.messages.push('Name is required')
+    if (!userId.value) {
+        Errors.userId.type = true;
+        Errors.userId.messages.push('User/Employee is required')
         isError = true
     } else {
-        Errors.name.type = null
+        Errors.userId.type = null
     }
-    if (!alias.value) {
-        Errors.alias.type = true
-        Errors.alias.messages.push('alias is required')
+
+    if (!typeId.value) {
+        Errors.typeId.type = true;
+        Errors.typeId.messages.push('Type is required')
         isError = true
     } else {
-        Errors.alias.type = null
+        Errors.typeId.type = null
+    }
+
+    if (!signature.value) {
+        Errors.signature.type = true;
+        Errors.signature.messages.push('signature is required')
+        isError = true
+    } else {
+        Errors.signature.type = null
     }
 
     if (isError) {
@@ -239,7 +302,7 @@ const Validations = () => {
         })
     }
 
-    return !isError;
+    return !isError
 }
 
 const rows = ref([]);
@@ -254,7 +317,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/department`, {
+        const { data } = await api.get(`/signatoryprofile`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -320,50 +383,61 @@ const LastPage = () => {
     }
 }
 
+
 const NewDialog = () => {
     ResetForm();
     dialog.value = true;
     isEdit.value = false;
 }
 
-const ModifyDialog = (data) => {
+const ModifyDialog = async (data) => {
     ResetForm();
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
-    name.value = data.name;
-    alias.value = data.alias;
+    if (!users.value.length) {
+        await LoadSignatories();
+    }
+    if (!types.value.length) {
+        await LoadSignatoryTypes();
+    }
+    filteredUsers.value = [...users.value];
+    userId.value = users.value.find(p => p.value === data.userId)?.value || null;
+    if (data.signature) {
+        const response = await fetch(`/public/signatures/${data.signature}`);
+        const blob = await response.blob();
+        signature.value = new File([blob], data.signature, { type: blob.type });
+    }
+    typeId.value = data.typeId;
     isActive.value = (data.isActive ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
-    name.value = '';
-    alias.value = '';
+    userId.value = '';
+    typeId.value = '';
+    signature.value = null;
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.alias.type = null;
+    Errors.userId.type = null;
+    Errors.typeId.type = null;
+    Errors.signature.type = null;
 }
 
 const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
-        const response = id.value && isEdit
-            ? await api.post(`/department/${id.value}/update`, {
-                name: name.value,
-                alias: alias.value
-            })
-            : await api.post('/department', {
-                name: name.value,
-                alias: alias.value
+        const form = new FormData();
+        form.append("userId", userId.value);
+        form.append("typeId", typeId.value);
+        form.append("file", signature.value);
+        const response = await api.post('/signatoryprofile', form, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
             });
         dialog.value = false;
-        if (id.value && isEdit) {
-            UpdateList(response.data.department);
-        } else {
-            LoadAll();
-        }
+        LoadAll();
         Toast.fire({
             icon: "success",
             html: `
@@ -414,10 +488,10 @@ const Toggle = async () => {
     submitLoading.value = true;
     try {
         const response = isActive.value
-            ? await api.post(`/department/${id.value}/disable`)
-            : await api.post(`/department/${id.value}/enable`)
+            ? await api.post(`/signatoryprofile/${id.value}/disable`)
+            : await api.post(`/signatoryprofile/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.department)
+        UpdateList(response.data.signatory)
         Toast.fire({
             icon: "success",
             html: `
@@ -440,6 +514,61 @@ const Toggle = async () => {
         submitLoading.value = false;
     }
 }
+
+const types = ref([]);
+const users = ref([]);
+
+const createFilterFn = (sourceRef, targetRef) => {
+    return (val, update) => {
+        update(() => {
+            if (!val) {
+                targetRef.value = [];
+            } else {
+                const needle = val.toLowerCase().trim()
+                targetRef.value = sourceRef.value
+                    .filter(v => (v.label ?? '').toLowerCase().includes(needle))
+                    .slice(0, 5)
+            }
+        })
+    }
+}
+
+const filteredUsers = ref([]);
+const filterUserFn = createFilterFn(users, filteredUsers);
+
+const LoadSignatories = async () => {
+    try {
+        const response = await api.get(`/option/signatories`);
+        users.value = response.data;
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+const LoadSignatoryTypes = async () => {
+    try {
+        const response = await api.get(`/option/signatorytypes`);
+        types.value = response.data;
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+const formatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.firstname || '';
+    const middlename = profile.middlename
+        ? profile.middlename.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.lastname || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+onBeforeMount(() => {
+    LoadSignatoryTypes();
+    LoadSignatories();
+})
 
 onMounted(() => {
     LoadAll();

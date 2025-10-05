@@ -1,125 +1,293 @@
 <template>
     <div>
-        <transition-group name="fade-slide" tag="div" class="q-gutter-md row q-col-gutter-md">
-            <q-card v-for="(data, index) in filteredUsers" :key="index" class="card col-xs-12 col-sm-4 col-md-3 col-lg-3 flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
-                <q-card-section class="text-center">
-                    <div class="text-body1 text-uppercase">{{ data.name }}</div>
-                </q-card-section>
-                <q-card-actions>
-                    <div class="text-caption">{{ data.level }}</div>
-                </q-card-actions>
-                <div class="card-overlay absolute-full flex flex-center text-center">
-                    <div class="q-gutter-xs">
-                        <q-btn v-if="data.isActive" unelevated size="sm" round color="primary" icon="edit" @click="() => { dialog = true; isEdit = true; OpenDialog(data); }">
-                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">modify</q-tooltip>
-                        </q-btn>
-                        <q-btn v-if="data.isActive" unelevated size="sm" round color="primary" icon="delete">
-                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">disable</q-tooltip>
-                        </q-btn>
-                        <q-btn v-if="!data.isActive" unelevated size="sm" round color="primary" icon="check">
-                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">enable</q-tooltip>
-                        </q-btn>
-                    </div>
-                </div>
-            </q-card>
-        </transition-group>
-        <q-page-sticky position="bottom-left" :offset="[18, 18]">
-            <q-card class="no-shadow radius-xs">
-                <q-card-section>
-                    <q-input outlined dense debounce="300" v-model="filter" placeholder="Search...">
-                        <template v-slot:before>
-                            <q-btn unelevated size="sm" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
-                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
-                            </q-btn>
-                            <q-btn unelevated size="sm" round color="primary" :label="meta.CurrentPage" outline>
-                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Current Page</q-tooltip>
-                            </q-btn>
-                            <q-btn unelevated size="sm" round color="primary" :label="meta.TotalPages" outline>
-                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Total Page</q-tooltip>
-                            </q-btn>
-                            <q-btn unelevated size="sm" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
-                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
-                            </q-btn>
-                        </template>
-                        <template v-slot:prepend>
-                            <q-icon name="search" style="font-size: 1rem;" />
-                        </template>
-                        <template v-slot:after>
-                            <q-btn unelevated size="md" color="primary" label="new record" @click="() => { dialog = true; isEdit = false; OpenDialog() }" />
-                        </template>
-                    </q-input>
-                </q-card-section>
-            </q-card>
-        </q-page-sticky>
-        <q-dialog v-model="dialog" full-height position="right" persistent>
+        <div class="card-grid">
+            <div class="card-anim-wrapper">
+                <q-card
+                    key="data-add"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    @click="NewDialog()"
+                >
+                    <q-card-section class="text-center">
+                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                    </q-card-section>
+                </q-card>
+            </div>
+            
+            <div
+                v-for="(data, index) in rows"
+                :key="`data-${data.id}`"
+                class="card-anim-wrapper"
+                :style="{ animationDelay: `${index * 120}ms` }"
+            >
+                <q-card
+                    @click="ModifyDialog(data)"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    >
+                    <q-card-section class="text-center full-width">
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data.profile) }}</div>
+                    </q-card-section>
+                    <q-card-section class="full-width">
+                        <div class="text-caption text-uppercase">{{ data.role?.name }}</div>
+                        <div class="text-caption text-grey">{{ data.level }}</div>
+                    </q-card-section>
+                    <div
+                        class="absolute-top-left q-ma-sm"
+                        style="width: 7px; height: 7px; border-radius: 50%;"
+                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
+                    ></div>
+                </q-card>
+            </div>
+        </div>
+        <q-dialog v-model="dialog" full-height position="right" persistent square>
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify user' : 'create new user' }}</div>
                 </q-card-section>
                 <q-separator inset />
-                <q-card-section class="col q-pa-lg">
-                    <div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-3">
-                                <q-select outlined v-model="level" emit-value map-options use-input input-debounce="300" :options="filteredLevels" label="Choose Level" @filter="filterLevel">
-                                    <template v-slot:option="scope">
-                                        <q-item v-bind="scope.itemProps">
-                                            <q-item-section>
-                                                <q-item-label class="text-uppercase">{{ scope.opt.label }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
+                <q-card-section class="col q-pa-lg scroll">
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">search employee</span>
+                                <q-icon
+                                    :name="Errors.profileId.type ? 'error' : 'info'"
+                                    :color="Errors.profileId.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.profileId.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.profileId.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.profileId.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-select 
+                                outlined 
+                                v-model="profileId" 
+                                emit-value 
+                                map-options 
+                                use-input 
+                                input-debounce="300" 
+                                :options="filteredProfiles" 
+                                @filter="filterProfileFn" 
+                                :error="Errors.profileId.type"
+                                hide-dropdown-icon
+                                :no-error-icon="true"
+                                clearable
+                            >
+                            </q-select>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">username</span>
+                                <q-icon
+                                    :name="Errors.username.type ? 'error' : 'info'"
+                                    :color="Errors.username.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.username.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.username.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.username.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="username" 
+                                outlined 
+                                :error="Errors.username.type" 
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">password</span>
+                                <q-icon
+                                    :name="Errors.password.type ? 'error' : 'info'"
+                                    :color="Errors.password.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.password.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.password.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.password.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="password" 
+                                :type="showPassword ? 'text' : 'password'"
+                                outlined 
+                                :error="Errors.password.type" 
+                                :no-error-icon="true"
+                            >
+                                <template v-slot:append>
+                                    <q-icon :name="showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" @click="showPassword = !showPassword" style="font-size: 1rem;" />
+                                </template>
+                            </q-input>
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">access level</span>
+                            <q-icon
+                                :name="Errors.level.type ? 'error' : 'info'"
+                                :color="Errors.level.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.level.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.level.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.level.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
                                     </template>
-                                </q-select>
-                            </div>
-                            <div class="col-6">
-                                <q-input v-if="level == 'Management'" v-model="name" outlined label="Name" />
-                                <q-select v-if="level == 'Employee'" outlined v-model="employee" emit-value map-options use-input fill-input input-debounce="300" :options="filteredEmployees" label="Choose Employee" @filter="filterEmployee">
-                                    <template v-slot:option="scope">
-                                        <q-item v-bind="scope.itemProps">
-                                            <q-item-section>
-                                                <q-item-label class="text-uppercase">{{ scope.opt.label }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
                                     </template>
-                                </q-select>
-                            </div>
+                                </q-tooltip>
+                            </q-icon>
                         </div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-3">
-                                <q-select outlined v-model="roleId" emit-value map-options :options="filteredRoles" label="Choose Role" fill-input input-debounce="300" @filter="filterRole"/>
-                            </div>
-                            
-                            <div class="col-3">
-                                <q-select outlined v-model="roleId" emit-value map-options :options="filteredDepartments" label="Choose Department" @filter="filterDepartment"/>
-                            </div>
+                        <q-radio v-model="level" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Management" label="Management"  class="text-uppercase" />
+                        <q-radio v-model="level" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Employee" label="Employee"  class="text-uppercase" />
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">user role</span>
+                            <q-icon
+                                :name="Errors.level.type ? 'error' : 'info'"
+                                :color="Errors.level.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.level.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.level.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.level.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
                         </div>
-                        <div class="row q-col-gutter-xs q-mb-xs">
-                            <div class="col-3">
-                                <q-input v-model="employeeNo" outlined label="Employee No." autofocus />
-                            </div>
-                            <div class="col-3">
-                                <q-input v-model="name" outlined label="Name" />
-                            </div>
-                            <div class="col-3">
-                                <q-input v-model="name" outlined label="Name" />
-                            </div>
-                        </div>
+                        <q-radio 
+                            v-for="(v, index) in roles" 
+                            v-model="roleId" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye" 
+                            :val="v.value" 
+                            :label="v.label" 
+                            class="text-uppercase" 
+                            :disable="isDisabled(v.value)"
+                        />
                     </div>
                 </q-card-section>
                 
-                <q-card-section>
+                <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn unelevated size="md" color="primary" class="text-capitalize" label="save" @click="Save" />
-                        <q-btn unelevated size="md" color="primary" class="text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
+                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
+                        <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
-                </q-card-section>
+                </q-card-actions>
+                <q-inner-loading :showing="submitLoading">
+                    <div class="text-center">
+                        <q-spinner-puff size="md"/>
+                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
+                    </div>
+                </q-inner-loading>
             </q-card>
         </q-dialog>
+        <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
+            <q-toolbar>
+                <q-toolbar-title class="text-caption text-uppercase">
+                    <div>© 2025 WORKFORCE. All Rights Reserved.</div>
+                </q-toolbar-title>
+                <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                    <template v-slot:before>
+                        <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
+                    </template>
+                    <template v-slot:after>
+                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
+                        </q-btn>
+                    </template>
+                    <template v-slot:prepend>
+                        <q-icon name="search" style="font-size: 1rem;" />
+                    </template>
+                </q-input>
+                <q-inner-loading :showing="loading">
+                    <q-spinner-puff size="md" />
+                </q-inner-loading>
+            </q-toolbar>
+        </q-footer>
     </div>
 </template>
 
 <script setup>
-
 import { 
     usePreferenceStore 
 } from 'src/stores/preference-store';
@@ -128,7 +296,8 @@ import {
     reactive,
     computed,
     onMounted,
-    ref 
+    ref, 
+    watch
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -140,468 +309,399 @@ const PreferenceStore = usePreferenceStore();
 const dialog = ref(false);
 const isEdit = ref(false);
 const submitLoading = ref(false);
-const toggleLoading = ref(false);
+const showPassword = ref(false);
 
 const id = ref('');
-const employeeNo = ref('');
-const name = ref('');
+const profileId = ref('');
 const username = ref('');
 const password = ref('');
 const roleId = ref('');
 const level = ref('');
-const avatar = ref('');
+const isActive = ref(false);
 
-const errors = ref([]);
-
-const formErrors = reactive({
-    employeeNo: { 
-        type: null 
+const Errors = reactive({
+    profileId: { 
+        type: null, messages: []
     },
-    name: { 
-        type: null 
+    username: {
+        type: null, messages: []
     },
-    username: { 
-        type: null 
-    },
-    password: { 
-        type: null 
+    password: {
+        type: null, messages: []
     },
     roleId: {
-        type: null
+        type: null, messages: []
     },
     level: {
-        type: null
-    },
-    avatar: {
-        type: null
+        type: null, messages: []
     }
 });
 
-const formValidations = () => {
-
-    errors.value = [];
+const Validations = () => {
 
     let isError = false;
 
-    if (!employeeNo.value) {
-        formErrors.employeeNo.type = true
-        errors.value.push({
-            type: 'field',
-            value: employeeNo.value,
-            msg: 'This field is required',
-            path: 'employeeNo',
-            location: 'body'
-        });
-        isError = true;
-    } else {
-        formErrors.employeeNo.type = null
-    }
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].messages = [];
+    });
 
-    if (!name.value) {
-        formErrors.name.type = true
-        errors.value.push({
-            type: 'field',
-            value: name.value,
-            msg: 'This field is required',
-            path: 'name',
-            location: 'body'
-        });
-        isError = true;
+    if (!profileId.value) {
+        Errors.profileId.type = true;
+        Errors.profileId.messages.push('Employee is required')
+        isError = true
     } else {
-        formErrors.name.type = null
+        Errors.profileId.type = null
     }
 
     if (!username.value) {
-        formErrors.username.type = true
-        errors.value.push({
-            type: 'field',
-            value: username.value,
-            msg: 'This field is required',
-            path: 'username',
-            location: 'body'
-        });
-        isError = true;
+        Errors.username.type = true;
+        Errors.username.messages.push('Username is required')
+        isError = true
     } else {
-        formErrors.username.type = null
+        Errors.username.type = null
     }
 
-    if (!password.value) {
-        formErrors.password.type = true
-        errors.value.push({
-            type: 'field',
-            value: password.value,
-            msg: 'This field is required',
-            path: 'password',
-            location: 'body'
-        });
-        isError = true;
-    } else if (password.value.length < 4) {
-        formErrors.password.type = true;
-        errors.value.push({
-            type: 'field',
-            value: password.value,
-            msg: 'Password must be at least 4 characters long',
-            path: 'password',
-            location: 'body'
-        });
-        isError = true;
-    } else {
-        formErrors.password.type = null;
+    if (isEdit) {
+        if (!password.value) {
+            Errors.password.type = true;
+            Errors.password.messages.push('Password is required')
+            isError = true
+        } else {
+            Errors.password.type = null
+        }
     }
 
     if (!roleId.value) {
-        formErrors.roleId.type = true
-        errors.value.push({
-            type: 'field',
-            value: roleId.value,
-            msg: 'This field is required',
-            path: 'roleId',
-            location: 'body'
-        });
-        isError = true;
+        Errors.roleId.type = true;
+        Errors.roleId.messages.push('Role is required')
+        isError = true
     } else {
-        formErrors.roleId.type = null
+        Errors.roleId.type = null
     }
 
     if (!level.value) {
-        formErrors.level.type = true
-        errors.value.push({
-            type: 'field',
-            value: level.value,
-            msg: 'This field is required',
-            path: 'level',
-            location: 'body'
-        });
-        isError = true;
+        Errors.level.type = true;
+        Errors.level.messages.push('Level is required')
+        isError = true
     } else {
-        formErrors.level.type = null
+        Errors.level.type = null
     }
 
-    if (!avatar.value || !avatar.value.files || avatar.value.files.length === 0) {
-        formErrors.avatar.type = true;
-        errors.value.push({
-            type: 'field',
-            value: null,
-            msg: 'This field is required',
-            path: 'file',
-            location: 'body'
-        });
-        isError = true;
-    } else {
-        const file = avatar.value.files[0];
-        const maxSize = 2 * 1024 * 1024;
-        if (file.size > maxSize) {
-            formErrors.avatar.type = true;
-            errors.value.push({
-                type: 'field',
-                value: avatar.value,
-                msg: 'File size must not exceed 2MB',
-                path: 'file',
-                location: 'body'
-            });
-            isError = true;
-        }
-        const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
-            formErrors.avatar.type = true;
-            errors.value.push({
-                type: 'field',
-                value: avatar.value,
-                msg: 'Only JPG, PNG, or PDF files are allowed',
-                path: 'file',
-                location: 'body'
-            });
-            isError = true;
-        }
+    if (isError) {
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                <div class="text-caption">Something went wrong.</div>
+            `
+        })
     }
 
     return !isError
 }
 
-const users = ref([]);
+const rows = ref([]);
 
 const meta = ref({});
 const page = ref(1);
-const limit = ref(15);
+const limit = ref(10);
 const loading = ref(false);
 
 const filter = ref('');
 
-const LoadAllUsers = async () => {
+const LoadAll = async () => {
     loading.value = true;
     try {
         const { data } = await api.get(`/user`, {
             params: { 
                 Page: page.value, 
-                Limit: limit.value 
+                Limit: limit.value,
+                Filter: filter.value || ''
             }
         });
-        users.value = data.data
-        meta.value = data.meta
+        rows.value = data.data;
+        meta.value = data.meta;
+
+        if (!rows.value.length) {
+            Toast.fire({
+                icon: "info",
+                html: `
+                <div class="text-h6 text-bold text-uppercase">Notice</div>
+                <div class="text-caption text-capitalize;">No records found!</div>
+                `
+            });
+        }
     } catch (error) {
-        console.error("Error fetching all users:", error);
+        console.error("Error fetching all data:", error);
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Error</div>
+                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+            `
+        });
     } finally {
-        loading.value = false
+        loading.value = false;
     }
 }
 
-const filteredUsers = computed(() => {
-    let data = users.value
-    if (filter.value) {
-        data = data.filter(v =>
-            v.name.toLowerCase().includes(filter.value.toLowerCase()) ||
-            v.username.toLowerCase().includes(filter.value.toLowerCase())
-        )
-    }
-    return data.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+watch(filter, () => {
+    page.value = 1;
+    LoadAll();
 })
 
 const NextPage = () => {
     if (page.value < meta.value.TotalPages) {
         page.value++
-        LoadAllUsers()
+        LoadAll()
     }
 }
 
 const PreviousPage = () => {
     if (page.value > 1) {
         page.value--
-        LoadAllUsers()
+        LoadAll()
     }
 }
 
-const OpenDialog = (data) => {
-    ResetForm();
-    if (isEdit) {
-        id.value = data.id;
-        employeeNo.value = data.employeeNo;
-        name.value = data.name;
-        username.value = data.username;
-        roleId.value = data.roleId;
-        level.value = data.level;
-        avatar.value = data.avatar;
+const FirstPage = () => {
+    if (page.value > 1) {
+        page.value = 1
+        LoadAll()
     }
+}
+
+const LastPage = () => {
+    if (page.value < meta.value.TotalPages) {
+        page.value = meta.value.TotalPages
+        LoadAll()
+    }
+}
+
+
+const NewDialog = () => {
+    ResetForm();
+    dialog.value = true;
+    isEdit.value = false;
+    LoadProfile();
+    LoadRole();
+}
+
+const ModifyDialog = async (data) => {
+    ResetForm();
+    dialog.value = true;
+    isEdit.value = true;
+    id.value = data.id;
+    if (!profiles.value.length) {
+        await LoadProfile();
+    }
+    filteredProfiles.value = [...profiles.value];
+    profileId.value = profiles.value.find(p => p.value === data.profileId)?.value || null;
+    username.value = data.username;
+    if (!roles.value.length) {
+        await LoadRole();
+    }
+    roleId.value = data.roleId;
+    level.value = data.level;
+    isActive.value = (data.isActive ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
-    employeeNo.value = '';
-    name.value = '';
+    profileId.value = '';
     username.value = '';
     password.value = '';
     roleId.value = '';
     level.value = '';
-    avatar.value = '';
-    formErrors.employeeNo.type = null;
-    formErrors.name.type = null;
-    formErrors.username.type = null;
-    formErrors.password.type = null;
-    formErrors.roleId.type = null;
-    formErrors.level.type = null;
-    formErrors.avatar.type = null;
+    isActive.value = false;
+    Errors.profileId.type = null;
+    Errors.username.type = null;
+    Errors.password.type = null;
+    Errors.roleId.type = null;
+    Errors.level.type = null;
 }
 
 const Save = async () => {
-    if (!formValidations()) return;
+    if (!Validations()) return;
     submitLoading.value = true;
     try {
-        const response = isEdit
+        const response = id.value && isEdit
             ? await api.post(`/user/${id.value}/update`, {
-                employeeNo: employeeNo.value,
-                name: name.value,
+                profileId: profileId.value,
                 username: username.value,
                 password: password.value,
                 roleId: roleId.value,
-                level: level.value,
-                avatar: avatar.value
+                level: level.value
             })
             : await api.post('/user', {
-                employeeNo: employeeNo.value,
-                name: name.value,
+                profileId: profileId.value,
                 username: username.value,
                 password: password.value,
                 roleId: roleId.value,
-                level: level.value,
-                avatar: avatar.value
+                level: level.value
             });
-            (isEdit ? UpdateList(response.data.user) : PushList(response.data.user))
-            ResetForm();
-            Toast.fire({
-                icon: "success",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">granted!</div>
-                    <div class="text-caption;">${response.data.message}<div>
-                `
-            });
+        dialog.value = false;
+        if (id.value && isEdit) {
+            UpdateList(response.data.user);
+        } else {
+            LoadAll();
+        }
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
     } catch (e) {
-        errors.value = [];
-        errors.value = e.response.data.errors;
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
     } finally {
         submitLoading.value = false;
     }
 }
 
-const PushList = (data) => {
-    users.value.push(data);
+const applyBackendErrors = (backendErrors) => {
+
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+        
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
 }
 
 const UpdateList = (data) => {
-    const index = users.value.findIndex(item => item.id === data.id)
+    const index = rows.value.findIndex(item => item.id === data.id)
     if (index !== -1) {
-        users.value[index] = data
+        rows.value[index] = data
     }
 }
 
-const Toggle = async (data) => {
-    toggleLoading.value = true;
+const Toggle = async () => {
+    submitLoading.value = true;
     try {
-        const response = data.isActive
-            ? await api.post(`/user/${data.id}/disable`)
-            : await api.post(`/user/${data.id}/enable`)
+        const response = isActive.value
+            ? await api.post(`/user/${id.value}/disable`)
+            : await api.post(`/user/${id.value}/enable`)
+        dialog.value = false;
         UpdateList(response.data.user)
         Toast.fire({
             icon: "success",
             html: `
                 <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption;">${response.data.message}<div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
             `
         });
     } catch (e) {
-        console.log(e);
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
     } finally {
-        toggleLoading.value = false;
+        submitLoading.value = false;
     }
 }
 
-const levels = ref([
-    { 
-        label: 'Management', 
-        value: 'Management' 
-    },
-    { 
-        label: 'Employee', 
-        value: 'Employee' 
-    }
-]);
-const employees = ref([]);
+
+const profiles = ref([]);
 const roles = ref([]);
-const departments = ref([]);
 
-const filteredRoles = ref(roles.value);
-const filteredEmployees = ref(employees.value);
-const filteredLevels = ref(levels.value);
-const filteredDepartments = ref(departments.value);
-
-const filterRole = (val, update) => {
-    if (val === '') {
+const createFilterFn = (sourceRef, targetRef) => {
+    return (val, update) => {
         update(() => {
-            filteredRoles.value = roles.value
+            if (!val) {
+                targetRef.value = [];
+            } else {
+                const needle = val.toLowerCase().trim()
+                targetRef.value = sourceRef.value
+                    .filter(v => (v.label ?? '').toLowerCase().includes(needle))
+                    .slice(0, 5)
+            }
         })
-        return
     }
-    update(() => {
-        const needle = val.toLowerCase()
-        filteredRoles.value = roles.value.filter(v =>
-            v.label.toLowerCase().includes(needle)
-        )
-    })
 }
 
-const filterEmployee = (val, update) => {
-    if (val === '') {
-        update(() => {
-            filteredEmployees.value = employees.value
-        })
-        return
-    }
-    update(() => {
-        const needle = val.toLowerCase()
-        filteredEmployees.value = employees.value.filter(v =>
-            v.label.toLowerCase().includes(needle)
-        )
-    })
-}
+const filteredProfiles = ref([]);
+const filterProfileFn = createFilterFn(profiles, filteredProfiles);
 
-const filterLevel = (val, update) => {
-    if (val === '') {
-        update(() => {
-            filteredLevels.value = levels.value
-        })
-        return
-    }
-    update(() => {
-        const needle = val.toLowerCase()
-        filteredLevels.value = levels.value.filter(v =>
-            v.label.toLowerCase().includes(needle)
-        )
-    })
-}
-
-const filterDepartment = (val, update) => {
-    if (val === '') {
-        update(() => {
-            filteredDepartments.value = departments.value
-        })
-        return
-    }
-    update(() => {
-        const needle = val.toLowerCase()
-        filteredDepartments.value = departments.value.filter(v =>
-            v.label.toLowerCase().includes(needle)
-        )
-    })
-}
-
-const LoadOptions = async () => {
+const LoadProfile = async () => {
     try {
-        const response = await api.get(`/option`);
-
+        const response = await api.get(`/option/profiles`);
+        profiles.value = response.data;
     } catch (error) {
-        console.error("Error fetching all options:", error);
-    } finally {
-
+        console.error("Error fetching options:", error);
     }
 }
+
+const LoadRole = async () => {
+    try {
+        const response = await api.get(`/option/roles`);
+        roles.value = response.data;
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+}
+
+const formatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.firstname || '';
+    const middlename = profile.middlename
+        ? profile.middlename.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.lastname || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+const isDisabled = (roleValue) => {
+    if (roleValue === 1) return true
+    if (level.value === 'Management') {
+        return roleValue === 6
+    } else if (level.value === 'Employee') {
+        return roleValue >= 1 && roleValue <= 5
+    }
+    return false
+}
+
+watch(level, (val) => {
+    if (val === 'Employee') {
+        roleId.value = 6
+    } else if (val === 'Management') {
+        if (roleId.value === 6) roleId.value = null
+    }
+})
 
 onMounted(() => {
-    LoadAllUsers();
-    LoadOptions();
+    LoadAll();
 })
 
 </script>
 
 <style scoped>
-.card {
-    height: 250px;
-    width: 225px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-.card-overlay {
-    backdrop-filter: blur(6px);
-    background: rgba(255, 255, 255, 0.4);
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
 
-.card:hover .card-overlay {
-  opacity: 1;
-}
-/* Smooth fade + slide */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-    transition: all 0.4s ease;
-}
-.fade-slide-enter-from {
-    opacity: 0;
-    transform: translateY(15px) scale(0.98);
-}
-.fade-slide-leave-to {
-    opacity: 0;
-    transform: translateY(-15px) scale(0.98);
-}
 </style>
