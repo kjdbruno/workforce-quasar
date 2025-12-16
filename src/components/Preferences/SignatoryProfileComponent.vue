@@ -39,7 +39,7 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify signatory profile' : 'create new signatory profile' }}</div>
@@ -49,7 +49,7 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">select employee</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">search employee</span>
                                 <q-icon
                                     :name="Errors.userId.type ? 'error' : 'info'"
                                     :color="Errors.userId.type ? 'negative' : 'grey'"
@@ -86,7 +86,22 @@
                                 :error="Errors.userId.type"
                                 hide-dropdown-icon
                                 :no-error-icon="true"
-                            />
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
@@ -122,6 +137,40 @@
                                 :error="Errors.signature.type"
                                 :no-error-icon="true"
                                 clearable
+                            />
+                        </div>
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">order</span>
+                                <q-icon
+                                    :name="Errors.order.type ? 'error' : 'info'"
+                                    :color="Errors.order.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.order.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.order.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.order.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="order" 
+                                outlined
+                                :error="Errors.order.type" 
+                                :no-error-icon="true"
                             />
                         </div>
                     </div>
@@ -242,6 +291,7 @@ const id = ref('');
 const userId = ref('');
 const typeId = ref('');
 const signature = ref(null);
+const order = ref('');
 const isActive = ref(false);
 
 const Errors = reactive({
@@ -255,6 +305,9 @@ const Errors = reactive({
         type: null, messages: []
     },
     signature: { 
+        type: null, messages: []
+    },
+    order: {
         type: null, messages: []
     }
 });
@@ -290,6 +343,18 @@ const Validations = () => {
         isError = true
     } else {
         Errors.signature.type = null
+    }
+
+    if (!order.value) {
+        Errors.order.type = true;
+        Errors.order.messages.push('order is required')
+        isError = true
+    } else if (!/^\d+$/.test(order.value)) {
+        Errors.order.type = true;
+        Errors.order.messages.push('Order must be a whole number');
+        isError = true;
+    } else {
+        Errors.order.type = null
     }
 
     if (isError) {
@@ -409,6 +474,7 @@ const ModifyDialog = async (data) => {
         signature.value = new File([blob], data.signature, { type: blob.type });
     }
     typeId.value = data.typeId;
+    order.value = data.order;
     isActive.value = (data.isActive ? true : false);
 }
 
@@ -417,10 +483,12 @@ const ResetForm = () => {
     userId.value = '';
     typeId.value = '';
     signature.value = null;
+    order.value = '';
     isActive.value = false;
     Errors.userId.type = null;
     Errors.typeId.type = null;
     Errors.signature.type = null;
+    Errors.order.type = null;
 }
 
 const Save = async () => {
@@ -431,6 +499,7 @@ const Save = async () => {
         form.append("userId", userId.value);
         form.append("typeId", typeId.value);
         form.append("file", signature.value);
+        form.append("order", order.value);
         const response = await api.post('/signatoryprofile', form, {
                 headers: {
                     "Content-Type": "multipart/form-data"

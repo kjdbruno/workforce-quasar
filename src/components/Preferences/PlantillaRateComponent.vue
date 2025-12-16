@@ -25,11 +25,12 @@
                     class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
                     v-ripple
                 >
-                        <q-card-section class="text-center full-width">
-                            <div class="text-subtitle2 text-uppercase">{{ data.class?.name }}</div>
+                        <q-card-section class="text-center full-width q-pa-none">
+                            <div class="text-subtitle1 text-uppercase">{{ data?.positions?.name }}</div>
+                            <div class="text-caption text-grey">{{ data?.class?.name }}</div>
                         </q-card-section>
-                        <q-card-section class="full-width">
-                            <div class="text-caption text-grey">{{ data.grade?.name }}</div>
+                        <q-card-section class="q-pa-none">
+                            <div class="text-caption">{{ data?.grade?.name }}</div>
                         </q-card-section>
                         <div
                             class="absolute-top-left q-ma-sm"
@@ -41,111 +42,72 @@
         </div>
 
     <!-- Dialog -->
-    <q-dialog v-model="dialog" full-height position="right" persistent square>
+    <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
         <q-card class="dialog-card column full-height">
             <q-card-section class="q-pa-lg">
                 <div class="text-h6 text-uppercase">{{ isEdit ? 'modify rate' : 'create new rate' }}</div>
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                <div class="row q-col-gutter-xs q-mb-md">
-                    <div class="col-3">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose salary class</span>
-                            <q-icon
-                                :name="Errors.classId.type ? 'error' : 'info'"
-                                :color="Errors.classId.type ? 'negative' : 'grey'"
-                                class="cursor-pointer"
-                                size="xs"
-                            >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.classId.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.classId.type">
-                                        <div 
-                                            v-for="(msg, i) in Errors.classId.messages" 
-                                            :key="i" 
-                                            class="text-capitalize"
-                                        >
-                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-capitalize">
-                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                        </div>
-                                    </template>
-                                </q-tooltip>
-                            </q-icon>
-                        </div>
-                        <q-select
-                            outlined
-                            v-model="classId"
-                            emit-value
-                            map-options
-                            use-input
-                            input-debounce="300"
-                            :options="filteredClasses"
-                            @filter="filterClassFn"
-                            :error="Errors.classId.type"
-                            dropdown-icon="keyboard_arrow_down"
-                            :no-error-icon="true"
+                <div class="q-mb-md">
+                    <div class="q-mb-sm">
+                        <span class="text-caption text-uppercase text-grey q-mr-sm">choose salary class</span>
+                        <q-icon
+                            :name="Errors.salaryId.type ? 'error' : 'info'"
+                            :color="Errors.salaryId.type ? 'negative' : 'grey'"
+                            class="cursor-pointer"
+                            size="xs"
                         >
-                            <template v-slot:no-option>
-                                <q-item>
-                                    <q-item-section class="text-italic text-grey">
-                                    No options
-                                    </q-item-section>
-                                </q-item>
-                            </template>
-                        </q-select>
+                            <q-tooltip anchor="top middle" self="center middle" :class="Errors.salaryId.type ? 'bg-negative' : 'bg-grey'">
+                                <template v-if="Errors.salaryId.type">
+                                    <div 
+                                        v-for="(msg, i) in Errors.salaryId.messages" 
+                                        :key="i" 
+                                        class="text-capitalize"
+                                    >
+                                        <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <div class="text-capitalize">
+                                        <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                    </div>
+                                </template>
+                            </q-tooltip>
+                        </q-icon>
                     </div>
-                    <div class="col-3">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose salary grade</span>
-                            <q-icon
-                                :name="Errors.gradeId.type ? 'error' : 'info'"
-                                :color="Errors.gradeId.type ? 'negative' : 'grey'"
-                                class="cursor-pointer"
-                                size="xs"
-                            >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.gradeId.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.gradeId.type">
-                                        <div 
-                                            v-for="(msg, i) in Errors.gradeId.messages" 
-                                            :key="i" 
-                                            class="text-capitalize"
-                                        >
-                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-capitalize">
-                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                        </div>
-                                    </template>
-                                </q-tooltip>
-                            </q-icon>
-                        </div>
-                        <q-select
-                            outlined
-                            v-model="gradeId"
-                            emit-value
-                            map-options
-                            use-input
-                            input-debounce="300"
-                            :options="filteredGrades"
-                            @filter="filterGradeFn"
-                            :error="Errors.gradeId.type"
-                            dropdown-icon="keyboard_arrow_down"
-                            :no-error-icon="true"
+                    <div class="card-grid">
+                        <div
+                            v-for="(data, index) in salaries"
+                            :key="`data-${data.id}`"
+                            class="inner-card-anim-wrapper"
+                            :style="{ animationDelay: `${index * 120}ms` }"
                         >
-                            <template v-slot:no-option>
-                                <q-item>
-                                    <q-item-section class="text-italic text-grey">
-                                    No options
-                                    </q-item-section>
-                                </q-item>
-                            </template>
-                        </q-select>
+                            <q-card 
+                                class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" 
+                                tag="label"
+                                :class="{ 'card--active': salaryId === data.id }"
+                                @click="salaryId = data.id"
+                            >
+                                <q-card-section class="text-center full-width q-pa-none">
+                                    <div class="text-subtitle1 text-uppercase">{{ data?.positions?.name }}</div>
+                                    <div class="text-caption text-grey">{{ data?.class?.name }}</div>
+                                </q-card-section>
+                                <q-card-section class="q-pa-none">
+                                    <div class="text-caption">{{ data?.grade?.name }}</div>
+                                    <div class="text-caption text-grey">{{ data?.status }}</div>
+                                </q-card-section>
+                                <div class="checkmark-overlay">
+                                    <q-radio
+                                        v-model="vacancyId"
+                                        :val="data.id"
+                                        checked-icon="task_alt"
+                                        unchecked-icon="panorama_fish_eye"
+                                        size="md"
+                                    />
+                                </div>
+                            </q-card>
+                        </div>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs">
@@ -257,6 +219,7 @@
                             v-model="value.name" 
                             outlined  
                             readonly 
+                            input-class="text-capitalize"
                         />
                     </div>
                     <div class="col-2">
@@ -351,14 +314,12 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const classId = ref('');
-const gradeId = ref('');
+const salaryId = ref('');
 const steps = ref([]);
 const isActive = ref(false);
 
 const Errors = reactive({
-    classId: { type: null, messages: [] },
-    gradeId: { type: null, messages: [] },
+    salaryId: { type: null, messages: [] },
     rates: []
 });
 
@@ -391,15 +352,9 @@ const Validations = () => {
         hourlyCompensation: { type: null, messages: [] }
     }));
 
-    if (!classId.value) {
-        Errors.classId.type = true;
-        Errors.classId.messages.push('salary class is required');
-        isError = true;
-    }
-
-    if (!gradeId.value) {
-        Errors.gradeId.type = true;
-        Errors.gradeId.messages.push('salary grade is required');
+    if (!salaryId.value) {
+        Errors.salaryId.type = true;
+        Errors.salaryId.messages.push('salary class is required');
         isError = true;
     }
 
@@ -524,12 +479,6 @@ const LastPage = () => {
     } 
 };
 
-const increments = ref([]);
-const classes = ref([]);
-const grades = ref([]);
-const filteredClasses = ref([]);
-const filteredGrades = ref([]);
-
 const NewDialog = () => {
     ResetForm();
     dialog.value = true;
@@ -542,27 +491,16 @@ const ModifyDialog = async (data) => {
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
-    if (!classes.value.length) {
-        await LoadSalaryClasses();
-    }
-    if (!grades.value.length) {
-        await LoadSalaryGrades();
-    }
-    filteredClasses.value = [...classes.value];
-    filteredGrades.value = [...grades.value];
-    classId.value = classes.value.find(p => p.value === data.classId)?.value || null;
-    gradeId.value = grades.value.find(p => p.value === data.gradeId)?.value || null;
+    salaryId.value = data.salaryId;
     steps.value = initializeSteps(increments.value, data.rates);
     isActive.value = !!data.isActive;
 };
 
 const ResetForm = () => {
     id.value = '';
-    classId.value = '';
-    gradeId.value = '';
+    salaryId.value = '';
     isActive.value = false;
-    Errors.classId.type = null;
-    Errors.gradeId.type = null;
+    Errors.salaryId.type = null;
     Errors.rates = [];
     Errors.rates = steps.value.map(() => ({
         monthlyCompensation: { type: null, messages: [] },
@@ -583,13 +521,11 @@ const Save = async () => {
     try {
         const response = id.value && isEdit.value
             ? await api.post(`/rate/${id.value}/update`, { 
-                classId: classId.value, 
-                gradeId: gradeId.value,
+                salaryId: salaryId.value, 
                 rates: steps.value 
             })
             : await api.post('/rate', { 
-                classId: classId.value, 
-                gradeId: gradeId.value,
+                salaryId: salaryId.value, 
                 rates: steps.value 
             });
 
@@ -627,7 +563,6 @@ const applyBackendErrors = (backendErrors) => {
 const UpdateList = (data) => {
     const index = rows.value.findIndex(item => item.id === data.id);
     if (index !== -1) rows.value[index] = data;
-    console.log('to')
 };
 
 const Toggle = async () => {
@@ -655,34 +590,13 @@ const Toggle = async () => {
     }
 };
 
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        if (val === '') {
-        update(() => { targetRef.value = sourceRef.value; });
-            return;
-        }
-        update(() => {
-            const needle = val.toLowerCase();
-            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
-        });
-    };
-};
-const filterClassFn = createFilterFn(classes, filteredClasses);
-const filterGradeFn = createFilterFn(grades, filteredGrades);
+const increments = ref([]);
+const salaries = ref([]);
 
-const LoadSalaryClasses = async () => {
+const LoadSalaries = async () => {
     try {
-        const response = await api.get(`/option/salaryclasses`);
-        classes.value = response.data;
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const LoadSalaryGrades = async () => {
-    try {
-        const response = await api.get(`/option/salarygrades`);
-        grades.value = response.data;
+        const response = await api.get(`/option/salaryrates`);
+        salaries.value = response.data;
     } catch (error) {
         console.error("Error fetching options:", error);
     }
@@ -698,8 +612,7 @@ const LoadIncrements = async () => {
 };
 
 onBeforeMount(() => {
-    LoadSalaryClasses();
-    LoadSalaryGrades();
+    LoadSalaries();
     LoadIncrements();
 })
 

@@ -30,11 +30,13 @@
 import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
 import { useRecruitmentStore } from 'src/stores/recruitment-store';
 import RequisitionComponent from 'src/components/Recruitment/RequisitionComponent.vue';
+import ApplicationComponent from 'src/components/Recruitment/ApplicationComponent.vue';
 
 const RecruitmentStore = useRecruitmentStore();
 
 const components = {
-    RequisitionComponent
+    RequisitionComponent,
+    ApplicationComponent
 };
 
 const tabs = [
@@ -42,13 +44,8 @@ const tabs = [
         name: 'Requisition'
     },
     { 
-        name: 'Application', 
-        subTabs: 
-        [
-            'Applicants', 
-            'Pooling'
-        ] 
-    },
+        name: 'Application'
+    }
 ];
 
 const activeTab = ref('');

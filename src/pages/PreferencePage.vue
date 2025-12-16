@@ -50,6 +50,7 @@ import PlantillaIncrementComponent from 'src/components/Preferences/PlantillaInc
 import PlantillaRateComponent from 'src/components/Preferences/PlantillaRateComponent.vue';
 import PlantillaSalaryGradeComponent from 'src/components/Preferences/PlantillaSalaryGradeComponent.vue';
 import PlantillaSalaryClassComponent from 'src/components/Preferences/PlantillaSalaryClassComponent.vue';
+import PlantillaSalaryComponent from 'src/components/Preferences/PlantillaSalaryComponent.vue';
 import ScheduleClassComponent from 'src/components/Preferences/ScheduleClassComponent.vue';
 import ScheduleShiftComponent from 'src/components/Preferences/ScheduleShiftComponent.vue';
 import ScheduleHolidayComponent from 'src/components/Preferences/ScheduleHolidayComponent.vue';
@@ -91,6 +92,7 @@ const components = {
     PlantillaRateComponent,
     PlantillaSalaryGradeComponent,
     PlantillaSalaryClassComponent,
+    PlantillaSalaryComponent,
     ScheduleClassComponent,
     ScheduleShiftComponent,
     ScheduleHolidayComponent,
@@ -171,9 +173,10 @@ const tabs = [
         [
             'Increment', 
             'Salary Class', 
-            'Salary Grade', 
-            'Rate', 
-            'Position'
+            'Salary Grade',
+            'Position', 
+            'Salary',
+            // 'Rate'
         ] 
     },
     { 

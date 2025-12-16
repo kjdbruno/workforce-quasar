@@ -25,171 +25,164 @@
                     class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
                     >
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data?.position?.name }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ data.salary?.positions?.name }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
-                        <div class="text-caption text-uppercase">{{ data?.position?.salary?.grade?.name }}</div>
+                        <div class="text-caption text-uppercase">{{ data?.salary?.grade?.name }}</div>
                         <div class="text-caption text-grey">{{ data?.status }}</div>
                     </q-card-section>
+                    <div
+                        class="absolute-top-left q-ma-sm"
+                        style="width: 7px; height: 7px; border-radius: 50%;"
+                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
+                    ></div>
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">create opening</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
-                            <div class="q-mb-md">
-                                <div class="q-mb-xs">
-                                    <span class="text-caption text-uppercase text-grey q-mr-sm">position</span>
-                                    <q-icon
-                                        :name="Errors.positionId.type ? 'error' : 'info'"
-                                        :color="Errors.positionId.type ? 'negative' : 'grey'"
-                                        class="cursor-pointer"
-                                        size="xs"
-                                    >
-                                        <q-tooltip anchor="top middle" self="center middle" :class="Errors.positionId.type ? 'bg-negative' : 'bg-grey'">
-                                            <template v-if="Errors.positionId.type">
-                                                <div 
-                                                    v-for="(msg, i) in Errors.positionId.messages" 
-                                                    :key="i" 
-                                                    class="text-capitalize"
-                                                >
-                                                    <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                                </div>
-                                            </template>
-                                            <template v-else>
-                                                <div class="text-capitalize">
-                                                    <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                                </div>
-                                            </template>
-                                        </q-tooltip>
-                                    </q-icon>
-                                </div>
-                                <div>
-                                    <q-select
-                                        outlined
-                                        v-model="positionId"
-                                        emit-value
-                                        map-options
-                                        use-input
-                                        input-debounce="300"
-                                        :options="filteredPositions"
-                                        @filter="filterPositionFn"
-                                        :error="Errors.positionId.type"
-                                        dropdown-icon="keyboard_arrow_down"
-                                        :no-error-icon="true"
-                                        @update:model-value="() => { LoadPositionQualifications(); LoadRecruitmentSteps(); }"
-                                    >
-                                        <template v-slot:option="scope">
-                                            <q-item v-bind="scope.itemProps">
-                                                <q-item-section>
-                                                    <q-item-label>{{ scope.opt.label }}</q-item-label>
-                                                    <q-item-label caption>{{ scope.opt.grade }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                        <template v-slot:no-option>
-                                            <q-item>
-                                                <q-item-section class="text-italic text-grey">
-                                                No options
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                    </q-select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-6">
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey q-mb-xs">job description</div>
-                                <div class="text-caption">{{ qualifications?.description || 'N/A' }}</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey q-mb-xs">status</div>
-                                <div class="text-caption">{{ qualifications?.status || 'N/A' }}</div>
-                            </div>
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey q-mb-xs">job qualification</div>
-                                <div class="text-caption">
-                                    <span v-for="(dt, index) in qualifications?.qualifications">
-                                        {{ index+1 }} {{ dt.name }}
-                                    </span>
-                                    {{ qualifications.length===0 ? 'N/A' : null }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">initial salary</span>
-                                <q-icon
-                                    :name="Errors.stepId.type ? 'error' : 'info'"
-                                    :color="Errors.stepId.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.stepId.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.stepId.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.stepId.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
-                            <q-select
-                                outlined
-                                v-model="stepId"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredSteps"
-                                @filter="filterStepFn"
-                                :error="Errors.stepId.type"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
+                    <div class="q-mb-md">
+                        <div class="q-mb-sm">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose position</span>
+                            <q-icon
+                                :name="Errors.salary.type ? 'error' : 'info'"
+                                :color="Errors.salary.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
                             >
-                                <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
-                                        <q-item-section>
-                                            <q-item-label>{{ scope.opt.class }}</q-item-label>
-                                            <q-item-label>{{ scope.opt.label }}</q-item-label>
-                                            <q-item-label caption>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(scope.opt.monthly) }}</q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                                <template v-slot:no-option>
-                                    <q-item>
-                                        <q-item-section class="text-italic text-grey">
-                                        No options
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                            </q-select>
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.salary.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.salary.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.salary.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
                         </div>
+                        <div class="card-grid">
+                            <div
+                                v-for="(data, index) in positions"
+                                :key="`data-${data.id}`"
+                                class="inner-card-anim-wrapper"
+                                :style="{ animationDelay: `${index * 120}ms` }"
+                            >
+                                <q-card 
+                                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" 
+                                    tag="label"
+                                    :class="{ 'card--active': salary === data }"
+                                    @click="salary = data"
+                                >
+                                    <q-card-section class="text-center full-width q-pa-none">
+                                        <div class="text-subtitle1 text-uppercase">{{ data?.positions?.name }}</div>
+                                        <div class="text-caption text-uppercase">{{ data?.class?.name }}</div>
+                                    </q-card-section>
+                                    <q-card-section class="q-pa-none">
+                                        <div class="text-caption">{{ data?.grade?.name }}</div>
+                                        <div class="text-caption text-grey">{{ data?.status }}</div>
+                                    </q-card-section>
+                                    <div class="checkmark-overlay">
+                                        <q-radio
+                                            v-model="salary"
+                                            :val="data"
+                                            checked-icon="task_alt"
+                                            unchecked-icon="panorama_fish_eye"
+                                            size="md"
+                                        />
+                                    </div>
+                                </q-card>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey q-mb-xs">job description</div>
+                            <div class="text-caption">{{ qualifications?.description || 'N/A' }}</div>
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey q-mb-xs">job qualification</div>
+                            <div class="text-caption">
+                                <div v-for="(dt, index) in qualifications?.qualifications">
+                                    {{ index+1 }}. {{ dt.name }}
+                                </div>
+                                {{ qualifications.length===0 ? 'N/A' : null }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-sm">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">choose initial salary</span>
+                            <q-icon
+                                :name="Errors.stepId.type ? 'error' : 'info'"
+                                :color="Errors.stepId.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.stepId.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.stepId.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.stepId.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <div class="card-grid" v-if="steps.length">
+                            <div
+                                v-for="(data, index) in steps"
+                                :key="`data-${data.id}`"
+                                class="inner1-card-anim-wrapper"
+                                :style="{ animationDelay: `${index * 120}ms` }"
+                            >
+                                <q-card 
+                                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" 
+                                    tag="label"
+                                    :class="{ 'card--active': stepId === data.stepId }"
+                                    @click="stepId = data.stepId"
+                                >
+                                    <q-card-section class="text-center full-width q-pa-sm">
+                                        <div class="text-caption text-uppercase">{{ data?.increment?.name }}</div>
+                                        <div class="text-caption text-grey">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(data?.monthlyCompensation) }}</div>
+                                    </q-card-section>
+                                    <div class="checkmark-overlay">
+                                        <q-radio
+                                            v-model="stepId"
+                                            :val="data.stepId"
+                                            checked-icon="task_alt"
+                                            unchecked-icon="panorama_fish_eye"
+                                            size="md"
+                                        />
+                                    </div>
+                                </q-card>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">company</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select company</span>
                                 <q-icon
                                     :name="Errors.companyId.type ? 'error' : 'info'"
                                     :color="Errors.companyId.type ? 'negative' : 'grey'"
@@ -234,11 +227,18 @@
                                         </q-item-section>
                                     </q-item>
                                 </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
                             </q-select>
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">department</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select department</span>
                                 <q-icon
                                     :name="Errors.departmentId.type ? 'error' : 'info'"
                                     :color="Errors.departmentId.type ? 'negative' : 'grey'"
@@ -283,11 +283,18 @@
                                         </q-item-section>
                                     </q-item>
                                 </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
                             </q-select>
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">schedule</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select shift</span>
                                 <q-icon
                                     :name="Errors.shiftId.type ? 'error' : 'info'"
                                     :color="Errors.shiftId.type ? 'negative' : 'grey'"
@@ -332,204 +339,20 @@
                                         </q-item-section>
                                     </q-item>
                                 </template>
-                            </q-select>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">location</span>
-                                <q-icon
-                                    :name="Errors.location.type ? 'error' : 'info'"
-                                    :color="Errors.location.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.location.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.location.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.location.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
-                            <q-input 
-                                v-model="location" 
-                                outlined
-                                :error="Errors.location.type"
-                                :no-error-icon="true"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">employment status</span>
-                                <q-icon
-                                    :name="Errors.employmentId.type ? 'error' : 'info'"
-                                    :color="Errors.employmentId.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.employmentId.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.employmentId.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.employmentId.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
-                            <q-select
-                                outlined
-                                v-model="employmentId"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredEmploymentStatuses"
-                                @filter="filterEmploymentStatusFn"
-                                :error="Errors.employmentId.type"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:no-option>
-                                    <q-item>
-                                        <q-item-section class="text-italic text-grey">
-                                        No options
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>
                             </q-select>
                         </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">date needed</span>
-                                <q-icon
-                                    :name="Errors.date.type ? 'error' : 'info'"
-                                    :color="Errors.date.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.date.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.date.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.date.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
-                            <q-input 
-                                v-model="date" 
-                                outlined
-                                :error="Errors.date.type"
-                                :no-error-icon="true"
-                                type="date"
-                            />
-                        </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">additional/replacement</span>
-                            <q-icon
-                                :name="Errors.movement.type ? 'error' : 'info'"
-                                :color="Errors.movement.type ? 'negative' : 'grey'"
-                                class="cursor-pointer"
-                                size="xs"
-                            >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.movement.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.movement.type">
-                                        <div 
-                                            v-for="(msg, i) in Errors.movement.messages" 
-                                            :key="i" 
-                                            class="text-capitalize"
-                                        >
-                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-capitalize">
-                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                        </div>
-                                    </template>
-                                </q-tooltip>
-                            </q-icon>
-                        </div>
-                        <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Addition" label="addition to department"  class="text-uppercase" />
-                        <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Replacement" label="replacement"  class="text-uppercase" />
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">justification</span>
-                                <q-icon
-                                    :name="Errors.justification.type ? 'error' : 'info'"
-                                    :color="Errors.justification.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.justification.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.justification.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.justification.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
-                            <q-input 
-                                v-model="justification" 
-                                outlined
-                                :error="Errors.justification.type"
-                                :no-error-icon="true"
-                                type="textarea"
-                            />
-                        </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey q-mb-xs">background check</div>
-                        <q-checkbox right-label v-model="needBackgroundCheck" label="need background check?" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-uppercase"/>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">sex</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select sex</span>
                                 <q-icon
                                     :name="Errors.sexId.type ? 'error' : 'info'"
                                     :color="Errors.sexId.type ? 'negative' : 'grey'"
@@ -574,11 +397,18 @@
                                         </q-item-section>
                                     </q-item>
                                 </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
                             </q-select>
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">school level</span>
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select school level</span>
                                 <q-icon
                                     :name="Errors.levelId.type ? 'error' : 'info'"
                                     :color="Errors.levelId.type ? 'negative' : 'grey'"
@@ -620,6 +450,13 @@
                                     <q-item>
                                         <q-item-section class="text-italic text-grey">
                                         No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>
@@ -694,6 +531,205 @@
                             />
                         </div>
                     </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">select employment status</span>
+                                <q-icon
+                                    :name="Errors.employmentId.type ? 'error' : 'info'"
+                                    :color="Errors.employmentId.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.employmentId.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.employmentId.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.employmentId.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-select
+                                outlined
+                                v-model="employmentId"
+                                emit-value
+                                map-options
+                                use-input
+                                input-debounce="300"
+                                :options="filteredEmploymentStatuses"
+                                @filter="filterEmploymentStatusFn"
+                                :error="Errors.employmentId.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">date needed</span>
+                                <q-icon
+                                    :name="Errors.date.type ? 'error' : 'info'"
+                                    :color="Errors.date.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.date.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.date.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.date.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="date" 
+                                outlined
+                                :error="Errors.date.type"
+                                :no-error-icon="true"
+                                type="date"
+                            />
+                        </div>
+                        <div class="col-4">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">location</span>
+                                <q-icon
+                                    :name="Errors.location.type ? 'error' : 'info'"
+                                    :color="Errors.location.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.location.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.location.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.location.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="location" 
+                                outlined
+                                :error="Errors.location.type"
+                                :no-error-icon="true"
+                                input-class="text-capitalize"
+                            />
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">additional/replacement</span>
+                            <q-icon
+                                :name="Errors.movement.type ? 'error' : 'info'"
+                                :color="Errors.movement.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.movement.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.movement.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.movement.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Addition" label="addition to department"  class="text-uppercase" />
+                        <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Replacement" label="replacement"  class="text-uppercase" />
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-4">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">justification</span>
+                                <q-icon
+                                    :name="Errors.justification.type ? 'error' : 'info'"
+                                    :color="Errors.justification.type ? 'negative' : 'grey'"
+                                    class="cursor-pointer"
+                                    size="xs"
+                                >
+                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.justification.type ? 'bg-negative' : 'bg-grey'">
+                                        <template v-if="Errors.justification.type">
+                                            <div 
+                                                v-for="(msg, i) in Errors.justification.messages" 
+                                                :key="i" 
+                                                class="text-capitalize"
+                                            >
+                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-capitalize">
+                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                            </div>
+                                        </template>
+                                    </q-tooltip>
+                                </q-icon>
+                            </div>
+                            <q-input 
+                                v-model="justification" 
+                                outlined
+                                :error="Errors.justification.type"
+                                :no-error-icon="true"
+                                type="textarea"
+                            />
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey q-mb-xs">background check</div>
+                        <q-checkbox right-label v-model="needBackgroundCheck" label="need background check?" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-uppercase"/>
+                    </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
@@ -711,7 +747,7 @@
                 </q-inner-loading>
             </q-card>
         </q-dialog>
-        <q-dialog v-model="DetailDialog" full-height position="right" persistent square>
+        <q-dialog v-model="DetailDialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">requisition information</div>
@@ -720,11 +756,11 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">position</div>
-                        <div class="text-body1 text-uppercase">{{ info?.position?.name }}</div>
+                        <div class="text-body1 text-uppercase">{{ info?.salary?.positions?.name }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">salary</div>
-                        <div class="text-body1 text-uppercase">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(info?.position?.salary?.rates[0]?.monthlyCompensation) }}</div>
+                        <div class="text-body1 text-uppercase">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(info?.salary?.rates[0]?.monthlyCompensation) }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">status</div>
@@ -732,11 +768,11 @@
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">job description</div>
-                        <div class="text-body1">{{ info?.position?.description }}</div>
+                        <div class="text-body1">{{ info?.salary?.positions?.description }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">job qualifications</div>
-                        <div class="text-body1" v-for="(v, index) in info?.position?.qualifications" :key="index">{{ (index+1) }}. {{ v.name || 'N/A' }}</div>
+                        <div class="text-body1" v-for="(v, index) in info?.salary?.positions?.qualifications" :key="index">{{ (index+1) }}. {{ v.name || 'N/A' }}</div>
                     </div>
                     <div class="row q-col-gutter-lg q-mb-md">
                         <div>
@@ -776,7 +812,7 @@
                             <div class="text-body1">{{ info?.justification }}</div>
                         </div>
                     </div>
-                    <div class="row q-col-gutter-lg q-mb-xl">
+                    <div class="row q-col-gutter-lg q-mb-mb">
                         <div>
                             <div class="text-caption text-uppercase text-grey">sex</div>
                             <div class="text-body1">{{ info?.sex?.name }}</div>
@@ -794,10 +830,10 @@
                             <div class="text-body1">{{ info?.ageRange }}</div>
                         </div>
                     </div>
-                    <div class="row q-col-gutter-xl q-mb-md">
+                    <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
                         <div v-for="(dt, index) in info?.requests">
                             <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
-                            <div v-if="dt?.signatory?.signature">
+                            <div v-if="dt?.status == 'Approved'">
                                 <img :src="formatSignature(dt?.signatory)" width="150"/>
                             </div>
                             <div class="text-h6 text-uppercase">{{ formatName(dt?.signatory?.user?.profile) }}</div>
@@ -807,7 +843,7 @@
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="approve" >
+                        <q-btn v-if="canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve" >
                             <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                                 <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
                                     <q-card-section>
@@ -816,21 +852,39 @@
                                         </div>
                                     </q-card-section>
                                     <q-card-actions>
-                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" />
+                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="ApproveRequisition(info)"/>
                                     </q-card-actions>
                                 </q-card>
                             </q-menu>
                         </q-btn>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="PrintManpowerRequisition"/>
+                        <q-btn  v-if="isActive" unelevated size="md" color="primary" class="btn text-capitalize" :label="formatToggle(info) ? 'disable' : 'enable'" @click="Toggle"/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { DetailDialog = false; }" outline/>
                     </div>
                 </q-card-actions>
-                <q-inner-loading :showing="submitLoading">
+                <q-inner-loading :showing="DetailSubmitting">
                     <div class="text-center">
                         <q-spinner-puff size="md"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                     </div>
                 </q-inner-loading>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="printDialog" full-height full-width class="pdf">
+            <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
+                <q-btn
+                    icon="close"
+                    class="fixed bg-white text-primary shadow-2"
+                    round
+                    dense
+                    v-close-popup
+                    style="top: 15px; right: 15px; z-index: 999;"
+                />
+                <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
+                    <div class="iframe-container">
+                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                    </div>
+                </q-card-section>
             </q-card>
         </q-dialog>
         <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
@@ -882,14 +936,18 @@ import { api } from 'src/boot/axios';
 
 import { Toast } from 'src/boot/sweetalert'; 
 
-import moment from 'moment'
+import moment from 'moment';
+
+import { useAuthStore } from 'src/stores/auth-store';
+
+const AuthStore = useAuthStore();
 
 const dialog = ref(false);
 const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const positionId = ref('');
+const salary = ref('');
 const stepId = ref('');
 const companyId = ref('');
 const departmentId = ref('');
@@ -904,9 +962,10 @@ const ageRange = ref('');
 const movement = ref('');
 const justification = ref('');
 const needBackgroundCheck = ref(false);
+const isActive = ref(false);
 
 const Errors = reactive({
-    positionId: { 
+    salary: { 
         type: null, messages: []
     },
     stepId: { 
@@ -1019,12 +1078,12 @@ const Validations = () => {
         Errors[key].messages = [];
     });
 
-    if (!positionId.value) {
-        Errors.positionId.type = true;
-        Errors.positionId.messages.push('Position is required');
+    if (!salary.value) {
+        Errors.salary.type = true;
+        Errors.salary.messages.push('Position is required');
         isError = true;
     } else {
-        Errors.positionId.type = null;
+        Errors.salary.type = null;
     }
 
     if (!stepId.value) {
@@ -1237,7 +1296,7 @@ const NewDialog = () => {
 }
 
 const ResetForm = () => {
-    positionId.value = '';
+    salary.value = '';
     stepId.value = '';
     companyId.value = '';
     departmentId.value = '';
@@ -1253,6 +1312,7 @@ const ResetForm = () => {
     yearExperience.value = '';
     employmentId.value = '';
     qualifications.value = [];
+    Errors.salary.type = null;
     Errors.stepId.type = null;
     Errors.companyId.type = null;
     Errors.departmentId.type = null;
@@ -1273,7 +1333,7 @@ const Save = async () => {
     submitLoading.value = true;
     try {
         const response = await api.post('/recruitment', {
-            positionId: positionId.value,
+            salaryId: salary.value.id,
             stepId: stepId.value,
             companyId: companyId.value,
             departmentId: departmentId.value,
@@ -1310,7 +1370,6 @@ const Save = async () => {
             })
         }
     } finally {
-        ResetForm();
         submitLoading.value = false;
     }
 }
@@ -1334,12 +1393,108 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
+const DetailSubmitting = ref(false);
 const DetailDialog = ref(false);
 const info = ref(null)
 
 const InfoDialog = (data) => {
+    id.value = data.id;
+    isActive.value = data.isActive;
     DetailDialog.value = true;
-    info.value = data;
+    LoadDetails(data.id);
+}
+
+const LoadDetails = async (id) => {
+    DetailSubmitting.value = true;
+    try {
+        const response  = await api.get(`/recruitment/${id}/details`);
+        info.value = response.data.data
+    } catch (error) {
+        console.error("Error fetching all data:", error);
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Error</div>
+                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+            `
+        });
+    } finally {
+        DetailSubmitting.value = false;
+    }
+}
+
+const ApproveRequisition = async (data) => {
+    DetailSubmitting.value = true;
+    const authUserId = AuthStore.user?.id;
+    const matchedSignatory = data?.requests?.find(req => req.signatory?.userId === authUserId);
+    const signatoryId = matchedSignatory ? matchedSignatory.signatoryId : null;
+    const vacancyId = data?.requests[0]?.vacancyId;
+    try {
+        const response = await api.post('recruitment/approve', {
+            vacancyId: vacancyId,
+            signatoryId: signatoryId
+        })
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+        LoadAll();
+        DetailDialog.value = false;
+    } catch (error) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        DetailSubmitting.value = false;
+    }
+}
+
+const UpdateList = (data) => {
+    const index = rows.value.findIndex(item => item.id === data.id)
+    if (index !== -1) {
+        rows.value[index] = data
+    }
+}
+
+const Toggle = async () => {
+    DetailSubmitting.value = true;
+    try {
+        const response = isActive.value
+            ? await api.post(`/recruitment/${id.value}/disable`)
+            : await api.post(`/recruitment/${id.value}/enable`)
+        DetailDialog.value = false;
+        UpdateList(response.data.vacancy);
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        DetailSubmitting.value = false;
+    }
 }
 
 const positions = ref([]);
@@ -1351,8 +1506,6 @@ const sexes = ref([]);
 const levels = ref([]);
 const employmentstatuses = ref([]);
 
-const filteredPositions = ref([]);
-const filteredSteps = ref([]);
 const filteredCompanies = ref([]);
 const filteredDepartments = ref([]);
 const filteredSchedules = ref([]);
@@ -1373,8 +1526,6 @@ const createFilterFn = (sourceRef, targetRef) => {
     };
 };
 
-const filterPositionFn = createFilterFn(positions, filteredPositions);
-const filterStepFn = createFilterFn(steps, filteredSteps);
 const filterCompanyFn = createFilterFn(companies, filteredCompanies);
 const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
 const filterScheduleFn = createFilterFn(schedules, filteredSchedules);
@@ -1382,10 +1533,10 @@ const filterSexFn = createFilterFn(sexes, filteredSexes);
 const filterLevelFn = createFilterFn(levels, filteredLevels);
 const filterEmploymentStatusFn = createFilterFn(employmentstatuses, filteredEmploymentStatuses);
 
-const LoadRecruitmentSteps = async () => {
+const LoadRecruitmentSteps = async (id) => {
     try {
-        const response = await api.get(`/option/recruitmentsteps?positionId=${positionId.value}`);
-        steps.value = response.data;
+        const response = await api.get(`/option/recruitmentsteps?id=${id}`);
+        steps.value = response.data[0]?.rates;
     } catch (error) {
         console.error("Error fetching options:", error);
     }
@@ -1454,9 +1605,9 @@ const LoadPositions = async () => {
     }
 };
 
-const LoadPositionQualifications = async () => {
+const LoadPositionQualifications = async (id) => {
     try {
-        const response = await api.get(`/option/recruitmentqualifications?positionId=${positionId.value}`);
+        const response = await api.get(`/option/recruitmentqualifications?positionId=${id}`);
         qualifications.value = response.data[0];
     } catch (error) {
         console.error("Error fetching options:", error);
@@ -1486,6 +1637,52 @@ const formatName = (profile) => {
 
 const formatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
+}
+
+const formatToggle = (info) => !!info?.isActive;
+
+const canApprove = computed(() => {
+    if (!info.value?.requests || info.value.requests.length === 0) return false;
+
+    // Sort signatories by order
+    const sorted = [...info.value.requests].sort(
+        (a, b) => a.signatory.order - b.signatory.order
+    );
+
+    // Find the first pending request
+    const nextPending = sorted.find(req => req.status === 'Pending');
+    if (!nextPending) return false;
+
+    // Check if the current user matches the next pending signatory
+    return nextPending.signatory.userId === AuthStore.user?.id;
+});
+
+watch(salary, (newValue) => {
+    const id = newValue.positionId;
+    if (newValue) {
+        LoadPositionQualifications(id);
+        LoadRecruitmentSteps(newValue.id);
+    }
+})
+
+const printDialog = ref(false);
+const pdf = ref(null);
+
+const PrintManpowerRequisition = async () => {
+    DetailSubmitting.value = true;
+    try {
+        const res = await api.get(`/recruitment/${id.value}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+        DetailSubmitting.value = false;
+    } catch (error) {
+        DetailSubmitting.value = false;
+        console.error("Error generating PDF:", error);
+    }
 }
 
 onMounted(() => {

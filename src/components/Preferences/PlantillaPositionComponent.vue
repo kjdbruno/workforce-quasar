@@ -28,9 +28,6 @@
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
-                    <q-card-section class="full-width">
-                        <div class="text-caption text-grey">{{ data.salary?.grade?.name }}</div>
-                    </q-card-section>
                     <div
                         class="absolute-top-left q-ma-sm"
                         style="width: 7px; height: 7px; border-radius: 50%;"
@@ -39,7 +36,7 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify position' : 'create new position' }}</div>
@@ -79,6 +76,7 @@
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
+                                input-class="text-capitalize"
                             />
                         </div>
                         <div class="col-3">
@@ -125,6 +123,13 @@
                                     <q-item>
                                         <q-item-section class="text-italic text-grey">
                                         No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>

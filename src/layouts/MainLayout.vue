@@ -89,7 +89,7 @@
                         <q-item class="q-mb-sm">
                             <q-item-section avatar>
                                 <q-avatar>
-                                    <img :src="authStore.user?.profile?.photos.photo">
+                                    <img :src="formatPhoto(authStore.user?.profile?.photos.photo)">
                                 </q-avatar>
                             </q-item-section>
                             <q-item-section>

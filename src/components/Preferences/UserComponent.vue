@@ -27,15 +27,16 @@
                     >
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ formatName(data.profile) }}</div>
+                        <div class="text-caption text-grey">{{ data.username }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
-                        <div class="text-caption text-uppercase">{{ data.role?.name }}</div>
-                        <div class="text-caption text-grey">{{ data.level }}</div>
+                        <div class="text-caption text-uppercase">{{ data.role }}</div>
+                        <div class="text-caption text-grey">{{ data.status }}</div>
                     </q-card-section>
                     <div
                         class="absolute-top-left q-ma-sm"
                         style="width: 7px; height: 7px; border-radius: 50%;"
-                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
+                        :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"
                     ></div>
                 </q-card>
             </div>
@@ -89,6 +90,20 @@
                                 :no-error-icon="true"
                                 clearable
                             >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
                             </q-select>
                         </div>
                     </div>
@@ -169,47 +184,17 @@
                     </div>
                     <div class="q-mb-md">
                         <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">access level</span>
-                            <q-icon
-                                :name="Errors.level.type ? 'error' : 'info'"
-                                :color="Errors.level.type ? 'negative' : 'grey'"
-                                class="cursor-pointer"
-                                size="xs"
-                            >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.level.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.level.type">
-                                        <div 
-                                            v-for="(msg, i) in Errors.level.messages" 
-                                            :key="i" 
-                                            class="text-capitalize"
-                                        >
-                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-capitalize">
-                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                        </div>
-                                    </template>
-                                </q-tooltip>
-                            </q-icon>
-                        </div>
-                        <q-radio v-model="level" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Management" label="Management"  class="text-uppercase" />
-                        <q-radio v-model="level" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Employee" label="Employee"  class="text-uppercase" />
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
                             <span class="text-caption text-uppercase text-grey q-mr-sm">user role</span>
                             <q-icon
-                                :name="Errors.level.type ? 'error' : 'info'"
-                                :color="Errors.level.type ? 'negative' : 'grey'"
+                                :name="Errors.role.type ? 'error' : 'info'"
+                                :color="Errors.role.type ? 'negative' : 'grey'"
                                 class="cursor-pointer"
                                 size="xs"
                             >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.level.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.level.type">
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.role.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.role.type">
                                         <div 
-                                            v-for="(msg, i) in Errors.level.messages" 
+                                            v-for="(msg, i) in Errors.role.messages" 
                                             :key="i" 
                                             class="text-capitalize"
                                         >
@@ -226,7 +211,7 @@
                         </div>
                         <q-radio 
                             v-for="(v, index) in roles" 
-                            v-model="roleId" 
+                            v-model="role" 
                             checked-icon="task_alt" 
                             unchecked-icon="panorama_fish_eye" 
                             :val="v.value" 
@@ -235,13 +220,84 @@
                             :disable="isDisabled(v.value)"
                         />
                     </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">status</span>
+                            <q-icon
+                                :name="Errors.status.type ? 'error' : 'info'"
+                                :color="Errors.status.type ? 'negative' : 'grey'"
+                                class="cursor-pointer"
+                                size="xs"
+                            >
+                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.status.type ? 'bg-negative' : 'bg-grey'">
+                                    <template v-if="Errors.status.type">
+                                        <div 
+                                            v-for="(msg, i) in Errors.status.messages" 
+                                            :key="i" 
+                                            class="text-capitalize"
+                                        >
+                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="text-capitalize">
+                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
+                                        </div>
+                                    </template>
+                                </q-tooltip>
+                            </q-icon>
+                        </div>
+                        <q-radio 
+                            v-for="(v, index) in statuses" 
+                            v-model="status" 
+                            checked-icon="task_alt" 
+                            unchecked-icon="panorama_fish_eye" 
+                            :val="v.value" 
+                            :label="v.label" 
+                            class="text-uppercase"
+                        />
+                    </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                        <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="face" @click="() => { faceDialog = true }" />
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
+                    </div>
+                </q-card-actions>
+                <q-inner-loading :showing="submitLoading">
+                    <div class="text-center">
+                        <q-spinner-puff size="md"/>
+                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
+                    </div>
+                </q-inner-loading>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="faceDialog" full-height position="right" persistent square>
+            <q-card class="dialog-card column full-height">
+                <q-card-section class="q-pa-lg">
+                    <div class="text-h6 text-uppercase">register face</div>
+                </q-card-section>
+                <q-separator inset />
+                <q-card-section class="col q-pa-lg scroll">
+                    <div width="480px" height="360px">
+                        <SimpleVueCamera ref="camera" />
+                        <!-- <div style="margin-top:10px;">
+                        <input v-model="name" placeholder="Name (for register)" />
+                        <button @click="registerFace">Register Face</button>
+                        <button @click="scanFace">Scan (log)</button>
+                        </div>
+                        <div v-if="lastResult" style="margin-top:10px;">
+                        <pre>{{ lastResult }}</pre>
+                        </div> -->
+                    </div>
+                </q-card-section>
+                
+                <q-card-actions class="q-pa-lg bg">
+                    <div class="q-gutter-sm">
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="register" @click="registerFace" />
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { faceDialog = false; }" outline/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
@@ -291,6 +347,9 @@
 import { 
     usePreferenceStore 
 } from 'src/stores/preference-store';
+import {
+    useAuthStore
+} from 'src/stores/auth-store'
 
 import { 
     reactive,
@@ -305,6 +364,7 @@ import { api } from 'src/boot/axios';
 import { Toast } from 'src/boot/sweetalert'; 
 
 const PreferenceStore = usePreferenceStore();
+const AuthStore = useAuthStore();
 
 const dialog = ref(false);
 const isEdit = ref(false);
@@ -315,9 +375,8 @@ const id = ref('');
 const profileId = ref('');
 const username = ref('');
 const password = ref('');
-const roleId = ref('');
-const level = ref('');
-const isActive = ref(false);
+const role = ref('');
+const status = ref('');
 
 const Errors = reactive({
     profileId: { 
@@ -329,10 +388,10 @@ const Errors = reactive({
     password: {
         type: null, messages: []
     },
-    roleId: {
+    role: {
         type: null, messages: []
     },
-    level: {
+    status: {
         type: null, messages: []
     }
 });
@@ -362,7 +421,7 @@ const Validations = () => {
         Errors.username.type = null
     }
 
-    if (isEdit) {
+    if (!isEdit.value) {
         if (!password.value) {
             Errors.password.type = true;
             Errors.password.messages.push('Password is required')
@@ -372,20 +431,20 @@ const Validations = () => {
         }
     }
 
-    if (!roleId.value) {
-        Errors.roleId.type = true;
-        Errors.roleId.messages.push('Role is required')
+    if (!role.value) {
+        Errors.role.type = true;
+        Errors.role.messages.push('Role is required')
         isError = true
     } else {
-        Errors.roleId.type = null
+        Errors.role.type = null
     }
 
-    if (!level.value) {
-        Errors.level.type = true;
-        Errors.level.messages.push('Level is required')
+    if (!status.value) {
+        Errors.status.type = true;
+        Errors.status.messages.push('status is required')
         isError = true
     } else {
-        Errors.level.type = null
+        Errors.status.type = null
     }
 
     if (isError) {
@@ -485,26 +544,18 @@ const NewDialog = () => {
     dialog.value = true;
     isEdit.value = false;
     LoadProfile();
-    LoadRole();
 }
 
 const ModifyDialog = async (data) => {
     ResetForm();
+    LoadProfile();
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
-    if (!profiles.value.length) {
-        await LoadProfile();
-    }
-    filteredProfiles.value = [...profiles.value];
-    profileId.value = profiles.value.find(p => p.value === data.profileId)?.value || null;
+    profileId.value = Number(data.profileId);
     username.value = data.username;
-    if (!roles.value.length) {
-        await LoadRole();
-    }
-    roleId.value = data.roleId;
-    level.value = data.level;
-    isActive.value = (data.isActive ? true : false);
+    role.value = data.role;
+    status.value = data.status;
 }
 
 const ResetForm = () => {
@@ -512,14 +563,13 @@ const ResetForm = () => {
     profileId.value = '';
     username.value = '';
     password.value = '';
-    roleId.value = '';
-    level.value = '';
-    isActive.value = false;
+    role.value = '';
+    status.value = '';
     Errors.profileId.type = null;
     Errors.username.type = null;
     Errors.password.type = null;
-    Errors.roleId.type = null;
-    Errors.level.type = null;
+    Errors.role.type = null;
+    Errors.status.type = null;
 }
 
 const Save = async () => {
@@ -531,15 +581,15 @@ const Save = async () => {
                 profileId: profileId.value,
                 username: username.value,
                 password: password.value,
-                roleId: roleId.value,
-                level: level.value
+                role: role.value,
+                status: status.value
             })
             : await api.post('/user', {
                 profileId: profileId.value,
                 username: username.value,
                 password: password.value,
-                roleId: roleId.value,
-                level: level.value
+                role: role.value,
+                status: status.value
             });
         dialog.value = false;
         if (id.value && isEdit) {
@@ -629,39 +679,74 @@ const Toggle = async () => {
 
 
 const profiles = ref([]);
-const roles = ref([]);
+const roles = ref([
+    {
+        value: "SuperAdmin",
+        label: "Super Administrator"
+    },
+    {
+        value: "Admin",
+        label: "Administrator"
+    },
+    {
+        value: "Supervisor",
+        label: "Supervisor"
+    },
+    {
+        value: "HR",
+        label: "Human Resource"
+    },
+    {
+        value: "Finance",
+        label: "Finance"
+    },
+    {
+        value: "Employee",
+        label: "Employee"
+    },
+]);
+const statuses = ref([
+    {
+        value: "Active",
+        label: "Active"
+    },
+    {
+        value: "Inactive",
+        label: "Inactive"
+    },
+    {
+        value: "Suspended",
+        label: "Suspended"
+    }
+]);
+
+const filteredProfiles = ref([]);
 
 const createFilterFn = (sourceRef, targetRef) => {
     return (val, update) => {
+        if (val === '') {
+        update(() => { targetRef.value = sourceRef.value; });
+            return;
+        }
         update(() => {
-            if (!val) {
-                targetRef.value = [];
-            } else {
-                const needle = val.toLowerCase().trim()
-                targetRef.value = sourceRef.value
-                    .filter(v => (v.label ?? '').toLowerCase().includes(needle))
-                    .slice(0, 5)
-            }
-        })
-    }
-}
+            const needle = val.toLowerCase();
+            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
+        });
+    };
+};
 
-const filteredProfiles = ref([]);
+const normalizeOptions = data => data.map(d => ({
+    label: d.label ?? d.name ?? String(d.text ?? d.value),
+    value: Number(d.value ?? d.id)
+}))
+
 const filterProfileFn = createFilterFn(profiles, filteredProfiles);
 
 const LoadProfile = async () => {
     try {
-        const response = await api.get(`/option/profiles`);
-        profiles.value = response.data;
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-}
-
-const LoadRole = async () => {
-    try {
-        const response = await api.get(`/option/roles`);
-        roles.value = response.data;
+        const { data } = await api.get(`/option/profiles`);
+        profiles.value = normalizeOptions(data)
+        filteredProfiles.value = [...profiles.value]
     } catch (error) {
         console.error("Error fetching options:", error);
     }
@@ -678,27 +763,122 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const isDisabled = (roleValue) => {
-    if (roleValue === 1) return true
-    if (level.value === 'Management') {
-        return roleValue === 6
-    } else if (level.value === 'Employee') {
-        return roleValue >= 1 && roleValue <= 5
-    }
-    return false
+const isDisabled = (value) => {
+  // Disable only specific roles (like SuperAdmin and Admin)
+  return ['SuperAdmin'].includes(value)
 }
 
-watch(level, (val) => {
-    if (val === 'Employee') {
-        roleId.value = 6
-    } else if (val === 'Management') {
-        if (roleId.value === 6) roleId.value = null
-    }
-})
+
 
 onMounted(() => {
     LoadAll();
 })
+
+import * as faceapi from 'face-api.js';
+import SimpleVueCamera from 'simple-vue-camera';
+
+const camera = ref(null);
+const name = ref('');
+const lastResult = ref(null);
+const faceDialog = ref(false);
+
+async function loadModels() {
+  const MODEL_URL = '/models'; // put face-api models here
+  await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+  await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+}
+
+async function captureFrame() {
+  if (!camera.value) return null;
+
+  try {
+    const blob = await camera.value.snapshot(); // returns Blob
+    // Convert Blob to Image (HTMLImageElement) for face-api.js
+    const img = await createImageFromBlob(blob);
+    return img;
+  } catch (err) {
+    console.error("Error capturing snapshot:", err);
+    return null;
+  }
+}
+
+// helper function
+function createImageFromBlob(blob) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+// usage in registerFace or scanFace
+async function detectDescriptor() {
+  const img = await captureFrame();
+  if (!img) return null;
+
+  const detection = await faceapi
+    .detectSingleFace(img)
+    .withFaceLandmarks()
+    .withFaceDescriptor();
+
+  if (!detection) return null;
+  return { descriptor: detection.descriptor, img };
+}
+
+async function registerFace() {
+  lastResult.value = "Registering...";
+  const result = await detectDescriptor();
+  if (!result) return (lastResult.value = "No face detected");
+
+  const canvas = document.createElement("canvas");
+  canvas.width = result.img.width;
+  canvas.height = result.img.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(result.img, 0, 0);
+
+  const payload = {
+    name: name.value || "unknown",
+    descriptor: Array.from(result.descriptor),
+    imageBase64: canvas.toDataURL("image/png"),
+  };
+
+  try {
+    const res = await fetch("http://localhost:3000/api/face/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    lastResult.value = JSON.stringify(await res.json(), null, 2);
+  } catch (err) {
+    lastResult.value = "Error: " + err.message;
+  }
+}
+
+
+async function scanFace() {
+  lastResult.value = 'Scanning...';
+  const result = await detectDescriptor();
+  if (!result) return (lastResult.value = 'No face detected');
+
+  const payload = { descriptor: Array.from(result.descriptor) };
+  try {
+    const res = await fetch('http://localhost:3000/api/faces/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    lastResult.value = JSON.stringify(await res.json(), null, 2);
+  } catch (err) {
+    lastResult.value = 'Error: ' + err.message;
+  }
+}
+
+
+onMounted(async () => {
+  await loadModels();
+});
 
 </script>
 

@@ -39,7 +39,7 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify schedule shift' : 'create new schedule shift' }}</div>
@@ -91,6 +91,13 @@
                                     <q-item>
                                         <q-item-section class="text-italic text-grey">
                                         No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>

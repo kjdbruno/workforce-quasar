@@ -53,6 +53,36 @@ const routes = [
       { path: '', component: () => import('src/pages/RecruitmentPage.vue'), name: 'recruitment' }
     ]
   },
+  {
+    path: '/employee',
+    component: () => import('layouts/MainLayout.vue'),
+    beforeEnter: (to, from, next) => {
+      const auth = useAuthStore();
+      if (!auth.isAuthenticated) {
+        next('/')
+      } else {
+        next()
+      }
+    },
+    children: [
+      { path: '', component: () => import('src/pages/EmployeePage.vue'), name: 'employee' }
+    ]
+  },
+  {
+    path: '/leave',
+    component: () => import('layouts/MainLayout.vue'),
+    beforeEnter: (to, from, next) => {
+      const auth = useAuthStore();
+      if (!auth.isAuthenticated) {
+        next('/')
+      } else {
+        next()
+      }
+    },
+    children: [
+      { path: '', component: () => import('src/pages/LeavePage.vue'), name: 'leave' }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it

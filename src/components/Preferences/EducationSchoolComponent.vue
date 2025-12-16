@@ -39,7 +39,7 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify school' : 'create new school' }}</div>
@@ -79,6 +79,7 @@
                                 outlined
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
+                                input-class="text-capitalize"
                             />
                         </div>
                     </div>
