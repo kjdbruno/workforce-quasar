@@ -26,7 +26,7 @@
                     v-ripple
                     >
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ formatName(data.profile) }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                         <div class="text-caption text-grey">{{ data.username }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
@@ -41,7 +41,7 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="dialog" full-height position="right" persistent square>
+        <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
                     <div class="text-h6 text-uppercase">{{ isEdit ? 'modify user' : 'create new user' }}</div>

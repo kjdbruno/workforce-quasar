@@ -89,11 +89,11 @@
                         <q-item class="q-mb-sm">
                             <q-item-section avatar>
                                 <q-avatar>
-                                    <img :src="formatPhoto(authStore.user?.profile?.photos.photo)">
+                                    <img :src="formatPhoto(authStore.user?.avatar)">
                                 </q-avatar>
                             </q-item-section>
                             <q-item-section>
-                                <q-item-label caption class="text-uppercase text-bold">{{ formatName(authStore.user?.profile) }}</q-item-label>
+                                <q-item-label caption class="text-uppercase text-bold">{{ authStore.user?.name }}</q-item-label>
                                 <q-item-label caption lines="1">{{ authStore.user.username }}</q-item-label>
                             </q-item-section>
                         </q-item>
@@ -101,7 +101,7 @@
                 </div>
                 <div v-if="miniState" class="text-center">
                     <q-avatar class="q-mb-sm">
-                        <img :src="formatPhoto(authStore.user?.profile?.photos.photo)">
+                        <img :src="formatPhoto(authStore.user?.avatar)">
                     </q-avatar>
                 </div>
             </div>
@@ -239,8 +239,8 @@ const menuItems = [
 
 const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase();
 
-const formatPhoto = (photo) => {
-    return `${process.env.VUE_APP_BACKEND_URL}${photo}`
+const formatPhoto = (avatar) => {
+    return `${process.env.VUE_APP_BACKEND_URL}${avatar}`
 }
 
 </script>

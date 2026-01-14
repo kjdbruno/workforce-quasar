@@ -83,6 +83,21 @@ const routes = [
       { path: '', component: () => import('src/pages/LeavePage.vue'), name: 'leave' }
     ]
   },
+  {
+    path: '/dtr',
+    component: () => import('layouts/MainLayout.vue'),
+    beforeEnter: (to, from, next) => {
+      const auth = useAuthStore();
+      if (!auth.isAuthenticated) {
+        next('/')
+      } else {
+        next()
+      }
+    },
+    children: [
+      { path: '', component: () => import('src/pages/DailyTimeRecordPage.vue'), name: 'dtr' }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it

@@ -2,7 +2,7 @@
     <div>
         <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()" >
+                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
@@ -23,50 +23,93 @@
                     </q-card-section>
                 </q-card>
             </div>
-            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
+                <q-card
+                    @click="ModifyDialog(data)"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    >
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption text-grey">{{ data.alias }}</div>
-                    </q-card-section>
-                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
+                    <div class="absolute-top-left q-ma-sm"  style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
                 </q-card>
             </div>
         </div>
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify department' : 'create new department' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify position' : 'create new position' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'department name' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'position' }}</span>
                             </div>
                             <q-input 
                                 v-model="name" 
-                                label="Enter Department Name"
+                                label="Enter Position"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.alias.msg ? 'text-negative' : 'text-grey'">{{ Errors.alias.msg ? Errors.alias.msg : 'department alias' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.amount.msg ? 'text-negative' : 'text-grey'">{{ Errors.amount.msg ? Errors.amount.msg : 'amount' }}</span>
                             </div>
                             <q-input 
-                                v-model="alias" 
-                                label="Enter Department Alias"
+                                v-model="amount" 
+                                label="Enter Amount"
                                 outlined 
-                                :error="Errors.alias.type"
+                                :error="Errors.amount.type"
+                                :no-error-icon="true"
+                                input-class="text-capitalize"
+                            />
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'job description' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="description" 
+                                label="Enter Job Description"
+                                outlined 
+                                :error="Errors.description.type" 
+                                type="textarea"
                                 :no-error-icon="true"
                             />
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
+                            </div>
+                            <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
+                                <q-input
+                                    v-model="qualifications[index]"
+                                    label="Enter Qualification"
+                                    outlined
+                                    :error="Errors.qualifications.name.type[index]"
+                                    :no-error-icon="true"
+                                >
+                                    <template v-slot:append>
+                                        <q-btn
+                                            v-if="qualifications.length > 1"
+                                            flat unelevated round icon="block" size="sm"
+                                            @click="remove(index)"
+                                        />
+                                    </template>
+                                </q-input>
+                            </div>
                         </div>
                     </div>
                 </q-card-section>
@@ -75,6 +118,7 @@
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
+                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="Add" outline/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
                 </q-card-actions>
@@ -131,7 +175,9 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    nextTick, 
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -145,38 +191,73 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
+const amount = ref('');
 const name = ref('');
-const alias = ref('');
+const description = ref('');
+const qualifications = ref([""]);
 const isActive = ref(false);
 
 const Errors = reactive({
     name: { 
         type: null, msg: ''
     },
-    alias: {
+    amount: { 
         type: null, msg: ''
-    }
+    },
+    description: {
+        type: null, msg: ''
+    },
+    qualifications: {
+        name: {
+            type: [], msg: ''
+        }
+    },
 });
+
+const initErrors = () => {
+    Errors.qualifications.name.type = qualifications.value.map(() => null);
+}
 
 const Validations = () => {
     
     let isError = false;
 
+    Errors.qualifications.name = { type: null, msg: '' }
+    
     if (!name.value) {
         Errors.name.type = true
-        Errors.name.msg = 'Name is required'
+        Errors.name.msg = 'position is required!'
         isError = true
     } else {
         Errors.name.type = null
     }
-    if (!alias.value) {
-        Errors.alias.type = true
-        Errors.alias.msg = 'alias is required'
+
+    if (!amount.value) {
+        Errors.amount.type = true
+        Errors.amount.msg = 'amount is required!'
         isError = true
     } else {
-        Errors.alias.type = null
+        Errors.amount.type = null
     }
 
+    if (!description.value) {
+        Errors.description.type = true
+        Errors.description.msg = 'job decription is required'
+        isError = true
+    } else {
+        Errors.description.type = null
+    }
+
+   initErrors()
+    
+    qualifications.value.forEach((e, index) => {
+        if (!e) {
+            Errors.qualifications.name.type[index] = true;
+            Errors.qualifications.name.msg = 'qualification is required';
+            isError = true;
+        }
+    });
+    
     if (isError) {
         Toast.fire({
             icon: "error",
@@ -187,8 +268,9 @@ const Validations = () => {
         })
     }
 
-    return !isError;
+    return !isError
 }
+
 
 const rows = ref([]);
 
@@ -202,7 +284,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/department`, {
+        const { data } = await api.get(`/position`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -211,6 +293,16 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
+
+        if (!rows.value.length) {
+            Toast.fire({
+                icon: "info",
+                html: `
+                <div class="text-h6 text-bold text-uppercase">Notice</div>
+                <div class="text-caption text-capitalize;">No records found!</div>
+                `
+            });
+        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -264,23 +356,26 @@ const NewDialog = () => {
     isEdit.value = false;
 }
 
-const ModifyDialog = (data) => {
+const ModifyDialog = async (data) => {
     ResetForm();
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
-    alias.value = data.alias;
+    amount.value = data.amount;
+    description.value = data.description;
+    qualifications.value = data.qualification;
     isActive.value = (data.is_active ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
     name.value = '';
-    alias.value = '';
-    isActive.value = false;
+    description.value = '';
+    qualifications.value = [""];
     Errors.name.type = null;
-    Errors.alias.type = null;
+    Errors.amount.type = null;
+    Errors.description.type = null;
 }
 
 const Save = async () => {
@@ -288,17 +383,21 @@ const Save = async () => {
     submitLoading.value = true;
     try {
         const response = id.value && isEdit
-            ? await api.post(`/department/${id.value}/update`, {
+            ? await api.post(`/position/${id.value}/update`, {
                 name: name.value,
-                alias: alias.value
+                amount: amount.value,
+                description: description.value,
+                qualifications: qualifications.value
             })
-            : await api.post('/department', {
+            : await api.post('/position', {
                 name: name.value,
-                alias: alias.value
+                amount: amount.value,
+                description: description.value,
+                qualifications: qualifications.value
             });
         dialog.value = false;
         if (id.value && isEdit) {
-            UpdateList(response.data.department);
+            UpdateList(response.data.data);
         } else {
             LoadAll();
         }
@@ -352,10 +451,10 @@ const Toggle = async () => {
     submitLoading.value = true;
     try {
         const response = isActive.value
-            ? await api.post(`/department/${id.value}/disable`)
-            : await api.post(`/department/${id.value}/enable`)
+            ? await api.post(`/position/${id.value}/disable`)
+            : await api.post(`/position/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.department)
+        UpdateList(response.data.position)
         Toast.fire({
             icon: "success",
             html: `
@@ -377,6 +476,20 @@ const Toggle = async () => {
     } finally {
         submitLoading.value = false;
     }
+}
+
+const qualificationInputs = ref([]);
+
+const Add = async () => {
+    qualifications.value.unshift("");
+    await nextTick();
+    if (qualificationInputs.value[0]) {
+        qualificationInputs.value[0].focus();
+    }
+}
+
+const remove = (index) => {
+    qualifications.value.splice(index, 1);
 }
 
 onMounted(() => {

@@ -21,35 +21,31 @@
             </q-card-section>
         </q-card>
         <div class="q-mt-md">
-            <component :is="components[RecruitmentStore.component]" :key="RecruitmentStore.component" />
+            <component :is="components[ProfileStore.component]" :key="ProfileStore.component" />
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
-import { useRecruitmentStore } from 'src/stores/recruitment-store';
-import RequisitionComponent from 'src/components/Recruitment/RequisitionComponent.vue';
-import ApplicationComponent from 'src/components/Recruitment/ApplicationComponent.vue';
-import SignatoryComponent from 'src/components/Recruitment/SignatoryComponent.vue';
+import { useProfileStore } from 'src/stores/profile-store';
 
-const RecruitmentStore = useRecruitmentStore();
+import SignatoryComponent from 'src/components/Profile/SignatoryComponent.vue';
+import ProfileComponent from 'src/components/Profile/ProfileComponent.vue';
+
+const ProfileStore = useProfileStore();
 
 const components = {
     SignatoryComponent,
-    RequisitionComponent,
-    ApplicationComponent
+    ProfileComponent
 };
 
 const tabs = [
-    // { 
-    //     name: 'Signatory'
-    // },
     { 
-        name: 'Requisition'
+        name: 'Signatory'
     },
     { 
-        name: 'Application'
+        name: 'Profile'
     }
 ];
 
@@ -65,7 +61,7 @@ function selectTab(tabName, subTab = '') {
     
     const cleanTab = tabName.replace(/\s+/g, '');
     const cleanSub = subTab.replace(/\s+/g, '');
-    RecruitmentStore.component = subTab ? `${cleanTab}${cleanSub}Component` : `${cleanTab}Component`;
+    ProfileStore.component = subTab ? `${cleanTab}${cleanSub}Component` : `${cleanTab}Component`;
 }
 
 function toggleDropdown(tabName) {
@@ -80,13 +76,13 @@ function handleClickOutside(event) {
 }
 
 onBeforeMount(() => {
-    if (!RecruitmentStore.component) {
+    if (!ProfileStore.component) {
         // default
-        RecruitmentStore.component = 'RequisitionComponent';
-        activeTab.value = 'Requisition';
+        ProfileStore.component = 'SignatoryComponent';
+        activeTab.value = 'Signatory';
     } else {
         // restore previous
-        const match = RecruitmentStore.component.match(/([A-Z][a-z]+)/g) || [];
+        const match = ProfileStore.component.match(/([A-Z][a-z]+)/g) || [];
 
         if (match.length) {
             const tabName = match[0];

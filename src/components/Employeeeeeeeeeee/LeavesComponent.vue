@@ -106,7 +106,7 @@
                             <div class="text-caption text-grey">{{ data?.days }} day/s</div>
                             <div class="text-caption">{{ formatDate(data?.startDate) }} to {{ formatDate(data?.endDate) }}</div>
                         </q-card-section>
-                        <q-inner-loading :showing="EmployeeStore.loading">
+                        <q-inner-loading :showing="data.id == leaveId ? EmployeeStore.loading : null">
                             <q-spinner-puff />
                         </q-inner-loading>
                     </q-card>
@@ -167,17 +167,6 @@ const AuthStore = useAuthStore();
 const today = new Date();
 const month = ref(String(today.getMonth() + 1).padStart(2, '0'));
 const year = ref(String(today.getFullYear()));
-
-const trainings = ref([
-    {
-        title: '',
-        startDate: '',
-        endDate: '',
-        hour: '',
-        typeId: '',
-        conductedBy: ''
-    }
-]);
 
 const credits = ref([]);
 const LoadLeaveCredit = async () => {
@@ -290,8 +279,10 @@ onBeforeMount(() => {
 
 const printDialog = ref(false);
 const pdf = ref(null);
+const leaveId = ref('');
 
 const PrintLeaveForm = async (id) => {
+    leaveId.value = id;
     EmployeeStore.loading = true;
     try {
         const res = await api.get(`/employee/leave/application/${id}/pdf`, {

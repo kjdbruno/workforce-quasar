@@ -753,7 +753,7 @@ const Validations = () => {
 const LoadEmployment = async () => {
     EmployeeStore.loading = true;
     try {
-        const response = await api.get(`/employee/employment/${EmployeeStore.employment.id}`);
+        const response = await api.get(`/employee/employment/${EmployeeStore.profileId}`);
         const data = response.data.data;
         companyId.value = Number(data.companyId);
         departmentId.value = Number(data.departmentId);

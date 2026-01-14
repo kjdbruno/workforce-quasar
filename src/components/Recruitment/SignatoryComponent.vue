@@ -2,69 +2,127 @@
     <div>
         <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
+                <q-card
+                    key="data-add"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    @click="NewDialog()"
+                >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
                 </q-card>
             </div>
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </q-card-section>
-                </q-card>
-            </div>
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
-                        <div class="text-caption text-uppercase text-grey">no data found</div>
-                    </q-card-section>
-                </q-card>
-            </div>
-            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
+            
+            <div
+                v-for="(data, index) in rows"
+                :key="`data-${data.id}`"
+                class="card-anim-wrapper"
+                :style="{ animationDelay: `${index * 120}ms` }"
+            >
+                <q-card
+                    @click="ModifyDialog(data)"
+                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
+                    v-ripple
+                    >
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data.user?.profile) }}</div>
+                        <div class="text-caption text-grey">{{ data.description }}</div>
                     </q-card-section>
-                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
+                    <q-card-section class="full-width">
+                        <div class="text-caption">{{ formatOrdinal(data.order) }}</div>
+                        <div class="text-caption text-grey">order</div>
+                    </q-card-section>
+                    <div
+                        class="absolute-top-left q-ma-sm"
+                        style="width: 7px; height: 7px; border-radius: 50%;"
+                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
+                    ></div>
                 </q-card>
             </div>
         </div>
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify company' : 'create new company' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify vacancy signatory' : 'create new vacancy signatory' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'company name' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.userId.type ? 'text-negative' : 'text-grey'">{{ Errors.userId.type ? Errors.userId.message : 'employee/user' }}</span>
                             </div>
-                            <q-input 
-                                v-model="name" 
-                                label="Enter Company Name"
+                            <q-select 
                                 outlined 
-                                :error="Errors.name.type"
+                                v-model="userId" 
+                                label="Select Employee"
+                                emit-value 
+                                map-options 
+                                use-input 
+                                input-debounce="300" 
+                                :options="filteredUsers" 
+                                @filter="filterUserFn" 
+                                :error="Errors.userId.type"
                                 :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
+                                dropdown-icon="keyboard_arrow_down"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
+                        <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'description' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.signature.type ? 'text-negative' : 'text-grey'">{{ Errors.signature.type ? Errors.signature.message : 'signature' }}</span>
+                            </div>
+                            <q-file 
+                                outlined 
+                                v-model="signature"
+                                label="Upload Signature"
+                                accept=".jpg,.jpeg,.png"
+                                :error="Errors.signature.type"
+                                :no-error-icon="true"
+                            >
+                                <template v-if="signature" v-slot:append>
+                                    <q-avatar>
+                                        <img :src="previewUrl">
+                                    </q-avatar>
+                                </template>
+                            </q-file>
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.message : 'description' }}</span>
                             </div>
                             <q-input 
                                 v-model="description" 
                                 label="Enter Description"
-                                outlined 
-                                :error="Errors.description.type"
-                                type="textarea"
+                                outlined
+                                :error="Errors.description.type" 
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.order.type ? 'text-negative' : 'text-grey'">{{ Errors.order.type ? Errors.order.message : 'order' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="order" 
+                                label="Enter Order"
+                                outlined
+                                :error="Errors.order.type" 
                                 :no-error-icon="true"
                             />
                         </div>
@@ -131,7 +189,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -145,36 +204,73 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const name = ref('');
+const userId = ref('');
 const description = ref('');
+const signature = ref('');
+const order = ref('');
+
+const previewUrl = ref(null)
+
 const isActive = ref(false);
 
 const Errors = reactive({
-    name: { 
-        type: null, msg: '' 
+    userId: { 
+        type: null, message: ''
     },
     description: {
-        type: null, msg: ''
+        type: null, message: ''
+    },
+    signature: {
+        type: null, message: ''
+    },
+    order: {
+        type: null, message: ''
     }
 });
 
 const Validations = () => {
-    
+
     let isError = false;
 
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.msg = 'Name is required'
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].messages = [];
+    });
+
+    if (!userId.value) {
+        Errors.userId.type = true;
+        Errors.userId.message = 'User or employee is required!'
         isError = true
     } else {
-        Errors.name.type = null
+        Errors.userId.type = null
     }
+
     if (!description.value) {
-        Errors.description.type = true
-        Errors.description.msg = 'description is required'
+        Errors.description.type = true;
+        Errors.description.message = 'description is required!'
         isError = true
     } else {
         Errors.description.type = null
+    }
+
+    if (!signature.value) {
+        Errors.signature.type = true;
+        Errors.signature.message = 'signature is required!'
+        isError = true
+    } else {
+        Errors.signature.type = null
+    }
+
+    if (!order.value) {
+        Errors.order.type = true;
+        Errors.order.message = 'order is required';
+        isError = true
+    } else if (!/^\d+$/.test(order.value)) {
+        Errors.order.type = true;
+        Errors.order.message = 'Order must be a whole number';
+        isError = true;
+    } else {
+        Errors.order.type = null
     }
 
     if (isError) {
@@ -202,7 +298,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/company`, {
+        const { data } = await api.get(`/vacancy/signatory`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -211,6 +307,16 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
+
+        if (!rows.value.length) {
+            Toast.fire({
+                icon: "info",
+                html: `
+                <div class="text-h6 text-bold text-uppercase">Notice</div>
+                <div class="text-caption text-capitalize;">No records found!</div>
+                `
+            });
+        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -258,6 +364,7 @@ const LastPage = () => {
     }
 }
 
+
 const NewDialog = () => {
     ResetForm();
     dialog.value = true;
@@ -269,36 +376,53 @@ const ModifyDialog = (data) => {
     dialog.value = true;
     isEdit.value = true;
     id.value = data.id;
-    name.value = data.name;
+    userId.value = data.userId;
     description.value = data.description;
-    isActive.value = (data.is_active ? true : false);
+    previewUrl.value = formatPhoto(data.signature);
+    signature.value = {
+        name: data.filename,
+        __uploadedFile: true
+    };
+    order.value = data.order;
+    isActive.value = (data.isActive ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
-    name.value = '';
+    userId.value = '';
     description.value = '';
+    signature.value = '';
+    order.value = '';
     isActive.value = false;
-    Errors.name.type = null;
+    Errors.userId.type = null;
     Errors.description.type = null;
+    Errors.signature.type = null;
+    Errors.order.type = null;
 }
 
 const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
+        const form = new FormData();
+        form.append("userId", userId.value);
+        form.append("description", description.value);
+        form.append("file", signature.value);
+        form.append("order", order.value);
         const response = id.value && isEdit
-            ? await api.post(`/company/${id.value}/update`, {
-                name: name.value,
-                description: description.value
+            ? await api.post(`/vacancy/signatory/${id.value}/update`, form, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
             })
-            : await api.post('/company', {
-                name: name.value,
-                description: description.value
+            : await api.post('/vacancy/signatory', form, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
             });
         dialog.value = false;
         if (id.value && isEdit) {
-            UpdateList(response.data.company);
+            UpdateList(response.data.signatory);
         } else {
             LoadAll();
         }
@@ -309,7 +433,7 @@ const Save = async () => {
                 <div class="text-caption text-capitalize;">${response.data.message}<div>
             `
         });
-
+        ResetForm();
     } catch (e) {
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
@@ -327,13 +451,16 @@ const Save = async () => {
 }
 
 const applyBackendErrors = (backendErrors) => {
+
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
+        
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
         Errors[key].messages = []
     })
+    
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
@@ -353,10 +480,10 @@ const Toggle = async () => {
     submitLoading.value = true;
     try {
         const response = isActive.value
-            ? await api.post(`/company/${id.value}/disable`)
-            : await api.post(`/company/${id.value}/enable`)
+            ? await api.post(`/vacancy/signatory/${id.value}/disable`)
+            : await api.post(`/vacancy/signatory/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.company)
+        UpdateList(response.data.signatory)
         Toast.fire({
             icon: "success",
             html: `
@@ -380,8 +507,68 @@ const Toggle = async () => {
     }
 }
 
+const users = ref([]);
+const filteredUsers = ref([]);
+
+const createFilterFn = (sourceRef, targetRef) => {
+    return (val, update) => {
+        if (val === '') {
+        update(() => { targetRef.value = sourceRef.value; });
+            return;
+        }
+        update(() => {
+            const needle = val.toLowerCase();
+            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
+        });
+    };
+};
+
+const normalizeOptions = data => data.map(d => ({
+    label: d.label ?? d.name ?? String(d.text ?? d.value),
+    value: Number(d.value ?? d.id)
+}))
+
+const filterUserFn = createFilterFn(users, filteredUsers);
+
+const LoadUsers = async () => {
+    try {
+        const { data } = await api.get(`/vacancy/signatory/user/option`);
+        users.value = normalizeOptions(data)
+        filteredUsers.value = [...users.value]
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+const formatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.firstname || '';
+    const middlename = profile.middlename
+        ? profile.middlename.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.lastname || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+const formatOrdinal = (value) => {
+    if (!value || isNaN(value)) return '';
+    const num = Number(value);
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const v = num % 100;
+    return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+};
+
+const formatPhoto = (photo) => {
+    return `${process.env.VUE_APP_BACKEND_URL}${photo}`
+}
+
 onMounted(() => {
     LoadAll();
+});
+
+onBeforeMount(() => {
+    LoadUsers();
 })
 
 </script>

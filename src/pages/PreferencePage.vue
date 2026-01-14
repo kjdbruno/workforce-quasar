@@ -65,11 +65,18 @@ import PayrollTaxDeductionComponent from 'src/components/Preferences/PayrollTaxD
 import SchedulePremiumPayComponent from 'src/components/Preferences/SchedulePremiumPayComponent.vue';
 import SignatoryTypeComponent from 'src/components/Preferences/SignatoryTypeComponent.vue';
 import SignatoryProfileComponent from 'src/components/Preferences/SignatoryProfileComponent.vue';
+import EmploymentPositionComponent from 'src/components/Preferences/EmploymentPositionComponent.vue';
+import EmploymentScheduleComponent from 'src/components/Preferences/EmploymentScheduleComponent.vue';
+
 
 const PreferenceStore = usePreferenceStore();
 
 const components = {
     UserComponent,
+    EmploymentPositionComponent,
+    EmploymentScheduleComponent,
+
+
     EmployeeSexComponent,
     EmployeeRelationshipComponent,
     EmployeeBloodTypeComponent,
@@ -111,22 +118,7 @@ const tabs = [
         name: 'User' 
     },
     { 
-        name: 'Signatory', 
-        subTabs: 
-        [
-            'Type', 
-            'Profile'
-        ] 
-    },
-    { 
-        name: 'Employee', 
-        subTabs: 
-        [
-            'Sex', 
-            'Relationship', 
-            'Blood Type', 
-            'Marital Status'
-        ] 
+        name: 'Holiday' 
     },
     { 
         name: 'Education', 
@@ -150,33 +142,10 @@ const tabs = [
         subTabs: 
         [
             'Department', 
-            'Employment Status', 
-            'Appointment Status',
-            'Leave',
-            'Government Agency',
-            'Company'
-        ] 
-    },
-    { 
-        name: 'Schedule', 
-        subTabs: 
-        [
-            'Class', 
-            'Shift', 
-            'Premium Pay',
-            'Holiday'
-        ] 
-    },
-    { 
-        name: 'Plantilla', 
-        subTabs: 
-        [
-            'Increment', 
-            'Salary Class', 
-            'Salary Grade',
-            'Position', 
-            'Salary',
-            // 'Rate'
+            'Company',
+            'Position',
+            'Schedule',
+            'Leave'
         ] 
     },
     { 

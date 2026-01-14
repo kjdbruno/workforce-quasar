@@ -2,7 +2,7 @@
     <div>
         <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()" >
+                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
@@ -28,43 +28,58 @@
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption text-grey">{{ data.alias }}</div>
+                    <q-card-section class="full-width">
+                        <div class="text-caption text-grey">{{ formatTime(data.time_start) }} to {{ formatTime(data.time_end) }}</div>
                     </q-card-section>
-                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify department' : 'create new department' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify schedule shift' : 'create new schedule shift' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'department name' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'schedule name' }}</span>
                             </div>
                             <q-input 
                                 v-model="name" 
-                                label="Enter Department Name"
+                                label="Enter Schedule Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
-                                input-class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.alias.msg ? 'text-negative' : 'text-grey'">{{ Errors.alias.msg ? Errors.alias.msg : 'department alias' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.timeStart.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.msg ? Errors.timeStart.msg : 'time start' }}</span>
                             </div>
                             <q-input 
-                                v-model="alias" 
-                                label="Enter Department Alias"
+                                v-model="timeStart" 
+                                label="HH:MM"
                                 outlined 
-                                :error="Errors.alias.type"
+                                mask="##:##"
+                                fill-mask
+                                :error="Errors.timeStart.type"
+                                :no-error-icon="true"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.timeEnd.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.msg ? Errors.timeEnd.msg : 'time end' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="timeEnd" 
+                                label="HH:MM"
+                                outlined 
+                                mask="##:##"
+                                fill-mask 
+                                :error="Errors.timeEnd.type"
                                 :no-error-icon="true"
                             />
                         </div>
@@ -131,12 +146,15 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
 
 import { Toast } from 'src/boot/sweetalert'; 
+
+import moment from 'moment'
 
 const PreferenceStore = usePreferenceStore();
 
@@ -146,16 +164,20 @@ const submitLoading = ref(false);
 
 const id = ref('');
 const name = ref('');
-const alias = ref('');
+const timeStart = ref('');
+const timeEnd = ref('');
 const isActive = ref(false);
 
 const Errors = reactive({
     name: { 
         type: null, msg: ''
     },
-    alias: {
+    timeStart: { 
         type: null, msg: ''
-    }
+    },
+    timeEnd: { 
+        type: null, msg: ''
+    },
 });
 
 const Validations = () => {
@@ -164,17 +186,27 @@ const Validations = () => {
 
     if (!name.value) {
         Errors.name.type = true
-        Errors.name.msg = 'Name is required'
+        Errors.name.msg = 'schedule name is required'
         isError = true
     } else {
         Errors.name.type = null
     }
-    if (!alias.value) {
-        Errors.alias.type = true
-        Errors.alias.msg = 'alias is required'
+
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeStart.value) {
+        Errors.timeStart.type = true
+        Errors.timeStart.msg = 'time start is required'
         isError = true
     } else {
-        Errors.alias.type = null
+        Errors.timeStart.type = null
+    }
+
+    if (!timeEnd.value) {
+        Errors.timeEnd.type = true
+        Errors.timeEnd.msg = ('time end is required')
+        isError = true
+    } else {
+        Errors.timeEnd.type = null
     }
 
     if (isError) {
@@ -187,8 +219,9 @@ const Validations = () => {
         })
     }
 
-    return !isError;
+    return !isError
 }
+
 
 const rows = ref([]);
 
@@ -202,7 +235,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/department`, {
+        const { data } = await api.get(`/schedule`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -270,17 +303,20 @@ const ModifyDialog = (data) => {
     isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
-    alias.value = data.alias;
+    timeStart.value = data.time_start;
+    timeEnd.value =  data.time_end;
     isActive.value = (data.is_active ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
     name.value = '';
-    alias.value = '';
+    timeStart.value = '';
+    timeEnd.value = '';
     isActive.value = false;
     Errors.name.type = null;
-    Errors.alias.type = null;
+    Errors.timeStart.type = null;
+    Errors.timeEnd.type = null;
 }
 
 const Save = async () => {
@@ -288,17 +324,19 @@ const Save = async () => {
     submitLoading.value = true;
     try {
         const response = id.value && isEdit
-            ? await api.post(`/department/${id.value}/update`, {
+            ? await api.post(`/schedule/${id.value}/update`, {
                 name: name.value,
-                alias: alias.value
+                timeStart: timeStart.value,
+                timeEnd: timeEnd.value
             })
-            : await api.post('/department', {
+            : await api.post('/schedule', {
                 name: name.value,
-                alias: alias.value
+                timeStart: timeStart.value,
+                timeEnd: timeEnd.value
             });
         dialog.value = false;
         if (id.value && isEdit) {
-            UpdateList(response.data.department);
+            UpdateList(response.data.schedule);
         } else {
             LoadAll();
         }
@@ -352,10 +390,10 @@ const Toggle = async () => {
     submitLoading.value = true;
     try {
         const response = isActive.value
-            ? await api.post(`/department/${id.value}/disable`)
-            : await api.post(`/department/${id.value}/enable`)
+            ? await api.post(`/schedule/${id.value}/disable`)
+            : await api.post(`/schedule/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.department)
+        UpdateList(response.data.schedule)
         Toast.fire({
             icon: "success",
             html: `
@@ -379,12 +417,13 @@ const Toggle = async () => {
     }
 }
 
+const formatTime = (time) => {
+    if (!time) return ''
+    return moment(time, 'HH:mm').format('hh:mm A')
+}
+
 onMounted(() => {
     LoadAll();
 })
 
 </script>
-
-<style scoped>
-
-</style>

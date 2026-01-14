@@ -56,7 +56,7 @@
                 </div>
                 <div class="col-10">
                     <div class="row items-center q-gutter-xs">
-                        <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" type="time" mask="##:## AA" fill-mask style="width: 100px;"/>
+                        <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/>
                         <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" />
                         <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" />
                         <q-badge v-if="data.overtimes" rounded color="primary" :label="data.overtimes" />
