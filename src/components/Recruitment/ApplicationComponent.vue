@@ -60,7 +60,7 @@
                                 <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label" :class="{ 'card--active': vacancyId === data.id }" @click="vacancyId = data.id" >
                                     <q-card-section class="text-center full-width q-pa-none">
                                         <div class="text-subtitle1 text-uppercase">{{ data?.position?.name }}</div>
-                                        <div class="text-caption text-uppercase">{{ data?.salary_range }}</div>
+                                        <div class="text-caption text-uppercase">{{ formatCurrency(data?.salary_range) }} {{ data?.position?.salary_type }}</div>
                                     </q-card-section>
                                     <q-card-section class="q-pa-none">
                                         <div class="text-caption">{{ data?.company?.name }}</div>
@@ -155,7 +155,7 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate (MM/DD/YYYY)' }}</span>
                             </div>
                             <q-input 
                                 v-model="birthdate" 
@@ -163,7 +163,7 @@
                                 outlined 
                                 :error="Errors.birthdate.type"
                                 :no-error-icon="true"
-                                type="date"
+                                @update:model-value="formatBirthdate"
                             />
                         </div>
                         <div class="col-4">
@@ -220,6 +220,7 @@
                                 outlined 
                                 :error="Errors.contactNo.type"
                                 :no-error-icon="true"
+                                @update:model-value="formatPHNumber"
                             />
                         </div>
                     </div>
@@ -981,7 +982,7 @@ const birthplace = ref('');
 const bloodtype = ref('');
 const address = ref('');
 const email = ref('');
-const contactNo = ref('');
+const contactNo = ref('09');
 const educations = ref([
     {
         schoollevel: "",
@@ -1223,10 +1224,52 @@ const Validations = () => {
 
     if (!birthdate.value) {
         Errors.birthdate.type = true;
-        Errors.birthdate.msg = 'birthdate is required';
+        Errors.birthdate.message = 'Date is required';
         isError = true;
     } else {
-        Errors.birthdate.type = null;
+        // Expect format MM/DD/YYYY
+        const parts = birthdate.value.split('/');
+        if (parts.length !== 3) {
+            Errors.birthdate.type = true;
+            Errors.birthdate.message = 'Invalid date format';
+            isError = true;
+        } else {
+            let [mm, dd, yyyy] = parts.map(Number);
+            const currentYear = new Date().getFullYear();
+
+            let valid = true;
+            let errMsg = '';
+
+            // Validate month
+            if (mm < 1 || mm > 12) {
+                valid = false;
+                errMsg = 'invalid month';
+            }
+            // Validate day
+            else if (dd < 1 || dd > 31) {
+                valid = false;
+                errMsg = 'invalid day';
+            }
+            // Validate year is current or future
+            else if (yyyy < currentYear) {
+                valid = false;
+                errMsg = `invalid year`;
+            }
+            // Validate actual day for month
+            else {
+                const daysInMonth = new Date(yyyy, mm, 0).getDate(); // last day of month
+                if (dd > daysInMonth) {
+                    valid = false;
+                    errMsg = `Invalid day for month ${mm}`;
+                }
+            }
+
+            if (!valid) {
+                Errors.birthdate.type = true;
+                Errors.birthdate.message = errMsg;
+                isError = true;
+            }
+        }
     }
 
     if (!birthplace.value) {
@@ -1538,7 +1581,7 @@ const ResetForm = () => {
     bloodtype.value = '';
     address.value = '';
     email.value = '';
-    contactNo.value = '';
+    contactNo.value = '09';
     initErrors();
 }
 
@@ -1759,16 +1802,58 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const formatAddress = (profile) => {
-    if (!profile) return 'No address provided';
-    const parts = [
-        profile.streetAddress,
-        profile.barangay?.name,
-        profile.town?.name,
-        profile.province?.name,
-        profile.region?.name
-    ].filter(Boolean);
-    return parts.join(', ');
+function formatCurrency(salaryRange) {
+    if (!salaryRange) return '';
+    // Split min and max
+    const parts = salaryRange.split('-').map(p => p.trim());
+    // Format each as currency
+    const formatted = parts.map(p => {
+        const num = Number(p);
+        return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+    });
+    // Join back with dash
+    return formatted.join(' - ');
+}
+
+const formatBirthdate = (val) => {
+    if (!val) {
+        birthdate.value = "";
+        return;
+    }
+    // Remove non-digit characters
+    const digits = val.replace(/\D/g, "");
+    // Automatically add slashes for MM/DD/YYYY
+    let formatted = digits;
+    if (digits.length > 2 && digits.length <= 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+    } else if (digits.length > 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
+    }
+    birthdate.value = formatted;
+}
+
+const formatPHNumber = (val) => {
+    // Remove all non-digit characters
+  let digits = val.replace(/\D/g, '')
+
+  // Always start with '09'
+  if (!digits.startsWith('09')) {
+    digits = '09'
+  }
+
+  // Limit to 11 digits
+  digits = digits.slice(0, 11)
+
+  contactNo.value = digits
+
+  // Validation
+  if (digits.length < 11) {
+    Errors.value.contactNo.type = true
+    Errors.value.contactNo.message = 'PH mobile number must be 11 digits starting with 09'
+  } else {
+    Errors.value.contactNo.type = false
+    Errors.value.contactNo.message = ''
+  }
 }
 
 const addEducation = () => {

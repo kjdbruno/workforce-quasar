@@ -29,7 +29,7 @@
                         <div class="text-subtitle2 text-uppercase">{{ data?.position?.name }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
-                        <div class="text-caption text-uppercase">{{ data?.salary_range }}</div>
+                        <div class="text-caption text-uppercase">{{ formatCurrency(data?.salary_range) }} {{ data?.position?.salary_type }}</div>
                         <div class="text-caption text-grey">{{ data?.status }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status === 'Requested' ? 'bg-blue' : (data.status === 'Approved' ? 'bg-positive' : (data.status === 'Rejected' ? 'bg-negative' : (data.status === 'Filled' ? 'bg-primary' : null)))"/>
@@ -60,6 +60,7 @@
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
                                 class="text-capitalize"
+                                @update:model-value="() => { salaryRange = position.amount }"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -94,6 +95,36 @@
                                 <div v-else>
                                     N/A
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-3">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.sex.type ? 'text-negative' : 'text-grey'">{{ Errors.sex.type ? Errors.sex.message : 'sex' }}</span>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-radio v-for="value in sexes" v-model="sex" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-6">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.schoolLevel.type ? 'text-negative' : 'text-grey'">{{ Errors.schoolLevel.type ? Errors.schoolLevel.message : 'school level' }}</span>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-radio v-for="value in schoollevels" v-model="schoolLevel" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-12">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.employmentStatus.type ? 'text-negative' : 'text-grey'">{{ Errors.employmentStatus.type ? Errors.employmentStatus.message : 'employment status' }}</span>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-radio v-for="value in employmentstatuses" v-model="employmentStatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
                             </div>
                         </div>
                     </div>
@@ -183,6 +214,7 @@
                                 :error="Errors.scheduleId.type"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -216,36 +248,6 @@
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-6">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.schoolLevel.type ? 'text-negative' : 'text-grey'">{{ Errors.schoolLevel.type ? Errors.schoolLevel.message : 'school level' }}</span>
-                            </div>
-                            <div class="q-gutter-sm">
-                                <q-radio v-for="value in schoollevels" v-model="schoolLevel" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.sex.type ? 'text-negative' : 'text-grey'">{{ Errors.sex.type ? Errors.sex.message : 'sex' }}</span>
-                            </div>
-                            <div class="q-gutter-sm">
-                                <q-radio v-for="value in sexes" v-model="sex" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-12">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.employmentStatus.type ? 'text-negative' : 'text-grey'">{{ Errors.employmentStatus.type ? Errors.employmentStatus.message : 'employment status' }}</span>
-                            </div>
-                            <div class="q-gutter-sm">
-                                <q-radio v-for="value in employmentstatuses" v-model="employmentStatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.yearExperience.type ? 'text-negative' : 'text-grey'">{{ Errors.yearExperience.type ? Errors.yearExperience.message : 'yr/s of experience' }}</span>
@@ -260,7 +262,7 @@
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.ageRange.type ? 'text-negative' : 'text-grey'">{{ Errors.ageRange.type ? Errors.ageRange.message : 'age range' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.ageRange.type ? 'text-negative' : 'text-grey'">{{ Errors.ageRange.type ? Errors.ageRange.message : 'age range (00-00)' }}</span>
                             </div>
                             <q-input 
                                 v-model="ageRange" 
@@ -273,7 +275,7 @@
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.message : 'date needed' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.message : 'date needed (MM/DD/YYYY)' }}</span>
                             </div>
                             <q-input 
                                 v-model="date" 
@@ -281,7 +283,7 @@
                                 outlined
                                 :error="Errors.date.type"
                                 :no-error-icon="true"
-                                type="date"
+                                @update:model-value="formatDateNeeded"
                             />
                         </div>
                     </div>
@@ -355,8 +357,8 @@
                         <div class="text-body1 text-uppercase">{{ info?.position?.name }}</div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">salary</div>
-                        <div class="text-body1 text-uppercase">{{ info?.salary_range }}</div>
+                        <div class="text-caption text-uppercase text-grey">salary range</div>
+                        <div class="text-body1 text-uppercase">{{ formatCurrency(info?.salary_range) }} {{ info?.position?.salary_type }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">status</div>
@@ -675,11 +677,54 @@ const Validations = () => {
 
     if (!date.value) {
         Errors.date.type = true;
-        Errors.date.message = 'date is required';
+        Errors.date.message = 'Date is required';
         isError = true;
     } else {
-        Errors.date.type = null;
+        // Expect format MM/DD/YYYY
+        const parts = date.value.split('/');
+        if (parts.length !== 3) {
+            Errors.date.type = true;
+            Errors.date.message = 'Invalid date format';
+            isError = true;
+        } else {
+            let [mm, dd, yyyy] = parts.map(Number);
+            const currentYear = new Date().getFullYear();
+
+            let valid = true;
+            let errMsg = '';
+
+            // Validate month
+            if (mm < 1 || mm > 12) {
+                valid = false;
+                errMsg = 'invalid month';
+            }
+            // Validate day
+            else if (dd < 1 || dd > 31) {
+                valid = false;
+                errMsg = 'invalid day';
+            }
+            // Validate year is current or future
+            else if (yyyy < currentYear) {
+                valid = false;
+                errMsg = `invalid year`;
+            }
+            // Validate actual day for month
+            else {
+                const daysInMonth = new Date(yyyy, mm, 0).getDate(); // last day of month
+                if (dd > daysInMonth) {
+                    valid = false;
+                    errMsg = `Invalid day for month ${mm}`;
+                }
+            }
+
+            if (!valid) {
+                Errors.date.type = true;
+                Errors.date.message = errMsg;
+                isError = true;
+            }
+        }
     }
+
 
     if (!location.value) {
         Errors.location.type = true;
@@ -1127,12 +1172,46 @@ const formatSalaryRange = (val) => {
 }
 
 const formatAgeRange = (val) => {
-    if (!val) return
-    let clean = val.replace(/[^\d-]/g, '')
-    const parts = clean.split('-').slice(0, 2)
-    const min = parts[0] || ''
-    const max = parts[1] || ''
-    ageRange.value = max ? `${min}-${max}` : min
+    if (!val) return;
+    // Remove non-digit characters
+    let clean = val.replace(/\D/g, '');
+    // Take only the first 4 digits
+    clean = clean.slice(0, 4);
+    // Split into two parts of 2 digits each
+    const min = clean.slice(0, 2);
+    const max = clean.slice(2, 4);
+    // Combine with dash if max exists
+    ageRange.value = max ? `${min}-${max}` : min;
+};
+
+const formatDateNeeded = (val) => {
+    if (!val) {
+        date.value = "";
+        return;
+    }
+    // Remove non-digit characters
+    const digits = val.replace(/\D/g, "");
+    // Automatically add slashes for MM/DD/YYYY
+    let formatted = digits;
+    if (digits.length > 2 && digits.length <= 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+    } else if (digits.length > 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
+    }
+    date.value = formatted;
+}
+
+function formatCurrency(salaryRange) {
+    if (!salaryRange) return '';
+    // Split min and max
+    const parts = salaryRange.split('-').map(p => p.trim());
+    // Format each as currency
+    const formatted = parts.map(p => {
+        const num = Number(p);
+        return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
+    });
+    // Join back with dash
+    return formatted.join(' - ');
 }
 
 

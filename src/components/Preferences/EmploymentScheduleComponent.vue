@@ -29,7 +29,7 @@
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
-                        <div class="text-caption text-grey">{{ formatTime(data.time_start) }} to {{ formatTime(data.time_end) }}</div>
+                        <div class="text-caption text-grey">{{ formatTime(data) }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
@@ -62,11 +62,10 @@
                             <q-input 
                                 v-model="timeStart" 
                                 label="HH:MM"
-                                outlined 
-                                mask="##:##"
-                                fill-mask
+                                outlined
                                 :error="Errors.timeStart.type"
                                 :no-error-icon="true"
+                                @update:model-value="formatTimeStart"
                             />
                         </div>
                         <div class="col-2">
@@ -77,10 +76,9 @@
                                 v-model="timeEnd" 
                                 label="HH:MM"
                                 outlined 
-                                mask="##:##"
-                                fill-mask 
                                 :error="Errors.timeEnd.type"
                                 :no-error-icon="true"
+                                @update:model-value="formatTimeEnd"
                             />
                         </div>
                     </div>
@@ -417,10 +415,68 @@ const Toggle = async () => {
     }
 }
 
-const formatTime = (time) => {
-    if (!time) return ''
-    return moment(time, 'HH:mm').format('hh:mm A')
+const formatTime = (app) => {
+    if (!app?.time_start || !app?.time_end) return ""
+    const format = (time24) => {
+        const [hours, minutes] = time24.split(":").map(Number)
+        const ampm = hours >= 12 ? "PM" : "AM"
+        const hours12 = hours % 12 || 12
+        return `${hours12}:${minutes.toString().padStart(2, "0")} ${ampm}`
+    }
+    return `${format(app?.time_start)} to ${format(app?.time_end)}`
 }
+
+const formatTimeStart = (value) => {
+    if (!value) {
+        timeStart.value = ''
+        return
+    }
+
+    // Must be exactly 4 digits (HHMM)
+    if (!/^\d{4}$/.test(value)) return
+
+    const hour = Number(value.slice(0, 2))
+    const minute = Number(value.slice(2, 4))
+
+    // 24-hour validation
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+        timeStart.value = ''
+        return
+    }
+
+    // Convert to 12-hour format
+    const suffix = hour >= 12 ? 'PM' : 'AM'
+    const hour12 = hour % 12 || 12
+
+    timeStart.value = `${hour12}:${String(minute).padStart(2, '0')} ${suffix}`
+}
+
+const formatTimeEnd = (value) => {
+    if (!value) {
+        timeEnd.value = ''
+        return
+    }
+
+    // Must be exactly 4 digits (HHMM)
+    if (!/^\d{4}$/.test(value)) return
+
+    const hour = Number(value.slice(0, 2))
+    const minute = Number(value.slice(2, 4))
+
+    // 24-hour validation
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+        timeEnd.value = ''
+        return
+    }
+
+    // Convert to 12-hour format
+    const suffix = hour >= 12 ? 'PM' : 'AM'
+    const hour12 = hour % 12 || 12
+
+    timeEnd.value = `${hour12}:${String(minute).padStart(2, '0')} ${suffix}`
+}
+
+
 
 onMounted(() => {
     LoadAll();

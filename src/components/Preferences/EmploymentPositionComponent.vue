@@ -24,13 +24,13 @@
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
-                <q-card
-                    @click="ModifyDialog(data)"
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                    v-ripple
-                    >
+                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
+                        <div class="text-caption text-uppercase">{{ formatSalary(data) }}</div>
+                    </q-card-section>
+                    <q-card-section class="text-center full-width">
+                        <div class="text-caption text-grey text-uppercase">{{ data?.status }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm"  style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
                 </q-card>
@@ -57,9 +57,7 @@
                                 input-class="text-capitalize"
                             />
                         </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
+                        <div class="col-2">
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.amount.msg ? 'text-negative' : 'text-grey'">{{ Errors.amount.msg ? Errors.amount.msg : 'amount' }}</span>
                             </div>
@@ -72,9 +70,17 @@
                                 input-class="text-capitalize"
                             />
                         </div>
+                        <div class="col-7">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            </div>
+                        </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
+                        <div class="col-5">
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'job description' }}</span>
                             </div>
@@ -89,7 +95,7 @@
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
+                        <div class="col-5">
                             <div class="q-mb-xs">
                                 <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
                             </div>
@@ -191,8 +197,9 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const amount = ref('');
 const name = ref('');
+const amount = ref('');
+const salarytype = ref('');
 const description = ref('');
 const qualifications = ref([""]);
 const isActive = ref(false);
@@ -202,6 +209,9 @@ const Errors = reactive({
         type: null, msg: ''
     },
     amount: { 
+        type: null, msg: ''
+    },
+    salarytype: { 
         type: null, msg: ''
     },
     description: {
@@ -238,6 +248,14 @@ const Validations = () => {
         isError = true
     } else {
         Errors.amount.type = null
+    }
+
+    if (!salarytype.value) {
+        Errors.salarytype.type = true
+        Errors.salarytype.msg = 'salary type is required!'
+        isError = true
+    } else {
+        Errors.salarytype.type = null
     }
 
     if (!description.value) {
@@ -293,16 +311,6 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
-
-        if (!rows.value.length) {
-            Toast.fire({
-                icon: "info",
-                html: `
-                <div class="text-h6 text-bold text-uppercase">Notice</div>
-                <div class="text-caption text-capitalize;">No records found!</div>
-                `
-            });
-        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -363,6 +371,7 @@ const ModifyDialog = async (data) => {
     id.value = data.id;
     name.value = data.name;
     amount.value = data.amount;
+    salarytype.value = data.salarytype;
     description.value = data.description;
     qualifications.value = data.qualification;
     isActive.value = (data.is_active ? true : false);
@@ -371,10 +380,13 @@ const ModifyDialog = async (data) => {
 const ResetForm = () => {
     id.value = '';
     name.value = '';
+    amount.value = '';
+    salarytype.value = '';
     description.value = '';
     qualifications.value = [""];
     Errors.name.type = null;
     Errors.amount.type = null;
+    Errors.salarytype.type = null;
     Errors.description.type = null;
 }
 
@@ -386,12 +398,14 @@ const Save = async () => {
             ? await api.post(`/position/${id.value}/update`, {
                 name: name.value,
                 amount: amount.value,
+                salarytype: salarytype.value,
                 description: description.value,
                 qualifications: qualifications.value
             })
             : await api.post('/position', {
                 name: name.value,
                 amount: amount.value,
+                salarytype: salarytype.value,
                 description: description.value,
                 qualifications: qualifications.value
             });
@@ -476,6 +490,17 @@ const Toggle = async () => {
     } finally {
         submitLoading.value = false;
     }
+}
+
+const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
+
+const formatSalary = (app, currency = 'PHP') => {
+    const salary = new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2
+    }).format(app?.amount)
+    return `${salary} ${app.salary_type}`
 }
 
 const qualificationInputs = ref([]);
