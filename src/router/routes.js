@@ -1,4 +1,6 @@
 import { useAuthStore } from 'src/stores/auth-store';
+import { usePreferenceStore } from 'src/stores/preference-store';
+import { useEmployeeStore } from 'src/stores/employee-store';
 
 const routes = [
   {
@@ -28,9 +30,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore();
+      const preference = usePreferenceStore();
       if (!auth.isAuthenticated) {
         next('/')
       } else {
+        preference.component = preference.component ?? 'UserComponent'
         next()
       }
     },
@@ -58,9 +62,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore();
+      const employee = useEmployeeStore();
       if (!auth.isAuthenticated) {
         next('/')
       } else {
+        employee.component = employee.component ?? 'EmployeeComponent'
         next()
       }
     },
