@@ -1,8 +1,28 @@
 <template>
-    <div>
+    <div class="dtr-wrapper">
         <q-card class="no-shadow radius-xs q-mb-md">
             <q-card-section>
                 <div class="filter-inline">
+                    <q-input
+                        outlined
+                        v-model="year"
+                        style="width: 80px"
+                        dense
+                    />
+                    <div class="q-gutter-xs">
+                        <q-btn
+                            v-for="(m, index) in months"
+                            round
+                            unelevated
+                            :class="month === m.value ? 'bg-primary text-white' : 'bg-accent text-grey border-primary'"
+                            @click="() => { month = m.value; LoadAll(); }"
+                            size="md"
+                            :label="m.label"
+                        />
+                    </div>
+                </div>
+
+                <!-- <div class="filter-inline">
                     <q-input
                         outlined
                         v-model="year"
@@ -27,7 +47,7 @@
                             <span class="month-label">{{ m.label }}</span>
                         </label>
                     </div>
-                </div>
+                </div> -->
             </q-card-section>
         </q-card>
         <div class="card-grid">
@@ -748,5 +768,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+    
 </style>
