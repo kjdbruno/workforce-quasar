@@ -14,87 +14,39 @@
                             v-for="(m, index) in months"
                             round
                             unelevated
-                            :class="month === m.value ? 'bg-primary text-white' : 'bg-accent text-grey border-primary'"
+                            :class="month === m.value ? 'active' : 'inactive'"
                             @click="() => { month = m.value; LoadAll(); }"
                             size="md"
                             :label="m.label"
                         />
                     </div>
                 </div>
-
-                <!-- <div class="filter-inline">
-                    <q-input
-                        outlined
-                        v-model="year"
-                        style="width: 80px"
-                        dense
-                    />
-                    <div class="month-wrapper">
-                        <label
-                            v-for="m in months"
-                            :key="m.value"
-                            class="month-circle"
-                            :class="{ active: month === m.value }"
-                        >
-                            <input
-                                type="radio"
-                                name="month"
-                                :value="m.value"
-                                v-model="month"
-                                hidden
-                                @update:model-value="LoadAll()"
-                            />
-                            <span class="month-label">{{ m.label }}</span>
-                        </label>
-                    </div>
-                </div> -->
             </q-card-section>
         </q-card>
         <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card
-                    key="data-add"
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                    v-ripple
-                    @click="NewDialog()"
-                >
+                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
                 </q-card>
             </div>
-            <div
-                v-if="rows.length === 0"
-                class="card-anim-wrapper"
-                :style="{ animationDelay: `120ms` }"
-            >
-                <q-card 
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" 
-                    tag="label"
-                >
+            <div v-if="rows.length === 0" class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
+                <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label">
                     <q-card-section class="text-center full-width q-pa-sm">
                         <div class="text-caption text-uppercase">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
-            <div
-                v-for="(data, index) in rows"
-                :key="`data-${data.id}`"
-                class="card-anim-wrapper"
-                :style="{ animationDelay: `${index * 120}ms` }"
-            >
-                <q-card
-                    @click="DetailDialog(data)"
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                    v-ripple
-                    >
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
+                <q-card @click="() => { employee = data; AttendanceDialog = true; GetAttendance(data.id) }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data?.name }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ FormatName(data?.employee) }}</div>
                         <div class="text-caption text-capitalized">{{ data?.status }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width q-pa-sm">
-                        <div class="text-caption">{{ formatDate(data?.dateStart) }} to {{ formatDate(data?.dateEnd) }}</div>
-                        <div class="text-caption text-grey">{{ formatDateRange(data?.dateStart, data?.dateEnd) }}</div>
+                        <div class="text-caption">{{ FormatDateRange(data) }}</div>
+                        <div class="text-caption text-grey">{{ FormatDay(data) }}</div>
                     </q-card-section>
                 </q-card>
             </div>
@@ -102,48 +54,31 @@
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify leave application' : 'create new leave application' }}</div>
+                    <div class="text-h6 text-uppercase">generate attendance</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.dateStart.type ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.type ? Errors.dateStart.message : 'date start' }}</span>
-                            </div>
-                            <q-input 
-                                v-model="dateEnd" 
-                                outlined 
-                                :error="Errors.dateEnd.type"
-                                :no-error-icon="true"
-                                type="date"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.dateEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.dateEnd.type ? Errors.dateEnd.message : 'date end' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase" :class="Errors.dateStart.type ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.type ? Errors.dateStart.message : 'date start (YYYY-MM-DD)' }}</div>
                             <q-input 
                                 v-model="dateStart" 
+                                label="Enter Date"
                                 outlined 
                                 :error="Errors.dateStart.type"
                                 :no-error-icon="true"
-                                type="date"
+                                @update:model-value="val => FormatStartDate(val)"
                             />
                         </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.message : 'reason' }}</span>
-                            </div>
+                        <div class="col-2">
+                            <div class="text-caption text-uppercase" :class="Errors.dateEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.dateEnd.type ? Errors.dateEnd.message : 'date end (YYYY-MM-DD)' }}</div>
                             <q-input 
-                                v-model="description" 
+                                v-model="dateEnd" 
+                                label="Enter Date"
                                 outlined 
-                                type="textarea" 
-                                :error="Errors.description.type"
+                                :error="Errors.dateEnd.type"
                                 :no-error-icon="true"
-                                label="Enter Description"
+                                @update:model-value="val => FormatEndDate(val)"
                             />
                         </div>
                     </div>
@@ -163,50 +98,85 @@
                 </q-inner-loading>
             </q-card>
         </q-dialog>
-        <!-- <q-dialog v-model="leaveDialog" full-height position="right" persistent square class="dialog">
+        <q-dialog v-model="AttendanceDialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">leave application</div>
+                    <div class="text-h6 text-uppercase">daily time records</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">employee</div>
-                        <div class="text-body1 text-uppercase">{{ formatName(info?.profileLeave?.profile) }}</div>
+                        <div class="text-body1 text-uppercase">{{ FormatName(employee?.employee) }}</div>
                     </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">leave type</div>
-                        <div class="text-body1 text-uppercase">{{ info?.profileLeave?.leaveType?.name }}</div>
+                    <div class="q-mb-sm">
+                        <span class="text-subtitle1 text-uppercase text-bold q-mr-md">daily time record</span>
                     </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">leave duration</div>
-                        <div class="text-body1 text-uppercase">{{ formatDate(info?.dateStart) }} to {{ formatDate(info?.dateEnd) }}</div>
+                    <div class="row q-col-gutter-xs">
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">date</span>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">day</span>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">records</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">day/s</div>
-                        <div class="text-body1 text-uppercase">{{ formatDateRange(info?.dateStart, info?.dateEnd) }}</div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">status</div>
-                        <div class="text-body1 text-uppercase">{{ info?.status }}</div>
+                    <div class="q-mb-xl">
+                        <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in attendances.results">
+                            <div class="col-1">
+                                <q-input outlined dense :model-value="FormatAttendanceDate(data.date)" />
+                            </div>
+                            <div class="col-1">
+                                <q-input outlined dense :model-value="FormatAttendanceDay(data.date)" />
+                            </div>
+                            <div class="col-10">
+                                <div class="row items-center q-gutter-xs">
+                                    <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/>
+                                    <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" />
+                                    <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" />
+                                    <q-badge v-if="data.overtimes" rounded color="primary" :label="data.overtimes" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
-                        <div v-for="(dt, index) in info?.requests">
+                        <div v-for="(dt, index) in attendances.approvals">
                             <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
                             <div v-if="dt?.status == 'Approved'">
-                                <img :src="formatSignature(dt?.signatory)" width="150"/>
+                                <img :src="FormatSignature(dt?.setting)" width="150"/>
                             </div>
-                            <div class="text-h6 text-uppercase">{{ formatName(dt?.signatory?.user?.profile) }}</div>
+                            <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
                         </div>
                     </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="info.isActive && canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve" @click="Approve(info.id)" />
-                        <q-btn v-if="info.isActive && info.status === 'Approved'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(info.id)" />
-                        <q-btn v-if="info.isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel" @click="Cancel(info.id)"/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { leaveDialog = false; }" outline/>
+                        <q-btn v-if="canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
+                            <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                                <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
+                                    <q-card-section>
+                                        <div class="text-h6 text-center text-uppercase">
+                                            proceed to approve
+                                        </div>
+                                    </q-card-section>
+                                    <q-card-actions>
+                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Approve(attendances?.id)"/>
+                                    </q-card-actions>
+                                </q-card>
+                            </q-menu>
+                        </q-btn>
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(attendances?.id)" />
+                        <!-- <q-btn v-if="info.isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel" @click="Cancel(info.id)"/> -->
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { AttendanceDialog = false; }" outline/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
@@ -216,7 +186,7 @@
                     </div>
                 </q-inner-loading>
             </q-card>
-        </q-dialog> -->
+        </q-dialog>
         <q-dialog v-model="printDialog" full-height full-width class="pdf">
             <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
                 <q-btn
@@ -293,7 +263,7 @@ import {
     useAuthStore 
 } from 'src/stores/auth-store';
 
-const authStore = useAuthStore();
+const AuthStore = useAuthStore();
 
 const PreferenceStore = usePreferenceStore();
 
@@ -341,13 +311,6 @@ const Validations = () => {
     } else {
         Errors.dateEnd.type = null
     }
-    if (!description.value) {
-        Errors.description.type = true;
-        Errors.description.message = ('description is required!')
-        isError = true
-    } else {
-        Errors.description.type = null
-    }
 
     if (isError) {
         Toast.fire({
@@ -374,7 +337,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/dtr`, {
+        const { data } = await api.get(`/attendance`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -385,16 +348,6 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
-
-        if (!rows.value.length) {
-            Toast.fire({
-                icon: "info",
-                html: `
-                <div class="text-h6 text-bold text-uppercase">Notice</div>
-                <div class="text-caption text-capitalize;">No records found!</div>
-                `
-            });
-        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -452,21 +405,18 @@ const ResetForm = () => {
     id.value = '';
     dateStart.value = '';
     dateEnd.value = '';
-    description.value = '';
     isActive.value = false;
     Errors.dateStart.type = false;
     Errors.dateEnd.type = false;
-    Errors.description.type = false;
 }
 
 const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
-        const response = await api.post('/dtr', {
+        const response = await api.post('/attendance', {
                 dateStart: dateStart.value,
                 dateEnd: dateEnd.value,
-                description: description.value
             });
         LoadAll();
         dialog.value = false;
@@ -552,38 +502,38 @@ const LoadDetails = async (id) => {
 }
 
 const canApprove = computed(() => {
-    if (!info.value?.requests || info.value.requests.length === 0) return false;
+    if (!attendances.value.approvals || attendances.value.approvals.length === 0) return false;
 
-    // Sort signatories by order
-    const sorted = [...info.value.requests].sort(
-        (a, b) => a.signatory.order - b.signatory.order
+    // Sort approvals by setting order
+    const sorted = [...attendances.value.approvals].sort(
+        (a, b) => a.setting.order - b.setting.order
     );
 
-    // Find the first pending request
+    // Find the first pending approval
     const nextPending = sorted.find(req => req.status === 'Pending');
     if (!nextPending) return false;
 
-    // Check if the current user matches the next pending signatory
-    return nextPending.signatory.userId === authStore.user?.id;
+    // Check if the current user is the approver of the next pending approval
+    return nextPending.setting?.approver?.id === AuthStore.user?.id;
 });
 
 const Approve = async (id) => {
     submitLoading.value = true;
-    // Get the current user ID from authStore
-    const userId = Number(authStore.user.id);
-    const leave = info.value;
-    // Safely find the matching request
-    const myRequest = leave.requests.find(
-        req => Number(req.signatory?.userId) === userId
+    const userId = Number(AuthStore.user.id);
+    const attendance = attendances.value;
+    const myRequest = attendance.approvals.find(a =>
+        Number(
+                a.setting?.approver?.employeeAccount?.user_id
+            ) === Number(userId)
         );
-
-    // Get the signatoryId if the request exists
-    const signatoryId = myRequest?.signatoryId ?? null;
+    const approvalid = myRequest?.id ?? null;
 
     try {
-        const response = await api.post(`/leave/${id}/${signatoryId}/approve`);
-        UpdateList(response.data.leave);
-        leaveDialog.value = false;
+        const response = await api.post(`/attendance/${id}/approve`, {
+            approvalid
+        });
+        LoadAll()
+        AttendanceDialog.value = false;
         Toast.fire({
             icon: "success",
             html: `
@@ -615,7 +565,7 @@ const pdf = ref(null);
 const Print = async (id) => {
     submitLoading.value = true;
     try {
-        const res = await api.get(`/employee/leave/application/${id}/pdf`, {
+        const res = await api.get(`/attendance/${id}/pdf`, {
             responseType: 'arraybuffer',
         })
         const blob = new Blob([res.data], { type: 'application/pdf' });
@@ -672,94 +622,115 @@ const months = Array.from({ length: 12 }, (_, i) => {
     return { label: monthName, value: monthValue };
 })
 
-const formatName = (profile) => {
+const FormatStartDate = (val) => {
+    dateStart.value = FormatToYMD(val)
+}
+const FormatEndDate = (val) => {
+    dateEnd.value = FormatToYMD(val)
+}
+const FormatToYMD = (val) => {
+    if (!val) return ''
+
+    // keep digits only
+    const digits = val.replace(/\D/g, '').slice(0, 8)
+
+    let formatted = digits
+
+    if (digits.length > 4 && digits.length <= 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
+    } else if (digits.length > 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
+    }
+
+    return formatted
+}
+
+const FormatDateRange = (app) => {
+    const from = new Date(app.date_start);
+    const to = new Date(app.date_end);
+
+    const options = { month: 'short', day: 'numeric' };
+    const year = from.getFullYear();
+
+    const fromText = from.toLocaleDateString('en-US', options);
+    const toText = to.toLocaleDateString('en-US', options);
+
+    // Same month
+    if (from.getMonth() === to.getMonth()) {
+        return `${fromText}–${to.getDate()}, ${year}`;
+    }
+
+    return `${fromText} – ${toText}, ${year}`;
+};
+
+const FormatDay = (app) => {
+    let count = 0;
+
+    const start = new Date(app.date_start);
+    const end = new Date(app.date_end);
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const day = d.getDay(); // 0 = Sunday, 6 = Saturday
+
+        if (day !== 0 && day !== 6) {
+        count++;
+        }
+    }
+
+    // 👇 format label
+    return `${count} ${count === 1 ? 'day' : 'days'}`;
+};
+
+const FormatName = (profile) => {
     if (!profile) return '';
-    const firstname = profile.firstname || '';
-    const middlename = profile.middlename
-        ? profile.middlename.charAt(0).toUpperCase() + '.'
+    const firstname = profile.first_name || '';
+    const middlename = profile.middle_name
+        ? profile.middle_name.charAt(0).toUpperCase() + '.'
         : '';
-    const lastname = profile.lastname || '';
+    const lastname = profile.last_name || '';
     const suffix = profile.suffix ? ` ${profile.suffix}` : '';
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const formatDate = (date) => {
+const FormatAttendanceDate = (date) => {
     if (!date) return ''
-    return moment(date).format('MM-DD-YY')
+    return moment(date).format('DD')
 }
 
-const formatDateRange = (dateFrom, dateTo) => {
-    if (!dateFrom && !dateTo) return ''
-    const days = moment(dateTo).diff(moment(dateFrom), "days") + 1;
-    return days === 1 ? `${days} day` : `${days} days`;
-};
+const FormatAttendanceDay = (date) => {
+    if (!date) return ''
+    return moment(date).format('dddd')
+}
 
-const formatSignature = (sign) => {
+const FormatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
 
-const employees = ref([]);
-const leavetypes = ref([]);
+const AttendanceDialog = ref(false);
+const employee = ref(null);
+const attendances = ref([]);
 
-const filteredEmployees = ref([]);
-const filteredLeaveTypes = ref([]);
-
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        if (val === '') {
-        update(() => { targetRef.value = sourceRef.value; });
-            return;
-        }
-        update(() => {
-            const needle = val.toLowerCase();
-            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
-        });
-    };
-};
-
-// const normalizeOptions = data => data.map(d => ({
-//     label: [ d?.firstname, d?.middlename, d?.lastname, d?.suffix ].filter(Boolean).join(" "),
-//     value: Number(d?.id),
-//     idNo: d?.employment?.employeeNo
-// }))
-
-const filterEmployeeFn = createFilterFn(employees, filteredEmployees);
-const filterLeaveTypeFn = createFilterFn(leavetypes, filteredLeaveTypes);
-
-const LoadEmployees = async () => {
+const GetAttendance = async (id) => {
+    submitLoading.value = true;
     try {
-        const { data } = await api.get(`/leave/option/employee`);
-        employees.value = data.map(d => ({
-            label: [ d?.firstname, d?.middlename, d?.lastname, d?.suffix ].filter(Boolean).join(" "),
-            value: Number(d?.id),
-            idNo: d?.employment?.employeeNo
-        }))
-        filteredEmployees.value = [...employees.value]
+        const response = await api.get(`/attendance/${id}`);
+        attendances.value = (response.data)
     } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const LoadProfileLeaves = async () => {
-    try {
-        const { data } = await api.get(`/leave/option/leavetype`, {
-            params: {
-                profileId: profileId.value || null
-            }
+        console.error("Error fetching all data:", error);
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Error</div>
+                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+            `
         });
-        leavetypes.value = data.map(d => ({
-            label: d?.name,
-            value: Number(d?.id)
-        }))
-        filteredLeaveTypes.value = [...leavetypes.value]
-    } catch (error) {
-        console.error("Error fetching options:", error);
+    } finally {
+        submitLoading.value = false;
     }
-};
-
-onBeforeMount(() => {
-    LoadEmployees();
-})
+}
 
 onMounted(() => {
     LoadAll();

@@ -359,6 +359,24 @@ body {
   align-items: center;
   gap: 5px;
 }
+.filter-inline .q-btn .q-btn__content
+{
+  font-size: 0.75em;
+}
+
+.filter-inline .active
+{
+  border: 1px solid $primary;
+  background-color: $primary;
+  color: #FFF;
+}
+
+.filter-inline .inactive
+{
+  border: 1px solid $primary;
+  background-color: #FFF;
+  color: $primary;
+}
 
 .month-wrapper {
     display: flex;

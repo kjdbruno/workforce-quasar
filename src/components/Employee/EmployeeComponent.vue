@@ -24,7 +24,7 @@
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                <q-card @click="() => { EmployeeStore.component = 'ProfileComponent'; EmployeeStore.profile = data; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                <q-card @click="() => { EmployeeStore.component = 'ProfileComponent'; EmployeeStore.data = data; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
                     <q-card-section class="text-center full-width">
                         <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
                         <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
@@ -193,7 +193,7 @@
                                 outlined 
                                 :error="Errors.birthdate.type"
                                 :no-error-icon="true"
-                                type="date"
+                                @update:model-value="formatBirthdate"
                             />
                         </div>
                         <div class="col-4">
@@ -278,7 +278,7 @@
                                 outlined 
                                 :error="Errors.dateHired.type"
                                 :no-error-icon="true"
-                                type="date"
+                                @update:model-value="formatDateHired"
                             />
                         </div>
                     </div>
@@ -287,7 +287,7 @@
                             <span class="text-caption text-uppercase" :class="Errors.employmentstatus.msg ? 'text-negative' : 'text-grey'">{{ Errors.employmentstatus.msg ? Errors.employmentstatus.msg : 'employment status' }}</span>
                         </div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
@@ -308,6 +308,7 @@
                                 :error="Errors.companyId.type"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -342,6 +343,7 @@
                                 :error="Errors.departmentId.type"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -376,6 +378,7 @@
                                 :error="Errors.scheduleId.type"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -410,6 +413,7 @@
                                 :error="Errors.positionId.type"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -419,7 +423,7 @@
                                     </q-item>
                                 </template>
                                 <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps" :disable="scope.opt.status === 'Filled'">
+                                    <q-item v-bind="scope.itemProps" :disable="scope.opt.status !== 'Vacant'">
                                         <q-item-section>
                                             <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
                                         </q-item-section>
@@ -439,6 +443,7 @@
                                 outlined 
                                 :error="Errors.tin.type"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
@@ -451,6 +456,7 @@
                                 outlined 
                                 :error="Errors.sssNo.type"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
@@ -463,6 +469,7 @@
                                 outlined 
                                 :error="Errors.philhealthNo.type"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
@@ -475,6 +482,7 @@
                                 outlined 
                                 :error="Errors.pagibigNo.type"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             />
                         </div>
                     </div>
@@ -486,31 +494,75 @@
                             <span class="text-caption text-uppercase" :class="Errors.payrollgroupId.msg ? 'text-negative' : 'text-grey'">{{ Errors.payrollgroupId.msg ? Errors.payrollgroupId.msg : 'payroll group' }}</span>
                         </div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in payrollgroups" v-model="payrollgroupId" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value.value" :label="value.label" />
+                            <q-radio v-for="value in payrollgroups" v-model="payrollgroupId" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value.value" :label="value.label" class="text-capitalize"/>
                         </div>
                     </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.salarygroup.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarygroup.msg ? Errors.salarygroup.msg : 'salary group' }}</span>
+                            </div>
+                            <q-select
+                                outlined
+                                v-model="salarygroup"
+                                label="Choose Salary Group"
+                                emit-value
+                                map-options
+                                use-input
+                                input-debounce="300"
+                                :options="salarygroups"
+                                :error="Errors.salarygroup.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                                class="text-capitalize"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
-                        <div class="q-gutter-sm">
-                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                        </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.salarygroup.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarygroup.msg ? Errors.salarygroup.msg : 'salary group' }}</span>
-                        </div>
-                        <div class="q-gutter-sm">
-                            <q-radio v-for="value in salarygroups" v-model="salarygroup" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value.value" :label="value.label" />
-                        </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.taxstatus.msg ? 'text-negative' : 'text-grey'">{{ Errors.taxstatus.msg ? Errors.taxstatus.msg : 'tax status' }}</span>
-                        </div>
-                        <div class="q-gutter-sm">
-                            <q-radio v-for="value in taxstatuses" v-model="taxstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.taxstatus.msg ? 'text-negative' : 'text-grey'">{{ Errors.taxstatus.msg ? Errors.taxstatus.msg : 'tax status' }}</span>
+                            </div>
+                            <q-select
+                                outlined
+                                v-model="taxstatus"
+                                label="Choose Tax Status"
+                                use-input
+                                input-debounce="300"
+                                :options="taxstatuses"
+                                :error="Errors.taxstatus.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                                class="text-capitalize"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
                     </div>
                 </q-card-section>
@@ -562,16 +614,6 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
-
-        if (!rows.value.length) {
-            Toast.fire({
-                icon: "info",
-                html: `
-                <div class="text-h6 text-bold text-uppercase">Notice</div>
-                <div class="text-caption text-capitalize;">No records found!</div>
-                `
-            });
-        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -630,15 +672,39 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const formatTimeRange = (time) => {
-    const start = time.time_start;
-    const end = time.time_end;
-    if (!start && !end) return '';
-    const formattedStart = start ? moment(start, 'HH:mm:ss').format('h:mm A') : '';
-    const formattedEnd = end ? moment(end, 'HH:mm:ss').format('h:mm A') : '';
-    if (formattedStart && formattedEnd) return `${formattedStart} to ${formattedEnd}`;
-    return formattedStart || formattedEnd || '';
-};
+const formatBirthdate = (val) => {
+    if (!val) {
+        birthdate.value = "";
+        return;
+    }
+    // Remove non-digit characters
+    const digits = val.replace(/\D/g, "");
+    // Automatically add slashes for MM/DD/YYYY
+    let formatted = digits;
+    if (digits.length > 2 && digits.length <= 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+    } else if (digits.length > 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
+    }
+    birthdate.value = formatted;
+}
+
+const formatDateHired = (val) => {
+    if (!val) {
+        dateHired.value = "";
+        return;
+    }
+    // Remove non-digit characters
+    const digits = val.replace(/\D/g, "");
+    // Automatically add slashes for MM/DD/YYYY
+    let formatted = digits;
+    if (digits.length > 2 && digits.length <= 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
+    } else if (digits.length > 4) {
+        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
+    }
+    dateHired.value = formatted;
+}
 
 onMounted(() => {
     LoadAll();
@@ -671,7 +737,6 @@ const tin = ref('');
 const sssNo = ref('');
 const philhealthNo = ref('');
 const pagibigNo = ref('');
-const salarytype = ref('');
 const salarygroup = ref('');
 const payrollgroupId = ref('');
 const taxstatus = ref('');
@@ -700,7 +765,6 @@ const Errors = reactive({
     sssNo: { type: null, msg: '' },
     philhealthNo: { type: null, msg: '' },
     pagibigNo: { type: null, msg: '' },
-    salarytype: { type: null, msg: '' },
     salarygroup: { type: null, msg: '' },
     payrollgroupId: { type: null, msg: '' },
     taxstatus: { type: null, msg: '' },
@@ -902,14 +966,6 @@ const Validations = () => {
         Errors.pagibigNo.type = null;
     }
 
-    if (!salarytype.value) {
-        Errors.salarytype.type = true;
-        Errors.salarytype.msg = ('salary type is required');
-        isError = true;
-    } else {
-        Errors.salarytype.type = null;
-    }
-
     if (!salarygroup.value) {
         Errors.salarygroup.type = true;
         Errors.salarygroup.msg = ('salary group is required');
@@ -965,7 +1021,6 @@ const positions = ref([]);
 const companies = ref([]);
 const departments = ref([]);
 const schedules = ref([]);
-const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
 const salarygroups = ref([
     { value: "HIRE", label: "Hiring Rate" },
     { value: "PROMO", label: "Promotion Increase" },
@@ -1007,12 +1062,20 @@ const formatTime = (time) => {
     return `${hour12}:${m}${ampm}`
 }
 
-const formatCurrency = (value) => {
-    if (value === null || value === undefined) return ''
-    return new Intl.NumberFormat('en-PH', {
-        style: 'currency',
-        currency: 'PHP'
-    }).format(value)
+function formatCurrency(salaryRange, currency = 'PHP') {
+    if (!salaryRange) return '';
+
+    return salaryRange
+        .split('-')
+        .map(p => {
+            const num = parseFloat(p.replace(/,/g, ''));
+            return num.toLocaleString('en-PH', {
+                style: 'currency',
+                currency,
+                minimumFractionDigits: 2
+            });
+        })
+        .join(' - ');
 }
 
 const normalizeOptions = (data = []) => data.map(d => {
@@ -1164,7 +1227,6 @@ const Save = async () => {
         Data.append("departmentId", departmentId.value);
         Data.append("scheduleId", scheduleId.value);
         Data.append("employmentstatus", employmentstatus.value);
-        Data.append("salarytype", salarytype.value);
         Data.append("salarygroup", salarygroup.value);
         Data.append("payrollgroupId", payrollgroupId.value);
         Data.append("taxstatus", taxstatus.value);
@@ -1173,7 +1235,8 @@ const Save = async () => {
                 "Content-Type": "multipart/form-data"
             }
         });
-        
+        modal.value = false;
+        LoadAll()
         Toast.fire({
             icon: "success",
             html: `

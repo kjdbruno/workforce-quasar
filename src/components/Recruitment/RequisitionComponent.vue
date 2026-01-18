@@ -70,9 +70,9 @@
                                     </q-item>
                                 </template>
                                 <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
+                                    <q-item v-bind="scope.itemProps" :disable="scope.opt.status !== 'Vacant'">
                                         <q-item-section>
-                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }} - {{ scope.opt.status }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </template>
@@ -1201,19 +1201,21 @@ const formatDateNeeded = (val) => {
     date.value = formatted;
 }
 
-function formatCurrency(salaryRange) {
+function formatCurrency(salaryRange, currency = 'PHP') {
     if (!salaryRange) return '';
-    // Split min and max
-    const parts = salaryRange.split('-').map(p => p.trim());
-    // Format each as currency
-    const formatted = parts.map(p => {
-        const num = Number(p);
-        return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-    });
-    // Join back with dash
-    return formatted.join(' - ');
-}
 
+    return salaryRange
+        .split('-')
+        .map(p => {
+            const num = parseFloat(p.replace(/,/g, ''));
+            return num.toLocaleString('en-PH', {
+                style: 'currency',
+                currency,
+                minimumFractionDigits: 2
+            });
+        })
+        .join(' - ');
+}
 
 const formatToggle = (info) => !!info?.isActive;
 

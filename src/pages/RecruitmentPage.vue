@@ -2,21 +2,15 @@
     <div>
         <q-card class="no-shadow radius-xs">
             <q-card-section>
-                <div class="tabs-container" ref="tabsContainer">
-                    <div v-for="tab in tabs" :key="tab.name" class="tab-wrapper">
-                        <q-btn size="sm" unelevated class="tab" :class="{ active: activeTab === tab.name }" @click="tab.subTabs ? toggleDropdown(tab.name) : selectTab(tab.name)">
-                            {{ activeTab === tab.name && activeSubTab ? `${activeSubTab}` : tab.name }}
-                        </q-btn>
-                        <transition name="fade">
-                            <div v-if="tab.subTabs && dropdownOpen === tab.name" class="dropdown">
-                                <div class="text-center text-uppercase text-bold">{{ tab.name }}</div>
-                                <q-separator class="q-mt-xs q-mb-xs" />
-                                <q-btn unelevated size="sm" v-for="sub in tab.subTabs" :key="sub" class="sub-tab q-mb-xs" :class="{ active: activeSubTab === sub }" @click="selectTab(tab.name, sub)">
-                                    {{ sub }}
-                                </q-btn>
-                            </div>
-                        </transition>
-                    </div>
+                <div class="q-gutter-xs">
+                    <q-btn
+                        v-for="(btn, index) in navs"
+                        unelevated
+                        :class="RecruitmentStore.component === `${btn.component}` ? 'bg-primary text-white' : 'bg-accent'"
+                        @click="RecruitmentStore.component = `${btn.component}`"
+                        size="xs"
+                        :label="btn.label"
+                    />
                 </div>
             </q-card-section>
         </q-card>
@@ -31,80 +25,18 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
 import { useRecruitmentStore } from 'src/stores/recruitment-store';
 import RequisitionComponent from 'src/components/Recruitment/RequisitionComponent.vue';
 import ApplicationComponent from 'src/components/Recruitment/ApplicationComponent.vue';
-import SignatoryComponent from 'src/components/Recruitment/SignatoryComponent.vue';
 
 const RecruitmentStore = useRecruitmentStore();
 
 const components = {
-    SignatoryComponent,
     RequisitionComponent,
     ApplicationComponent
 };
 
-const tabs = [
-    // { 
-    //     name: 'Signatory'
-    // },
-    { 
-        name: 'Requisition'
-    },
-    { 
-        name: 'Application'
-    }
-];
-
-const activeTab = ref('');
-const activeSubTab = ref('');
-const dropdownOpen = ref(null);
-const tabsContainer = ref(null);
-
-function selectTab(tabName, subTab = '') {
-    activeTab.value = tabName;
-    activeSubTab.value = subTab;
-    dropdownOpen.value = null;
-    
-    const cleanTab = tabName.replace(/\s+/g, '');
-    const cleanSub = subTab.replace(/\s+/g, '');
-    RecruitmentStore.component = subTab ? `${cleanTab}${cleanSub}Component` : `${cleanTab}Component`;
-}
-
-function toggleDropdown(tabName) {
-    dropdownOpen.value = dropdownOpen.value === tabName ? null : tabName;
-}
-
-// Close dropdown if click outside
-function handleClickOutside(event) {
-    if (tabsContainer.value && !tabsContainer.value.contains(event.target)) {
-        dropdownOpen.value = null;
-    }
-}
-
-onBeforeMount(() => {
-    if (!RecruitmentStore.component) {
-        // default
-        RecruitmentStore.component = 'RequisitionComponent';
-        activeTab.value = 'Requisition';
-    } else {
-        // restore previous
-        const match = RecruitmentStore.component.match(/([A-Z][a-z]+)/g) || [];
-
-        if (match.length) {
-            const tabName = match[0];
-            const subTabName = match.slice(1, -1).join(' ');
-
-            activeTab.value = tabName;
-            activeSubTab.value = subTabName || '';
-        }
-    }
-})
-
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside);
-});
+const navs = [
+    { component: 'RequisitionComponent', label: 'vacancy' },
+    { component: 'ApplicationComponent', label: 'application' },
+]
 </script>
 
 <style scoped>

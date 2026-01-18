@@ -53,6 +53,7 @@
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">

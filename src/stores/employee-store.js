@@ -3,7 +3,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 export const useEmployeeStore = defineStore('employeeStore', {
   state: () => ({
     component: null,
-    profile: null
+    data: null
   }),
 
   getters: {

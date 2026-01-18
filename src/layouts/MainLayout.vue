@@ -127,7 +127,7 @@
                     </q-avatar>
                 </q-card-section>
                 <q-separator inset />
-                
+                <q-btn label="logout" color="primary" @click="authStore.logout"/>
             </q-card>
         </q-dialog>
         

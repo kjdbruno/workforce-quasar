@@ -149,7 +149,6 @@ const formatName = (profile) => {
 
 const tabs = ['profile', 'employment', 'photo', 'education', 'trainings', 'experiences', 'dependents', 'documents', 'id', 'service', 'dtr', 'leaves', 'performance', 'incidents', 'payslip'];
 
-
 onMounted(() => {
     LoadAll();
 });

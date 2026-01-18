@@ -44,7 +44,7 @@
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-3">
+                        <div class="col-4">
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'position' }}</span>
                             </div>
@@ -57,30 +57,9 @@
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.amount.msg ? 'text-negative' : 'text-grey'">{{ Errors.amount.msg ? Errors.amount.msg : 'amount' }}</span>
-                            </div>
-                            <q-input 
-                                v-model="amount" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.amount.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-7">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
-                            </div>
-                            <div class="q-gutter-sm">
-                                <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                            </div>
-                        </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-5">
+                        <div class="col-4">
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'job description' }}</span>
                             </div>
@@ -95,7 +74,7 @@
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-5">
+                        <div class="col-4">
                             <div class="q-mb-xs">
                                 <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
                             </div>
@@ -116,6 +95,55 @@
                                     </template>
                                 </q-input>
                             </div>
+                        </div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
+                        </div>
+                        <div class="q-gutter-sm">
+                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                        </div>
+                    </div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.monthly.msg ? 'text-negative' : 'text-grey'">{{ Errors.monthly.msg ? Errors.monthly.msg : 'monthly salary' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="monthly" 
+                                label="Enter Amount"
+                                outlined 
+                                :error="Errors.monthly.type"
+                                :no-error-icon="true"
+                                input-class="text-capitalize"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.daily.msg ? 'text-negative' : 'text-grey'">{{ Errors.daily.msg ? Errors.daily.msg : 'daily salary' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="daily" 
+                                label="Enter Amount"
+                                outlined 
+                                :error="Errors.daily.type"
+                                :no-error-icon="true"
+                                input-class="text-capitalize"
+                            />
+                        </div>
+                        <div class="col-2">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase" :class="Errors.hourly.msg ? 'text-negative' : 'text-grey'">{{ Errors.hourly.msg ? Errors.hourly.msg : 'hourly salary' }}</span>
+                            </div>
+                            <q-input 
+                                v-model="hourly" 
+                                label="Enter Amount"
+                                outlined 
+                                :error="Errors.hourly.type"
+                                :no-error-icon="true"
+                                input-class="text-capitalize"
+                            />
                         </div>
                     </div>
                 </q-card-section>
@@ -198,7 +226,9 @@ const submitLoading = ref(false);
 
 const id = ref('');
 const name = ref('');
-const amount = ref('');
+const monthly = ref('');
+const daily = ref('');
+const hourly = ref('');
 const salarytype = ref('');
 const description = ref('');
 const qualifications = ref([""]);
@@ -208,7 +238,13 @@ const Errors = reactive({
     name: { 
         type: null, msg: ''
     },
-    amount: { 
+    monthly: { 
+        type: null, msg: ''
+    },
+    daily: { 
+        type: null, msg: ''
+    },
+    hourly: { 
         type: null, msg: ''
     },
     salarytype: { 
@@ -242,12 +278,28 @@ const Validations = () => {
         Errors.name.type = null
     }
 
-    if (!amount.value) {
-        Errors.amount.type = true
-        Errors.amount.msg = 'amount is required!'
+    if (!monthly.value) {
+        Errors.monthly.type = true
+        Errors.monthly.msg = 'monthly salary is required!'
         isError = true
     } else {
-        Errors.amount.type = null
+        Errors.monthly.type = null
+    }
+
+    if (!daily.value) {
+        Errors.daily.type = true
+        Errors.daily.msg = 'daily salary is required!'
+        isError = true
+    } else {
+        Errors.daily.type = null
+    }
+
+    if (!hourly.value) {
+        Errors.hourly.type = true
+        Errors.hourly.msg = 'hourly salary is required!'
+        isError = true
+    } else {
+        Errors.hourly.type = null
     }
 
     if (!salarytype.value) {
@@ -370,8 +422,10 @@ const ModifyDialog = async (data) => {
     isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
-    amount.value = data.amount;
-    salarytype.value = data.salarytype;
+    monthly.value = data.monthly_salary;
+    daily.value = data.daily_salary;
+    hourly.value = data.hourly_salary;
+    salarytype.value = data.salary_type;
     description.value = data.description;
     qualifications.value = data.qualification;
     isActive.value = (data.is_active ? true : false);
@@ -380,12 +434,16 @@ const ModifyDialog = async (data) => {
 const ResetForm = () => {
     id.value = '';
     name.value = '';
-    amount.value = '';
+    monthly.value = '';
+    daily.value = '';
+    hourly.value = '';
     salarytype.value = '';
     description.value = '';
     qualifications.value = [""];
     Errors.name.type = null;
-    Errors.amount.type = null;
+    Errors.monthly.type = null;
+    Errors.daily.type = null;
+    Errors.hourly.type = null;
     Errors.salarytype.type = null;
     Errors.description.type = null;
 }
@@ -397,14 +455,18 @@ const Save = async () => {
         const response = id.value && isEdit
             ? await api.post(`/position/${id.value}/update`, {
                 name: name.value,
-                amount: amount.value,
+                monthly: monthly.value,
+                daily: daily.value,
+                hourly: hourly.value,
                 salarytype: salarytype.value,
                 description: description.value,
                 qualifications: qualifications.value
             })
             : await api.post('/position', {
                 name: name.value,
-                amount: amount.value,
+                monthly: monthly.value,
+                daily: daily.value,
+                hourly: hourly.value,
                 salarytype: salarytype.value,
                 description: description.value,
                 qualifications: qualifications.value
@@ -494,14 +556,34 @@ const Toggle = async () => {
 
 const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
 
-const formatSalary = (app, currency = 'PHP') => {
+const formatSalary = (data, currency = 'PHP') => {
+    if (!data) return '';
+
+    let amount = 0;
+
+    switch (data.salary_type) {
+        case 'Monthly':
+            amount = data.monthly_salary;
+            break;
+        case 'Daily':
+            amount = data.daily_salary;
+            break;
+        case 'Hourly':
+            amount = data.hourly_salary;
+            break;
+        default:
+            return '';
+    }
+
     const salary = new Intl.NumberFormat('en-PH', {
         style: 'currency',
         currency,
         minimumFractionDigits: 2
-    }).format(app?.amount)
-    return `${salary} ${app.salary_type}`
-}
+    }).format(Number(amount));
+
+    return `${salary} | ${data.salary_type}`;
+};
+
 
 const qualificationInputs = ref([]);
 
