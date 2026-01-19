@@ -32,6 +32,7 @@
                                 <div class="text-caption text-uppercase">{{ app?.salarygroup }}</div>
                                 <div class="text-caption text-grey">{{ formatDateRange(app) }}</div>
                             </q-card-section>
+                            <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="app.is_active ? 'bg-positive' : 'bg-negative'"></div>
                         </q-card>
                     </div>
                 </div>
@@ -135,7 +136,8 @@ const MapSalarySchedules = (data = []) => {
         salarygroup: item.salary_group ?? '',
         effectiveDate: item.effective_date ?? '',
         endDate: item.end_date ?? '',
-        notes: item.notes ?? ''
+        notes: item.notes ?? '',
+        is_active: item.is_active ?? ''
     }))
 }
 
