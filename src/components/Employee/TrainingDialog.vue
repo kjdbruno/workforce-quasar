@@ -64,7 +64,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.startDate.msg ? Errors.trainings.startDate.msg : 'start date' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.startDate.msg ? Errors.trainings.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
                             <q-input 
                                 v-model="value.startDate" 
                                 label="Enter Start Date"
@@ -75,7 +75,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.endDate.msg ? Errors.trainings.endDate.msg : 'end date' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.endDate.msg ? Errors.trainings.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
                             <q-input 
                                 v-model="value.endDate" 
                                 label="Enter End Date"
@@ -101,7 +101,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="SaveProfile()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddTraining" outline/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
@@ -333,5 +333,52 @@ const AddTraining = () => {
 const RemoveTraining = (index) => {
     const t = trainings.value;
     t.splice(index, 1);
+}
+
+const Save = async () => {
+    if (!Validations()) return;
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/employee/${EmployeeStore.data?.id}/training`, {
+            trainings: trainings.value
+        });
+        emit('update:modelValue', null);
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        SubmitLoading.value = false;
+    }
+};
+
+const applyBackendErrors = (backendErrors) => {
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
 }
 </script>

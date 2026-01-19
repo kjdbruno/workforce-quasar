@@ -21,7 +21,7 @@
                     </div>
                     <div class="col-2">
                         <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.dateHired.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateHired.msg ? Errors.dateHired.msg : 'date hired' }}</span>
+                            <span class="text-caption text-uppercase" :class="Errors.dateHired.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateHired.msg ? Errors.dateHired.msg : 'date hired (YYYY-MM-DD)' }}</span>
                         </div>  
                         <q-input 
                             v-model="dateHired" 
@@ -201,11 +201,43 @@
                         />
                     </div>
                 </div>
+                <div class="row q-col-gutter-xs q-mb-md">
+                    <div class="col-2">
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.taxstatus.msg ? 'text-negative' : 'text-grey'">{{ Errors.taxstatus.msg ? Errors.taxstatus.msg : 'tax status' }}</div>
+                        <q-select
+                            outlined
+                            v-model="taxstatus"
+                            label="Choose Tax Status"
+                            use-input
+                            input-debounce="300"
+                            :options="taxstatuses"
+                            :error="Errors.taxstatus.type"
+                            dropdown-icon="keyboard_arrow_down"
+                            :no-error-icon="true"
+                            class="text-capitalize"
+                        >
+                            <template v-slot:no-option>
+                                <q-item>
+                                    <q-item-section class="text-italic text-grey">
+                                    No options
+                                    </q-item-section>
+                                </q-item>
+                            </template>
+                            <template v-slot:option="scope">
+                                <q-item v-bind="scope.itemProps">
+                                    <q-item-section>
+                                        <q-item-label>{{ $CapitalizeWords(scope.opt) }}</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                            </template>
+                        </q-select>
+                    </div>
+                </div>
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="SaveProfile()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -231,7 +263,7 @@ const props = defineProps({
     dialogName: String
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isOpen = computed({
     get: () => props.modelValue === props.dialogName,
@@ -252,6 +284,7 @@ const tin = ref('');
 const sssNo = ref('');
 const philhealthNo = ref('');
 const pagibigNo = ref('');
+const taxstatus = ref('');
 
 const Errors = reactive({
     employeeNo: { type: null, msg: '' },
@@ -264,6 +297,7 @@ const Errors = reactive({
     sssNo: { type: null, msg: '' },
     philhealthNo: { type: null, msg: '' },
     pagibigNo: { type: null, msg: '' },
+    taxstatus: { type: null, msg: null }
 });
 
 const Validations = () => {
@@ -310,14 +344,6 @@ const Validations = () => {
         Errors.scheduleId.type = null;
     }
 
-    if (!address.value) {
-        Errors.address.type = true;
-        Errors.address.msg = ('address is requierd');
-        isError = true;
-    } else {
-        Errors.address.type = null;
-    }
-
     if (tin.value && tin.value.length > 15) {
         Errors.tin.type = true;
         Errors.tin.msg = ('TIN must not exceed 15 characters');
@@ -348,6 +374,14 @@ const Validations = () => {
         isError = true;
     } else {
         Errors.pagibigNo.type = null;
+    }
+
+    if (!taxstatus.value) {
+        Errors.taxstatus.type = true;
+        Errors.taxstatus.msg = ('tax status is required');
+        isError = true;
+    } else {
+        Errors.taxstatus.type = null;
     }
 
     if (isError) {
@@ -389,6 +423,7 @@ const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporar
 const companies = ref([]);
 const departments = ref([]);
 const schedules = ref([]);
+const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
 
 const filteredCompanies = ref([]);
 const filteredDepartments = ref([]);
@@ -516,5 +551,63 @@ const PopulateData = () => {
     sssNo.value = app.employment.sss_no;
     philhealthNo.value = app.employment.philhealth_no;
     pagibigNo.value = app.employment.pagibig_no;
+    taxstatus.value = app.employment.tax_status;
+}
+
+const Save = async () => {
+    if (!Validations()) return;
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/employee/${EmployeeStore.data?.employment?.id}/employment`, {
+            employeeNo: employeeNo.value,
+            dateHired: dateHired.value,
+            companyId: companyId.value,
+            departmentId: departmentId.value,
+            employmentstatus: employmentstatus.value,
+            tin: tin.value,
+            sssNo: sssNo.value,
+            pagibigNo: pagibigNo.value,
+            philhealthNo: philhealthNo.value,
+            taxstatus: taxstatus.value
+        });
+        emit('saved');
+        emit('update:modelValue', null);
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        SubmitLoading.value = false;
+    }
+};
+
+const applyBackendErrors = (backendErrors) => {
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
 }
 </script>

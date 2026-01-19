@@ -47,8 +47,8 @@
                 </div>
             </div>
         </div>
-        <profile-dialog v-model="activeDialog" dialog-name="ProfileDialog"/>
-        <employment-dialog v-model="activeDialog" dialog-name="EmploymentDialog"/>
+        <profile-dialog v-model="activeDialog" dialog-name="ProfileDialog" @saved="GetEmployee"/>
+        <employment-dialog v-model="activeDialog" dialog-name="EmploymentDialog" @saved="GetEmployee"/>
         <service-dialog v-model="activeDialog" dialog-name="ServiceDialog"/>
         <biometric-dialog v-model="activeDialog" dialog-name="BiometricDialog"/>
         <photo-dialog v-model="activeDialog" dialog-name="PhotoDialog"/>
@@ -64,6 +64,7 @@
         <incident-dialog v-model="activeDialog" dialog-name="IncidentDialog"/>
         <payslip-dialog v-model="activeDialog" dialog-name="PayslipDialog"/>
         <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog"/>
+        <salary-dialog v-model="activeDialog" dialog-name="SalaryDialog"/>
     </div>
     <!-- <div class="card-grid">
         <div class="card-anim-wrapper">
@@ -135,13 +136,14 @@ import PerformanceDialog from './PerformanceDialog.vue';
 import IncidentDialog from './IncidentDialog.vue';
 import PayslipDialog from './PayslipDialog.vue';
 import OvertimeDialog from './OvertimeDialog.vue';
+import SalaryDialog from './SalaryDialog.vue';
 const EmployeeStore = useEmployeeStore();
 
 const tabs = [
     { label: 'profile', dialog: 'ProfileDialog'},
     { label: 'employment', dialog: 'EmploymentDialog'},
     { label: 'service recrod', dialog: 'ServiceDialog'},
-    { label: 'salary', dialog: 'PayslipDialog'},
+    { label: 'salary', dialog: 'SalaryDialog'},
     { label: 'account', dialog: 'PayslipDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
     { label: 'photo', dialog: 'PhotoDialog'},

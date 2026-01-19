@@ -1,5 +1,5 @@
 <template>
-    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="PopulateData()">
+    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="() => { PopulateData(); }">
         <q-card class="dialog-card column full-height">
             <q-card-section class="q-pa-lg">
                 <div class="text-h6 text-uppercase">dependent information</div>
@@ -97,7 +97,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.birthdate.msg ? Errors.dependents.birthdate.msg : 'birthdate' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.birthdate.msg ? Errors.dependents.birthdate.msg : 'birthdate (YYYY-MM-DD)' }}</div>
                             <q-input 
                                 v-model="value.birthdate" 
                                 label="Enter Birthdate"
@@ -115,7 +115,6 @@
                                 outlined 
                                 :error="Errors.dependents.contactNo.type[index]"
                                 :no-error-icon="true"
-                                input-class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
@@ -126,7 +125,6 @@
                                 outlined 
                                 :error="Errors.dependents.email.type[index]"
                                 :no-error-icon="true"
-                                input-class="text-capitalize"
                             />
                         </div>
                         <div class="col-3">
@@ -149,7 +147,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="SaveProfile()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddDependent" outline/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
@@ -438,4 +436,50 @@ const ToggleEmergency = (index) => {
     })
 }
 
+const Save = async () => {
+    if (!Validations()) return;
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/employee/${EmployeeStore.data?.id}/dependent`, {
+            dependents: dependents.value
+        });
+        emit('update:modelValue', null);
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        SubmitLoading.value = false;
+    }
+};
+
+const applyBackendErrors = (backendErrors) => {
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
+}
 </script>

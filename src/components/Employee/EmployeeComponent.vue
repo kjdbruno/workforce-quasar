@@ -185,7 +185,7 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate (YYYY-MM-DD)' }}</span>
                             </div>
                             <q-input 
                                 v-model="birthdate" 
@@ -271,7 +271,7 @@
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.dateHired.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateHired.msg ? Errors.dateHired.msg : 'date hired' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.dateHired.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateHired.msg ? Errors.dateHired.msg : 'date hired (YYYY-MM-DD)' }}</span>
                             </div>  
                             <q-input 
                                 v-model="dateHired" 
@@ -673,37 +673,37 @@ const formatName = (profile) => {
 }
 
 const formatBirthdate = (val) => {
-    if (!val) {
-        birthdate.value = "";
-        return;
+    if (!val) return ''
+
+    // keep digits only
+    const digits = val.replace(/\D/g, '').slice(0, 8)
+
+    let formatted = digits
+
+    if (digits.length > 4 && digits.length <= 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
+    } else if (digits.length > 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
     }
-    // Remove non-digit characters
-    const digits = val.replace(/\D/g, "");
-    // Automatically add slashes for MM/DD/YYYY
-    let formatted = digits;
-    if (digits.length > 2 && digits.length <= 4) {
-        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
-    } else if (digits.length > 4) {
-        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
-    }
-    birthdate.value = formatted;
+
+    birthdate.value = formatted
 }
 
 const formatDateHired = (val) => {
-    if (!val) {
-        dateHired.value = "";
-        return;
+    if (!val) return ''
+
+    // keep digits only
+    const digits = val.replace(/\D/g, '').slice(0, 8)
+
+    let formatted = digits
+
+    if (digits.length > 4 && digits.length <= 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
+    } else if (digits.length > 6) {
+        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
     }
-    // Remove non-digit characters
-    const digits = val.replace(/\D/g, "");
-    // Automatically add slashes for MM/DD/YYYY
-    let formatted = digits;
-    if (digits.length > 2 && digits.length <= 4) {
-        formatted = digits.slice(0, 2) + "/" + digits.slice(2);
-    } else if (digits.length > 4) {
-        formatted = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4, 8);
-    }
-    dateHired.value = formatted;
+
+    dateHired.value = formatted
 }
 
 onMounted(() => {
@@ -1259,6 +1259,22 @@ const Save = async () => {
         ApplicationSubmitting.value = false;
     }
 };
+
+const applyBackendErrors = (backendErrors) => {
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
+}
 
 </script>
 

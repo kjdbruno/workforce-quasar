@@ -39,7 +39,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="SaveProfile()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(EmployeeStore.data?.id)" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -49,6 +49,23 @@
                     <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                 </div>
             </q-inner-loading>
+        </q-card>
+    </q-dialog>
+    <q-dialog v-model="printDialog" full-height full-width class="pdf">
+        <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
+            <q-btn
+                icon="close"
+                class="fixed bg-white text-primary shadow-2"
+                round
+                dense
+                v-close-popup
+                style="top: 15px; right: 15px; z-index: 999;"
+            />
+            <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
+                <div class="iframe-container">
+                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                </div>
+            </q-card-section>
         </q-card>
     </q-dialog>
 </template>
@@ -165,6 +182,26 @@ const formatDateRange = (app) => {
     const end = app.endDate ? formatDate(app.endDate) : 'Present'
 
     return `${start} – ${end}`
+}
+
+const printDialog = ref(false);
+const pdf = ref(null);
+
+const Print = async (id) => {
+    SubmitLoading.value = true;
+    try {
+        const res = await api.get(`/salary/service/${id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+        SubmitLoading.value = false;
+    } catch (error) {
+        SubmitLoading.value = false;
+        console.error("Error generating PDF:", error);
+    }
 }
 
 </script>

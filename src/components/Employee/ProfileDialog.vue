@@ -159,7 +159,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="SaveProfile()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -185,7 +185,7 @@ const props = defineProps({
     dialogName: String
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isOpen = computed({
     get: () => props.modelValue === props.dialogName,
@@ -388,5 +388,63 @@ const PopulateData = () => {
     address.value = app.address;
     email.value = app.email;
     contactNo.value = app.contact_number;
+}
+
+const Save = async () => {
+    if (!Validations()) return;
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/employee/${EmployeeStore.data?.id}/information`, {
+            firstname: firstname.value,
+            middlename: middlename.value,
+            lastname: lastname.value,
+            suffix: suffix.value,
+            sex: sex.value,
+            bloodtype: bloodtype.value,
+            civilstatus: civilstatus.value,
+            birthdate: birthdate.value,
+            address: address.value,
+            email: email.value,
+            contactNo: contactNo.value
+        });
+        emit('saved');
+        emit('update:modelValue', null);
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        SubmitLoading.value = false;
+    }
+};
+
+const applyBackendErrors = (backendErrors) => {
+    const errorsArray = Array.isArray(backendErrors)
+        ? backendErrors
+        : backendErrors?.errors || []
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null
+        Errors[key].messages = []
+    })
+    errorsArray.forEach(err => {
+        if (Errors[err.path] !== undefined) {
+            Errors[err.path].type = true
+            Errors[err.path].messages.push(err.msg)
+        }
+    })
 }
 </script>
