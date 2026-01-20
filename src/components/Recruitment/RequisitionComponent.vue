@@ -275,16 +275,21 @@
                         </div>
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.message : 'date needed (MM/DD/YYYY)' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.message : 'date needed (YYYY-MM-DD)' }}</span>
                             </div>
-                            <q-input 
+                            <!-- <q-input 
                                 v-model="date" 
                                 label="Enter Date"
                                 outlined
                                 :error="Errors.date.type"
                                 :no-error-icon="true"
                                 @update:model-value="formatDateNeeded"
-                            />
+                            /> -->
+                            <q-input outlined v-model="date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
@@ -541,6 +546,7 @@ import { useAuthStore } from 'src/stores/auth-store';
 const AuthStore = useAuthStore();
 
 const dialog = ref(false);
+const popup = ref(null);
 const isEdit = ref(false);
 const submitLoading = ref(false);
 
@@ -551,7 +557,7 @@ const departmentId = ref('');
 const scheduleId = ref('');
 const salaryRange = ref('');
 const sex = ref('');
-const date = ref('');
+const date = ref(new Date().toISOString().split('T')[0]);
 const location = ref('');
 const employmentStatus = ref('');
 const schoolLevel = ref('');
@@ -680,37 +686,38 @@ const Validations = () => {
         Errors.date.message = 'Date is required';
         isError = true;
     } else {
-        // Expect format MM/DD/YYYY
-        const parts = date.value.split('/');
+        const parts = date.value.split('-');
+
         if (parts.length !== 3) {
             Errors.date.type = true;
             Errors.date.message = 'Invalid date format';
             isError = true;
         } else {
-            let [mm, dd, yyyy] = parts.map(Number);
-            const currentYear = new Date().getFullYear();
+            let [yyyy, mm, dd] = parts.map(Number);
+            const today = new Date();
+            const currentYear = today.getFullYear();
 
             let valid = true;
             let errMsg = '';
 
-            // Validate month
-            if (mm < 1 || mm > 12) {
+            // Validate year
+            if (yyyy < currentYear) {
                 valid = false;
-                errMsg = 'invalid month';
+                errMsg = 'Year cannot be in the past';
+            }
+            // Validate month
+            else if (mm < 1 || mm > 12) {
+                valid = false;
+                errMsg = 'Invalid month';
             }
             // Validate day
             else if (dd < 1 || dd > 31) {
                 valid = false;
-                errMsg = 'invalid day';
-            }
-            // Validate year is current or future
-            else if (yyyy < currentYear) {
-                valid = false;
-                errMsg = `invalid year`;
+                errMsg = 'Invalid day';
             }
             // Validate actual day for month
             else {
-                const daysInMonth = new Date(yyyy, mm, 0).getDate(); // last day of month
+                const daysInMonth = new Date(yyyy, mm, 0).getDate();
                 if (dd > daysInMonth) {
                     valid = false;
                     errMsg = `Invalid day for month ${mm}`;
@@ -724,6 +731,7 @@ const Validations = () => {
             }
         }
     }
+
 
 
     if (!location.value) {
@@ -864,7 +872,7 @@ const ResetForm = () => {
     departmentId.value = '';
     scheduleId.value = '';
     salaryRange.value = '';
-    date.value = '';
+    date.value = new Date().toISOString().split('T')[0];
     location.value = '';
     movement.value = '';
     justification.value = '';

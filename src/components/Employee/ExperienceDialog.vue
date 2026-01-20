@@ -47,25 +47,19 @@
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.experiences.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.startDate.msg ? Errors.experiences.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
-                            <q-input 
-                                v-model="value.startDate" 
-                                label="Enter Start Date"
-                                outlined 
-                                :error="Errors.experiences.startDate.type[index]"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatStartDate(val, index)"
-                            />
+                            <q-input outlined v-model="value.startDate" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => expStartPopups[index] = el">
+                                    <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideExpStartPopup(index)"/>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.experiences.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.endDate.msg ? Errors.experiences.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
-                            <q-input 
-                                v-model="value.endDate" 
-                                label="Enter End Date"
-                                outlined 
-                                :error="Errors.experiences.endDate.type[index]"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatEndDate(val, index)"
-                            />
+                            <q-input outlined v-model="value.endDate" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => expEndPopups[index] = el">
+                                    <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideExpEndPopup(index)"/>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                     </div>
                 </div>
@@ -88,7 +82,7 @@
     </q-dialog>
 </template>
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed, nextTick } from 'vue';
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
@@ -331,5 +325,18 @@ const applyBackendErrors = (backendErrors) => {
             Errors[err.path].messages.push(err.msg)
         }
     })
+}
+
+const expStartPopups = ref([]);
+const expEndPopups = ref([]);
+function hideExpStartPopup(index) {
+  nextTick(() => {
+    if (expStartPopups.value[index]) expStartPopups.value[index].hide();
+  });
+}
+function hideExpEndPopup(index) {
+  nextTick(() => {
+    if (expEndPopups.value[index]) expEndPopups.value[index].hide();
+  });
 }
 </script>

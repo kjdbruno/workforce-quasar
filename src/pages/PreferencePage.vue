@@ -35,7 +35,7 @@ import CompanyComponent from 'src/components/Preferences/CompanyComponent.vue';
 import PositionComponent from 'src/components/Preferences/PositionComponent.vue';
 import ScheduleComponent from 'src/components/Preferences/ScheduleComponent.vue';
 import LeaveComponent from 'src/components/Preferences/LeaveComponent.vue';
-import SignatoryComponent from 'src/components/Recruitment/SignatoryComponent.vue';
+import SignatoryComponent from 'src/components/Preferences/SignatoryComponent.vue';
 import PayrollGroupComponent from 'src/components/Preferences/PayrollGroupComponent.vue';
 
 

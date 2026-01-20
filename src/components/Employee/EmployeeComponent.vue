@@ -187,14 +187,11 @@
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate (YYYY-MM-DD)' }}</span>
                             </div>
-                            <q-input 
-                                v-model="birthdate" 
-                                label="Enter Birthdate"
-                                outlined 
-                                :error="Errors.birthdate.type"
-                                :no-error-icon="true"
-                                @update:model-value="formatBirthdate"
-                            />
+                            <q-input outlined v-model="birthdate" label="Enter Birthdate">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="birthdate" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-4">
                             <div class="q-mb-xs">
@@ -273,13 +270,11 @@
                             <div class="q-mb-xs">
                                 <span class="text-caption text-uppercase" :class="Errors.dateHired.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateHired.msg ? Errors.dateHired.msg : 'date hired (YYYY-MM-DD)' }}</span>
                             </div>  
-                            <q-input 
-                                v-model="dateHired" 
-                                outlined 
-                                :error="Errors.dateHired.type"
-                                :no-error-icon="true"
-                                @update:model-value="formatDateHired"
-                            />
+                            <q-input outlined v-model="dateHired" label="Enter Date Hired">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="dateHired" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                     </div>
                     <div class="q-mb-md">
@@ -672,40 +667,6 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const formatBirthdate = (val) => {
-    if (!val) return ''
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
-
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    birthdate.value = formatted
-}
-
-const formatDateHired = (val) => {
-    if (!val) return ''
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
-
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    dateHired.value = formatted
-}
-
 onMounted(() => {
     LoadAll();
 });
@@ -721,13 +682,13 @@ const suffix = ref('');
 const sex = ref('');
 const bloodtype = ref('');
 const civilstatus = ref('');
-const birthdate = ref('');
+const birthdate = ref(new Date().toISOString().split('T')[0]);
 const birthplace = ref('');
 const address = ref('');
 const email = ref('');
 const contactNo = ref('');
 const employeeNo = ref('');
-const dateHired = ref('');
+const dateHired = ref(new Date().toISOString().split('T')[0]);
 const employmentstatus = ref('');
 const companyId = ref('');
 const departmentId = ref('');
@@ -852,38 +813,30 @@ const Validations = () => {
         Errors.birthplace.type = null;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.value) {
         Errors.email.type = true;
         Errors.email.msg = ('email is required');
         isError = true;
+    } else if (!emailRegex.test(email.value)) {
+        Errors.email.type = true;
+        Errors.email.msg = ('email must be a valid email address');
+        isError = true;
+    } else if (email.value.length > 100) {
+        Errors.email.type = true;
+        Errors.email.msg = ('email must not exceed 100 characters');
+        isError = true;
     } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.value)) {
-            Errors.email.type = true;
-            Errors.email.msg = ('email must be a valid email address');
-            isError = true;
-        } else if (email.value.length > 100) {
-            Errors.email.type = true;
-            Errors.email.msg = ('email must not exceed 100 characters');
-            isError = true;
-        } else {
-            Errors.email.type = null;
-        }
+        Errors.email.type = null;
     }
+    
 
     if (!contactNo.value) {
         Errors.contactNo.type = true;
         Errors.contactNo.msg = ('contact number is required');
         isError = true;
     } else {
-        const phMobileRegex = /^(09\d{9}|\+639\d{9})$/;
-        if (!phMobileRegex.test(contactNo.value)) {
-            Errors.contactNo.type = true;
-            Errors.contactNo.msg = ('enter a valid PH mobile number (e.g., 09123456789 or +639123456789)');
-            isError = true;
-        } else {
-            Errors.contactNo.type = null;
-        }
+        Errors.contactNo.type = null;
     }
 
     if (!dateHired.value) {
@@ -1003,13 +956,52 @@ const Validations = () => {
     return !isError
 }
 
+const ResetForm = () => {
+    applicant.value = null;
+    firstname.value = '';
+    middlename.value = '';
+    lastname.value = '';
+    suffix.value = '';
+    sex.value = '';
+    bloodtype.value = '';
+    civilstatus.value = '';
+    birthdate.value = new Date().toISOString().split('T')[0];
+    birthplace.value = '';
+    address.value = '';
+    email.value = '';
+    contactNo.value = '';
+    employeeNo.value = '';
+    dateHired.value = new Date().toISOString().split('T')[0]; // today
+    employmentstatus.value = '';
+    companyId.value = '';
+    departmentId.value = '';
+    scheduleId.value = '';
+    positionId.value = '';
+    tin.value = '';
+    sssNo.value = '';
+    philhealthNo.value = '';
+    pagibigNo.value = '';
+    salarygroup.value = '';
+    payrollgroupId.value = '';
+    taxstatus.value = '';
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
+}
+
 const ShowModal = () => {
     LoadCompanies();
     LoadDepartments();
     LoadSchedules();
     LoadPositions();
     LoadApplicants();
-    LoadPayrollGroups()
+    LoadPayrollGroups();
+    ResetForm();
+    ResetAllErrors();
 }
 
 const applicants = ref([]);
@@ -1275,6 +1267,8 @@ const applyBackendErrors = (backendErrors) => {
         }
     })
 }
+
+const popup = ref(null);
 
 </script>
 

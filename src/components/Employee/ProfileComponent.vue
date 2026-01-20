@@ -65,6 +65,7 @@
         <payslip-dialog v-model="activeDialog" dialog-name="PayslipDialog"/>
         <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog"/>
         <salary-dialog v-model="activeDialog" dialog-name="SalaryDialog"/>
+        <account-dialog v-model="activeDialog" dialog-name="AccountDialog"/>
     </div>
     <!-- <div class="card-grid">
         <div class="card-anim-wrapper">
@@ -137,6 +138,7 @@ import IncidentDialog from './IncidentDialog.vue';
 import PayslipDialog from './PayslipDialog.vue';
 import OvertimeDialog from './OvertimeDialog.vue';
 import SalaryDialog from './SalaryDialog.vue';
+import AccountDialog from './AccountDialog.vue';
 const EmployeeStore = useEmployeeStore();
 
 const tabs = [
@@ -144,7 +146,7 @@ const tabs = [
     { label: 'employment', dialog: 'EmploymentDialog'},
     { label: 'service recrod', dialog: 'ServiceDialog'},
     { label: 'salary', dialog: 'SalaryDialog'},
-    { label: 'account', dialog: 'PayslipDialog'},
+    { label: 'account', dialog: 'AccountDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
     { label: 'photo', dialog: 'PhotoDialog'},
     { label: 'education', dialog: 'EducationDialog'},

@@ -60,7 +60,7 @@
                                 <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label" :class="{ 'card--active': vacancyId === data.id }" @click="vacancyId = data.id" >
                                     <q-card-section class="text-center full-width q-pa-none">
                                         <div class="text-subtitle1 text-uppercase">{{ data?.position?.name }}</div>
-                                        <div class="text-caption text-uppercase">{{ formatCurrency(data?.salary_range) }} {{ data?.position?.salary_type }}</div>
+                                        <div class="text-caption text-uppercase">{{ formatCurrency(data?.salary_range) }}</div>
                                     </q-card-section>
                                     <q-card-section class="q-pa-none">
                                         <div class="text-caption">{{ data?.company?.name }}</div>
@@ -155,16 +155,13 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate (MM/DD/YYYY)' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.birthdate.msg ? Errors.birthdate.msg : 'birthdate (YYYY-MM-DD)' }}</span>
                             </div>
-                            <q-input 
-                                v-model="birthdate" 
-                                label="Enter Birthdate"
-                                outlined 
-                                :error="Errors.birthdate.type"
-                                :no-error-icon="true"
-                                @update:model-value="formatBirthdate"
-                            />
+                            <q-input outlined v-model="birthdate" label="Enter Birthdate">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="birthdate" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-4">
                             <div class="q-mb-xs">
@@ -220,7 +217,6 @@
                                 outlined 
                                 :error="Errors.contactNo.type"
                                 :no-error-icon="true"
-                                @update:model-value="formatPHNumber"
                             />
                         </div>
                     </div>
@@ -243,12 +239,12 @@
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.educations.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.startDate.msg ? Errors.educations.startDate.msg : 'start date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.educations.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.startDate.msg ? Errors.educations.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.educations.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.endDate.msg ? Errors.educations.endDate.msg : 'end date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.educations.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.endDate.msg ? Errors.educations.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -343,24 +339,18 @@
                                 </q-select>
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.startDate" 
-                                    label="Enter Start Date"
-                                    outlined 
-                                    :error="Errors.educations.startDate.type[index]"
-                                    :no-error-icon="true"
-                                    type="date"
-                                />
+                                <q-input outlined v-model="value.startDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => eduStartPopups[index] = el">
+                                        <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideEduStartPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.endDate"
-                                    label="Enter End Date" 
-                                    outlined 
-                                    :error="Errors.educations.endDate.type[index]"
-                                    :no-error-icon="true"
-                                    type="date"
-                                />
+                                <q-input outlined v-model="value.endDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => eduEndPopups[index] = el">
+                                        <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideEduEndPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-1">
                                 <q-btn 
@@ -395,12 +385,12 @@
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.trainings.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.startDate.msg ? Errors.trainings.startDate.msg : 'start date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.trainings.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.startDate.msg ? Errors.trainings.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.trainings.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.endDate.msg ? Errors.trainings.endDate.msg : 'end date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.trainings.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.endDate.msg ? Errors.trainings.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                             <div class="col-2">
@@ -448,24 +438,18 @@
                                 />
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.startDate" 
-                                    label="Enter Start Date"
-                                    outlined 
-                                    type="date"
-                                    :error="Errors.trainings.startDate.type[index]"
-                                    :no-error-icon="true"
-                                />
+                                <q-input outlined v-model="value.startDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => trainingStartPopups[index] = el">
+                                        <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideTrainingStartPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.endDate" 
-                                    label="Enter End Date"
-                                    outlined 
-                                    type="date"
-                                    :error="Errors.trainings.endDate.type[index]"
-                                    :no-error-icon="true"
-                                />
+                                <q-input outlined v-model="value.endDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => trainingEndPopups[index] = el">
+                                        <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideTrainingEndPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-2">
                                 <q-input 
@@ -509,12 +493,12 @@
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.experiences.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.startDate.msg ? Errors.experiences.startDate.msg : 'start date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.experiences.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.startDate.msg ? Errors.experiences.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="q-mb-xs">
-                                    <div class="text-caption text-uppercase" :class="Errors.experiences.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.endDate.msg ? Errors.experiences.endDate.msg : 'end date' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.experiences.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.experiences.endDate.msg ? Errors.experiences.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -539,24 +523,18 @@
                                 />
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.startDate" 
-                                    label="Enter Start Date"
-                                    outlined 
-                                    type="date"
-                                    :error="Errors.experiences.startDate.type[index]"
-                                    :no-error-icon="true"
-                                />
+                                <q-input outlined v-model="value.startDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => expStartPopups[index] = el">
+                                        <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideExpStartPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-2">
-                                <q-input 
-                                    v-model="value.endDate" 
-                                    label="Enter End Date"
-                                    outlined 
-                                    type="date"
-                                    :error="Errors.experiences.endDate.type[index]"
-                                    :no-error-icon="true"
-                                />
+                                <q-input outlined v-model="value.endDate" label="Enter Date">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => expEndPopups[index] = el">
+                                        <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideExpEndPopup(index)"/>
+                                    </q-popup-proxy>
+                                </q-input>
                             </div>
                             <div class="col-1">
                                 <q-btn 
@@ -953,7 +931,8 @@ import {
     onMounted,
     ref, 
     watch,
-    onBeforeMount
+    onBeforeMount,
+    nextTick
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -977,7 +956,7 @@ const lastname = ref('');
 const suffix = ref('');
 const sex = ref('');
 const civilstatus = ref('');
-const birthdate = ref('');
+const birthdate = ref(new Date().toISOString().split('T')[0]);
 const birthplace = ref('');
 const bloodtype = ref('');
 const address = ref('');
@@ -988,15 +967,15 @@ const educations = ref([
         schoollevel: "",
         schoolId: "",
         courseId: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     }
 ]);
 const trainings = ref([
     {
         title: '',
-        startDate: '',
-        endDate: '',
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         hour: '',
         typeId: '',
         conductedBy: ''
@@ -1005,8 +984,8 @@ const trainings = ref([
 const experiences = ref([
     {
         position: '',
-        startDate: '',
-        endDate: '',
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         description: ''
     }
 ]);
@@ -1060,60 +1039,60 @@ const Errors = reactive({
     //
     educations: {
         schoollevel: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         schoolId: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         courseId: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         startDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         endDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         }
     },
     trainings: {
         trainingtype: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         title: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         startDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         endDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         hour: {
-            type: null, msg: ''
+            type: [], msg: ''
         }
     },
     experiences: {
         position: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         startDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         endDate: {
-            type: null, msg: ''
+            type: [], msg: ''
         },
         description: {
-            type: null, msg: ''
+            type: [], msg: ''
         }
     },
     documents: {
         file: {
-            type: null, msg: ''
+            type: [], msg: ''
         }
     },
     //
     applicationstatus: {
-        type: null, msg: ''
+        type: [], msg: ''
     }
 });
 
@@ -1227,49 +1206,7 @@ const Validations = () => {
         Errors.birthdate.message = 'Date is required';
         isError = true;
     } else {
-        // Expect format MM/DD/YYYY
-        const parts = birthdate.value.split('/');
-        if (parts.length !== 3) {
-            Errors.birthdate.type = true;
-            Errors.birthdate.message = 'Invalid date format';
-            isError = true;
-        } else {
-            let [mm, dd, yyyy] = parts.map(Number);
-            const currentYear = new Date().getFullYear();
-
-            let valid = true;
-            let errMsg = '';
-
-            // Validate month
-            if (mm < 1 || mm > 12) {
-                valid = false;
-                errMsg = 'invalid month';
-            }
-            // Validate day
-            else if (dd < 1 || dd > 31) {
-                valid = false;
-                errMsg = 'invalid day';
-            }
-            // Validate year is current or future
-            else if (yyyy < currentYear) {
-                valid = false;
-                errMsg = `invalid year`;
-            }
-            // Validate actual day for month
-            else {
-                const daysInMonth = new Date(yyyy, mm, 0).getDate(); // last day of month
-                if (dd > daysInMonth) {
-                    valid = false;
-                    errMsg = `Invalid day for month ${mm}`;
-                }
-            }
-
-            if (!valid) {
-                Errors.birthdate.type = true;
-                Errors.birthdate.message = errMsg;
-                isError = true;
-            }
-        }
+        Errors.birthdate.type = null;
     }
 
     if (!birthplace.value) {
@@ -1296,38 +1233,30 @@ const Validations = () => {
         Errors.bloodtype.type = null;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.value) {
         Errors.email.type = true;
         Errors.email.msg = 'email is required';
         isError = true;
+    } else if (!emailRegex.test(email.value)) {
+        Errors.email.type = true;
+        Errors.email.msg = 'email must be a valid email address';
+        isError = true;
+    } else if (email.value.length > 100) {
+        Errors.email.type = true;
+        Errors.email.msg = 'email must not exceed 100 characters';
+        isError = true;
     } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.value)) {
-            Errors.email.type = true;
-            Errors.email.msg = 'email must be a valid email address';
-            isError = true;
-        } else if (email.value.length > 100) {
-            Errors.email.type = true;
-            Errors.email.msg = 'email must not exceed 100 characters';
-            isError = true;
-        } else {
-            Errors.email.type = null;
-        }
+        Errors.email.type = null;
     }
 
+    const phMobileRegex = /^(09\d{9}|\+639\d{9})$/;
     if (!contactNo.value) {
         Errors.contactNo.type = true;
         Errors.contactNo.msg = 'contact number is required';
         isError = true;
     } else {
-        const phMobileRegex = /^(09\d{9}|\+639\d{9})$/;
-        if (!phMobileRegex.test(contactNo.value)) {
-            Errors.contactNo.type = true;
-            Errors.contactNo.msg = 'enter a valid PH mobile no.';
-            isError = true;
-        } else {
-            Errors.contactNo.type = null;
-        }
+        Errors.contactNo.type = null;
     }
 
     initErrors()
@@ -1568,6 +1497,34 @@ const NewDialog = () => {
     dialog.value = true;
 }
 
+const ResetErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        const field = Errors[key];
+
+        // Top-level single fields
+        if (field.type !== undefined && !Array.isArray(field.type)) {
+        field.type = null;
+        field.msg = '';
+        }
+        // Top-level array fields
+        else if (field.type !== undefined && Array.isArray(field.type)) {
+        field.type = [];
+        field.msg = '';
+        }
+        // Nested groups (educations, trainings, experiences, documents)
+        else {
+        Object.keys(field).forEach(sub => {
+            if (Array.isArray(field[sub].type)) {
+            field[sub].type = [];
+            } else {
+            field[sub].type = null;
+            }
+            field[sub].msg = '';
+        });
+        }
+    });
+}
+
 const ResetForm = () => {
     vacancyId.value = '';
     firstname.value = '';
@@ -1576,13 +1533,45 @@ const ResetForm = () => {
     suffix.value = '';
     sex.value = '';
     civilstatus.value = '';
-    birthdate.value = '';
+    birthdate.value = new Date().toISOString().split('T')[0];
     birthplace.value = '';
     bloodtype.value = '';
     address.value = '';
     email.value = '';
     contactNo.value = '09';
-    initErrors();
+    educations.value = ([
+        {
+            schoollevel: "",
+            schoolId: "",
+            courseId: "",
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: new Date().toISOString().split('T')[0]
+        }
+    ]);
+    trainings.value = ([
+        {
+            title: '',
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: new Date().toISOString().split('T')[0],
+            hour: '',
+            typeId: '',
+            conductedBy: ''
+        }
+    ]);
+    experiences.value = ([
+        {
+            position: '',
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: new Date().toISOString().split('T')[0],
+            description: ''
+        }
+    ]);
+    documents.value = ([
+        {
+            file: ''
+        }
+    ]);
+    ResetErrors()
 }
 
 const Save = async () => {
@@ -1802,17 +1791,20 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-function formatCurrency(salaryRange) {
+function formatCurrency(salaryRange, currency = 'PHP') {
     if (!salaryRange) return '';
-    // Split min and max
-    const parts = salaryRange.split('-').map(p => p.trim());
-    // Format each as currency
-    const formatted = parts.map(p => {
-        const num = Number(p);
-        return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-    });
-    // Join back with dash
-    return formatted.join(' - ');
+
+    return salaryRange
+        .split('-')
+        .map(p => {
+            const num = parseFloat(p.replace(/,/g, ''));
+            return num.toLocaleString('en-PH', {
+                style: 'currency',
+                currency,
+                minimumFractionDigits: 2
+            });
+        })
+        .join(' - ');
 }
 
 const formatBirthdate = (val) => {
@@ -1832,38 +1824,14 @@ const formatBirthdate = (val) => {
     birthdate.value = formatted;
 }
 
-const formatPHNumber = (val) => {
-    // Remove all non-digit characters
-  let digits = val.replace(/\D/g, '')
-
-  // Always start with '09'
-  if (!digits.startsWith('09')) {
-    digits = '09'
-  }
-
-  // Limit to 11 digits
-  digits = digits.slice(0, 11)
-
-  contactNo.value = digits
-
-  // Validation
-  if (digits.length < 11) {
-    Errors.value.contactNo.type = true
-    Errors.value.contactNo.message = 'PH mobile number must be 11 digits starting with 09'
-  } else {
-    Errors.value.contactNo.type = false
-    Errors.value.contactNo.message = ''
-  }
-}
-
 const addEducation = () => {
     const e = educations.value;
     e.unshift({
         schoollevel: "",
         schoolId: "",
         courseId: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     });
 }
 
@@ -1877,8 +1845,8 @@ const addTraining = () => {
     t.unshift({
         trainingtype: "",
         title: "",
-        startDate: "",
-        endDate: "",
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         hour: ""
     });
 }
@@ -1894,8 +1862,8 @@ const addExperience = () => {
     e.unshift({
         position: "",
         description: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     });
 }
 
@@ -1945,6 +1913,51 @@ const PrintApplication = async (data) => {
         DetailSubmitting.value = false;
         console.error("Error generating PDF:", error);
     }
+}
+
+const popup = ref(null);
+// Refs for popups
+const eduStartPopups = ref([]);
+const eduEndPopups = ref([]);
+
+const trainingStartPopups = ref([]);
+const trainingEndPopups = ref([]);
+
+const expStartPopups = ref([]);
+const expEndPopups = ref([]);
+
+// Safe hide functions
+function hideEduStartPopup(index) {
+  nextTick(() => {
+    if (eduStartPopups.value[index]) eduStartPopups.value[index].hide();
+  });
+}
+function hideEduEndPopup(index) {
+  nextTick(() => {
+    if (eduEndPopups.value[index]) eduEndPopups.value[index].hide();
+  });
+}
+
+function hideTrainingStartPopup(index) {
+  nextTick(() => {
+    if (trainingStartPopups.value[index]) trainingStartPopups.value[index].hide();
+  });
+}
+function hideTrainingEndPopup(index) {
+  nextTick(() => {
+    if (trainingEndPopups.value[index]) trainingEndPopups.value[index].hide();
+  });
+}
+
+function hideExpStartPopup(index) {
+  nextTick(() => {
+    if (expStartPopups.value[index]) expStartPopups.value[index].hide();
+  });
+}
+function hideExpEndPopup(index) {
+  nextTick(() => {
+    if (expEndPopups.value[index]) expEndPopups.value[index].hide();
+  });
 }
 
 onMounted(() => {

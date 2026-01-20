@@ -17,13 +17,13 @@
                                 <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.credit.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.credit.msg ? Errors.leaves.credit.msg : 'credit' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.earned.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.earned.msg ? Errors.leaves.earned.msg : 'credit' }}</div>
+                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.earned.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.earned.msg ? Errors.leaves.earned.msg : 'earned' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.used.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.used.msg ? Errors.leaves.used.msg : 'credit' }}</div>
+                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.used.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.used.msg ? Errors.leaves.used.msg : 'used' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.balance.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.balance.msg ? Errors.leaves.balance.msg : 'credit' }}</div>
+                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.balance.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.balance.msg ? Errors.leaves.balance.msg : 'balance' }}</div>
                             </div>
                         </div>
                         <div class="row q-col-gutter-xs q-mb-xs" v-for="(app, index) in leaves" :key="index">

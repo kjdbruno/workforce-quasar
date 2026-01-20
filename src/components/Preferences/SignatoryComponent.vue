@@ -23,136 +23,173 @@
                     </q-card-section>
                 </q-card>
             </div>
-            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
+                <q-card @click="ShowDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
-                        <div class="text-caption text-uppercase">{{ formatSalary(data) }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ data.type }}</div>
+                        <div class="text-caption text-grey">{{ FormatOrdinal(data.order) }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width">
-                        <div class="text-caption text-grey text-uppercase">{{ data?.status }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ data.owner?.name }}</div>
+                        <div class="text-subtitle2 text-grey text-uppercase text-italic">{{ data.approver?.name }}</div>
                     </q-card-section>
-                    <div class="absolute-top-left q-ma-sm"  style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify position' : 'create new position' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isDetail ? 'signatory information' : 'create new signatory' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'position' }}</span>
+                    <div v-if="isDetail">
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">document type</div>
+                            <div class="text-body1 text-uppercase">{{ info?.type }}</div>
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">owner</div>
+                            <div class="text-body1 text-uppercase">{{ info?.owner?.name }}</div>
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">approver</div>
+                            <div class="text-body1 text-uppercase">{{ info?.approver?.name }}</div>
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">description</div>
+                            <div class="text-body1 text-uppercase">{{ info?.description }}</div>
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">signature</div>
+                            <div>
+                                <img :src="FormatSignature(info)" width="150"/>
                             </div>
-                            <q-input 
-                                v-model="name" 
-                                label="Enter Position"
-                                outlined 
-                                :error="Errors.name.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
+                        </div>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase text-grey">order</div>
+                            <div class="text-body1 text-uppercase">{{ FormatOrdinal(info?.order) }}</div>
                         </div>
                     </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'job description' }}</span>
+                    <div v-else>
+                        <div class="q-mb-md">
+                            <div class="text-caption text-uppercase" :class="Errors.type.msg ? 'text-negative' : 'text-grey'">{{ Errors.type.msg ? Errors.type.msg : 'document type' }}</div>
+                            <div class="q-gutter-sm">
+                                <q-radio v-for="value in types" v-model="type" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
                             </div>
-                            <q-input 
-                                v-model="description" 
-                                label="Enter Job Description"
-                                outlined 
-                                :error="Errors.description.type" 
-                                type="textarea"
-                                :no-error-icon="true"
-                            />
                         </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="q-mb-xs">
-                                <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
-                            </div>
-                            <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
-                                <q-input
-                                    v-model="qualifications[index]"
-                                    label="Enter Qualification"
+                        <div class="row q-col-gutter-xs q-mb-md">
+                            <div class="col-3">
+                                <div class="text-caption text-uppercase" :class="Errors.ownerid.msg ? 'text-negative' : 'text-grey'">{{ Errors.ownerid.msg ? Errors.ownerid.msg : 'owner' }}</div>
+                                <q-select
                                     outlined
-                                    :error="Errors.qualifications.name.type[index]"
+                                    v-model="ownerid"
+                                    label="Choose Owner"
+                                    emit-value
+                                    map-options
+                                    use-input
+                                    input-debounce="300"
+                                    :options="filteredOwners"
+                                    @filter="filterOwnerFn"
+                                    :error="Errors.ownerid.type"
+                                    dropdown-icon="keyboard_arrow_down"
                                     :no-error-icon="true"
+                                    class="text-capitalize"
                                 >
-                                    <template v-slot:append>
-                                        <q-btn
-                                            v-if="qualifications.length > 1"
-                                            flat unelevated round icon="block" size="sm"
-                                            @click="remove(index)"
-                                        />
+                                    <template v-slot:no-option>
+                                        <q-item>
+                                            <q-item-section class="text-italic text-grey">
+                                            No options
+                                            </q-item-section>
+                                        </q-item>
                                     </template>
-                                </q-input>
+                                    <template v-slot:option="scope">
+                                        <q-item v-bind="scope.itemProps">
+                                            <q-item-section>
+                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                                <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
+                                            </q-item-section>
+                                        </q-item>
+                                    </template>
+                                </q-select>
                             </div>
                         </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
-                        </div>
-                        <div class="q-gutter-sm">
-                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.monthly.msg ? 'text-negative' : 'text-grey'">{{ Errors.monthly.msg ? Errors.monthly.msg : 'monthly salary' }}</span>
+                        <div class="row q-col-gutter-xs q-mb-md">
+                            <div class="col-3">
+                                <div class="text-caption text-uppercase" :class="Errors.approverid.type ? 'text-negative' : 'text-grey'">{{ Errors.approverid.type ? Errors.approverid.msg : 'approver' }}</div>
+                                <q-select
+                                    outlined
+                                    v-model="approverid"
+                                    label="Choose Approver"
+                                    emit-value
+                                    map-options
+                                    use-input
+                                    input-debounce="300"
+                                    :options="filteredApprovers"
+                                    @filter="filterApproverFn"
+                                    :error="Errors.approverid.type"
+                                    dropdown-icon="keyboard_arrow_down"
+                                    :no-error-icon="true"
+                                    class="text-capitalize"
+                                >
+                                    <template v-slot:no-option>
+                                        <q-item>
+                                            <q-item-section class="text-italic text-grey">
+                                            No options
+                                            </q-item-section>
+                                        </q-item>
+                                    </template>
+                                    <template v-slot:option="scope">
+                                        <q-item v-bind="scope.itemProps">
+                                            <q-item-section>
+                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                                <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
+                                            </q-item-section>
+                                        </q-item>
+                                    </template>
+                                </q-select>
                             </div>
-                            <q-input 
-                                v-model="monthly" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.monthly.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.daily.msg ? 'text-negative' : 'text-grey'">{{ Errors.daily.msg ? Errors.daily.msg : 'daily salary' }}</span>
+                            <div class="col-2">
+                                <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'description' }}</div>
+                                <q-input 
+                                    v-model="description" 
+                                    label="Enter Description"
+                                    outlined 
+                                    :error="Errors.description.type"
+                                    :no-error-icon="true"
+                                    input-class="text-capitalize"
+                                />
                             </div>
-                            <q-input 
-                                v-model="daily" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.daily.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.hourly.msg ? 'text-negative' : 'text-grey'">{{ Errors.hourly.msg ? Errors.hourly.msg : 'hourly salary' }}</span>
+                            <div class="col-2">
+                                <div class="text-caption text-uppercase" :class="Errors.signature.type ? 'text-negative' : 'text-grey'">{{ Errors.signature.type ? Errors.signature.msg : 'signature' }}</div>
+                                <q-file 
+                                    v-model="signature" 
+                                    label="Upload Signature"
+                                    outlined 
+                                    :error="Errors.signature.type"
+                                    :no-error-icon="true"
+                                />
                             </div>
-                            <q-input 
-                                v-model="hourly" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.hourly.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
+                            <div class="col-1">
+                                <div class="text-caption text-uppercase" :class="Errors.order.type ? 'text-negative' : 'text-grey'">{{ Errors.order.type ? Errors.order.msg : 'order' }}</div>
+                                <q-input 
+                                    v-model="order" 
+                                    label="Enter Order"
+                                    outlined 
+                                    :error="Errors.order.type"
+                                    :no-error-icon="true"
+                                    input-class="text-capitalize"
+                                />
+                            </div>
                         </div>
                     </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                        <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="Add" outline/>
+                        <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
+                        <q-btn v-if="isDetail" unelevated size="md" color="primary" class="btn text-capitalize" :label="info?.is_active ? 'disable' : 'enable'" @click="Toggle(info)"/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
                 </q-card-actions>
@@ -210,7 +247,6 @@ import {
     onMounted,
     ref, 
     watch,
-    nextTick, 
     onBeforeMount
 } from 'vue';
 
@@ -221,112 +257,86 @@ import { Toast } from 'src/boot/sweetalert';
 const PreferenceStore = usePreferenceStore();
 
 const dialog = ref(false);
-const isEdit = ref(false);
+const isDetail = ref(false);
 const submitLoading = ref(false);
 
 const id = ref('');
-const name = ref('');
-const monthly = ref('');
-const daily = ref('');
-const hourly = ref('');
-const salarytype = ref('');
+const type = ref('');
+const ownerid = ref('');
+const approverid = ref('');
 const description = ref('');
-const qualifications = ref([""]);
+const signature = ref('');
+const order = ref('');
+
 const isActive = ref(false);
 
 const Errors = reactive({
-    name: { 
-        type: null, msg: ''
+    type: { 
+        type: null, msg: '' 
     },
-    monthly: { 
-        type: null, msg: ''
+    ownerid: { 
+        type: null, msg: '' 
     },
-    daily: { 
-        type: null, msg: ''
+    approverid: { 
+        type: null, msg: '' 
     },
-    hourly: { 
-        type: null, msg: ''
+    description: { 
+        type: null, msg: '' 
     },
-    salarytype: { 
-        type: null, msg: ''
+    signature: { 
+        type: null, msg: '' 
     },
-    description: {
-        type: null, msg: ''
-    },
-    qualifications: {
-        name: {
-            type: [], msg: ''
-        }
+    order: { 
+        type: null, msg: '' 
     },
 });
-
-const initErrors = () => {
-    Errors.qualifications.name.type = qualifications.value.map(() => null);
-}
 
 const Validations = () => {
     
     let isError = false;
 
-    Errors.qualifications.name = { type: null, msg: '' }
-    
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.msg = 'position is required!'
+    if (!type.value) {
+        Errors.type.type = true
+        Errors.type.msg = 'document type is required'
         isError = true
     } else {
-        Errors.name.type = null
+        Errors.ownerid.type = null
     }
-
-    if (!monthly.value) {
-        Errors.monthly.type = true
-        Errors.monthly.msg = 'monthly salary is required!'
+    if (!ownerid.value) {
+        Errors.ownerid.type = true
+        Errors.ownerid.msg = 'owner is required'
         isError = true
     } else {
-        Errors.monthly.type = null
+        Errors.ownerid.type = null
     }
-
-    if (!daily.value) {
-        Errors.daily.type = true
-        Errors.daily.msg = 'daily salary is required!'
+    if (!approverid.value) {
+        Errors.approverid.type = true
+        Errors.approverid.msg = 'approver is required'
         isError = true
     } else {
-        Errors.daily.type = null
+        Errors.approverid.type = null
     }
-
-    if (!hourly.value) {
-        Errors.hourly.type = true
-        Errors.hourly.msg = 'hourly salary is required!'
-        isError = true
-    } else {
-        Errors.hourly.type = null
-    }
-
-    if (!salarytype.value) {
-        Errors.salarytype.type = true
-        Errors.salarytype.msg = 'salary type is required!'
-        isError = true
-    } else {
-        Errors.salarytype.type = null
-    }
-
     if (!description.value) {
         Errors.description.type = true
-        Errors.description.msg = 'job decription is required'
+        Errors.description.msg = 'description is required'
         isError = true
     } else {
         Errors.description.type = null
     }
-
-   initErrors()
-    
-    qualifications.value.forEach((e, index) => {
-        if (!e) {
-            Errors.qualifications.name.type[index] = true;
-            Errors.qualifications.name.msg = 'qualification is required';
-            isError = true;
-        }
-    });
+    if (!signature.value) {
+        Errors.signature.type = true
+        Errors.signature.msg = 'signature is required'
+        isError = true
+    } else {
+        Errors.signature.type = null
+    }
+    if (!order.value) {
+        Errors.order.type = true
+        Errors.order.msg = 'order is required'
+        isError = true
+    } else {
+        Errors.order.type = null
+    }
     
     if (isError) {
         Toast.fire({
@@ -341,7 +351,6 @@ const Validations = () => {
     return !isError
 }
 
-
 const rows = ref([]);
 
 const meta = ref({});
@@ -354,7 +363,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/position`, {
+        const { data } = await api.get(`/signatory`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -413,70 +422,54 @@ const LastPage = () => {
 const NewDialog = () => {
     ResetForm();
     dialog.value = true;
-    isEdit.value = false;
+    isDetail.value = false;
 }
 
-const ModifyDialog = async (data) => {
+const info = ref([])
+
+const ShowDialog = (data) => {
     ResetForm();
     dialog.value = true;
-    isEdit.value = true;
-    id.value = data.id;
-    name.value = data.name;
-    monthly.value = data.monthly_salary;
-    daily.value = data.daily_salary;
-    hourly.value = data.hourly_salary;
-    salarytype.value = data.salary_type;
-    description.value = data.description;
-    qualifications.value = data.qualification;
-    isActive.value = (data.is_active ? true : false);
+    isDetail.value = true;
+    info.value = data;
 }
 
 const ResetForm = () => {
     id.value = '';
-    name.value = '';
-    monthly.value = '';
-    daily.value = '';
-    hourly.value = '';
-    salarytype.value = '';
+    type.value = '';
+    ownerid.value = '';
+    type.value = '';
+    approverid.value = '';
     description.value = '';
-    qualifications.value = [""];
-    Errors.name.type = null;
-    Errors.monthly.type = null;
-    Errors.daily.type = null;
-    Errors.hourly.type = null;
-    Errors.salarytype.type = null;
+    signature.value = '';
+    order.value = '';
+    isActive.value = false;
+    Errors.type.type = null;
+    Errors.ownerid.type = null;
+    Errors.approverid.type = null;
     Errors.description.type = null;
+    Errors.signature.type = null;
+    Errors.order.type = null;
 }
 
 const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
-        const response = id.value && isEdit
-            ? await api.post(`/position/${id.value}/update`, {
-                name: name.value,
-                monthly: monthly.value,
-                daily: daily.value,
-                hourly: hourly.value,
-                salarytype: salarytype.value,
-                description: description.value,
-                qualifications: qualifications.value
-            })
-            : await api.post('/position', {
-                name: name.value,
-                monthly: monthly.value,
-                daily: daily.value,
-                hourly: hourly.value,
-                salarytype: salarytype.value,
-                description: description.value,
-                qualifications: qualifications.value
-            });
+        const Data = new FormData();
+        Data.append('ownerid', ownerid.value);
+        Data.append('type', type.value);
+        Data.append('approverid', approverid.value);
+        Data.append('description', description.value);
+        Data.append('order', order.value);
+        Data.append('file', signature.value);
+        const response = await api.post(`/signatory`, Data, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
         dialog.value = false;
-        if (id.value && isEdit) {
-            UpdateList(response.data.data);
-        } else {
-            LoadAll();
-        }
+        LoadAll();
         Toast.fire({
             icon: "success",
             html: `
@@ -484,6 +477,7 @@ const Save = async () => {
                 <div class="text-caption text-capitalize;">${response.data.message}<div>
             `
         });
+
     } catch (e) {
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
@@ -516,21 +510,14 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
-const UpdateList = (data) => {
-    const index = rows.value.findIndex(item => item.id === data.id)
-    if (index !== -1) {
-        rows.value[index] = data
-    }
-}
-
-const Toggle = async () => {
+const Toggle = async (app) => {
     submitLoading.value = true;
     try {
-        const response = isActive.value
-            ? await api.post(`/position/${id.value}/disable`)
-            : await api.post(`/position/${id.value}/enable`)
+        const response = app.is_active
+            ? await api.post(`/signatory/${app.id}/disable`)
+            : await api.post(`/signatory/${app.id}/enable`)
         dialog.value = false;
-        UpdateList(response.data.position)
+        LoadAll()
         Toast.fire({
             icon: "success",
             html: `
@@ -554,53 +541,72 @@ const Toggle = async () => {
     }
 }
 
-const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
+const types = ref(["Vacancy", "Leave", "TimeCard", "Overtime"]);
+const owners = ref([]);
+const approvers = ref([]);
 
-const formatSalary = (data, currency = 'PHP') => {
-    if (!data) return '';
+const filteredOwners = ref([]);
+const filteredApprovers = ref([]);
 
-    let amount = 0;
-
-    switch (data.salary_type) {
-        case 'Monthly':
-            amount = data.monthly_salary;
-            break;
-        case 'Daily':
-            amount = data.daily_salary;
-            break;
-        case 'Hourly':
-            amount = data.hourly_salary;
-            break;
-        default:
-            return '';
-    }
-
-    const salary = new Intl.NumberFormat('en-PH', {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 2
-    }).format(Number(amount));
-
-    return `${salary} | ${data.salary_type}`;
+const createFilterFn = (sourceRef, targetRef) => {
+    return (val, update) => {
+        if (val === '') {
+        update(() => { targetRef.value = sourceRef.value; });
+            return;
+        }
+        update(() => {
+            const needle = val.toLowerCase();
+            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
+        });
+    };
 };
 
+const normalizeOptions = (data = []) => data.map(d => {
+    const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '')
 
-const qualificationInputs = ref([]);
+    // Default
+    return {
+        label: baseLabel,
+        value: Number(d.value ?? d.id),
+        role: d.role ?? ''
+    }
+})
 
-const Add = async () => {
-    qualifications.value.unshift("");
-    await nextTick();
-    if (qualificationInputs.value[0]) {
-        qualificationInputs.value[0].focus();
+const filterOwnerFn = createFilterFn(owners, filteredOwners);
+const filterApproverFn = createFilterFn(approvers, filteredApprovers);
+
+const LoadUsers = async () => {
+    try {
+        const { data } = await api.get(`/signatory/option/user`);
+        owners.value = normalizeOptions(data)
+        filteredOwners.value = [...owners.value]
+        approvers.value = normalizeOptions(data)
+        filteredApprovers.value = [...approvers.value]
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+function FormatOrdinal(n) {
+    if (n % 100 >= 11 && n % 100 <= 13) return `${n}th`;
+    switch (n % 10) {
+        case 1: return `${n}st`;
+        case 2: return `${n}nd`;
+        case 3: return `${n}rd`;
+        default: return `${n}th`;
     }
 }
 
-const remove = (index) => {
-    qualifications.value.splice(index, 1);
+const FormatSignature = (sign) => {
+    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
 
 onMounted(() => {
     LoadAll();
+})
+
+onBeforeMount(() => {
+    LoadUsers()
 })
 
 </script>

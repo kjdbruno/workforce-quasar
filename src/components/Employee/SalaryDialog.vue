@@ -1,5 +1,5 @@
 <template>
-    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="() => { PopulateData(); ResetForm() }">
+    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="() => { PopulateData(); ResetForm(); ResetAllErrors(); }">
         <q-card class="dialog-card column full-height">
             <q-card-section class="q-pa-lg">
                 <div class="text-h6 text-uppercase">salary schedule</div>
@@ -43,25 +43,19 @@
                 <div class="row q-col-gutter-xs q-mb-md">
                     <div class="col-2">
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dateStart.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.msg ? Errors.dateStart.msg : 'date start (YYYY-MM-DD)' }}</div>
-                        <q-input 
-                            v-model="dateStart" 
-                            label="Enter Date"
-                            outlined 
-                            :error="Errors.dateStart.type"
-                            :no-error-icon="true"
-                            @update:model-value="FormatDateStart"
-                        />
+                        <q-input outlined v-model="dateStart" label="Enter Date">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                <q-date v-model="dateStart" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                            </q-popup-proxy>
+                        </q-input>
                     </div>
                     <div class="col-2">
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dateEnd.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateEnd.msg ? Errors.dateEnd.msg : 'date end (YYYY-MM-DD)' }}</div>
-                        <q-input 
-                            v-model="dateEnd" 
-                            label="Enter Date"
-                            outlined 
-                            :error="Errors.dateEnd.type"
-                            :no-error-icon="true"
-                            @update:model-value="FormatDateEnd"
-                        />
+                        <q-input outlined v-model="dateEnd" label="Enter Date">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                <q-date v-model="dateEnd" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                            </q-popup-proxy>
+                        </q-input>
                     </div>
                 </div>
                 <div class="q-mb-md">
@@ -250,7 +244,7 @@ const LoadPositions = async () => {
 };
 
 const position = ref('');
-const dateStart = ref('');
+const dateStart = ref(new Date().toISOString().split('T')[0]);
 const dateEnd = ref('');
 const salarygroup = ref('');
 const salarytype = ref('');
@@ -305,48 +299,6 @@ const Validations = () => {
     }
 
     return !isError
-}
-
-const FormatDateStart = (val) => {
-    if (!val) {
-        dateStart.value = ''
-        return
-    }
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '')
-
-    let formatted = digits
-
-    // YYYY-MM-DD
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
-    }
-
-    dateStart.value = formatted
-}
-
-const FormatDateEnd = (val) => {
-    if (!val) {
-        dateEnd.value = ''
-        return
-    }
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '')
-
-    let formatted = digits
-
-    // YYYY-MM-DD
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
-    }
-
-    dateEnd.value = formatted
 }
 
 const SubmitLoading = ref(false);
@@ -411,12 +363,21 @@ const applyBackendErrors = (backendErrors) => {
 
 const ResetForm = () => {
     position.value = '';
-    dateStart.value = '';
+    dateStart.value = new Date().toISOString().split('T')[0];
     dateEnd.value = '';
     salarytype.value = '';
     salarygroup.value = '';
     amount.value = '';
     notes.value = '';
 }
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
+}
+
+const popup = ref(null);
 
 </script>

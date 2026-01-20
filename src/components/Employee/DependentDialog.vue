@@ -98,14 +98,11 @@
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.birthdate.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.birthdate.msg ? Errors.dependents.birthdate.msg : 'birthdate (YYYY-MM-DD)' }}</div>
-                            <q-input 
-                                v-model="value.birthdate" 
-                                label="Enter Birthdate"
-                                outlined 
-                                :error="Errors.dependents.birthdate.type[index]"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatBirthdate(val, index)"
-                            />
+                            <q-input outlined v-model="value.birthdate" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => birthdatePopups[index] = el">
+                                    <q-date v-model="value.birthdate" mask="YYYY-MM-DD" @update:model-value="() => hideBirthdatePopup(index)"/>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.contactNo.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.contactNo.msg ? Errors.dependents.contactNo.msg : 'contactNo' }}</div>
@@ -162,7 +159,7 @@
     </q-dialog>
 </template>
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed, nextTick } from 'vue';
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
@@ -481,5 +478,12 @@ const applyBackendErrors = (backendErrors) => {
             Errors[err.path].messages.push(err.msg)
         }
     })
+}
+
+const birthdatePopups = ref([]);
+function hideBirthdatePopup(index) {
+  nextTick(() => {
+    if (birthdatePopups.value[index]) birthdatePopups.value[index].hide();
+  });
 }
 </script>
