@@ -7,7 +7,7 @@ import 'sweetalert2/src/sweetalert2.scss';
 // Define your Toast mixin
 const Toast = Swal.mixin({
     toast: true,
-    position: 'bottom-start',
+    position: 'bottom-end',
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: false,

@@ -30,7 +30,7 @@
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.username.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.username.msg ? Errors.accounts.username.msg : 'username' }}</div>
                             <q-input 
                                 v-model="value.username" 
-                                label="Enter Firstname"
+                                label="Enter Username"
                                 outlined 
                                 :error="Errors.accounts.username.type[index]"
                                 :no-error-icon="true"
@@ -40,7 +40,7 @@
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.password.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.password.msg ? Errors.accounts.password.msg : 'password' }}</div>
                             <q-input 
                                 v-model="value.password" 
-                                label="Enter Firstname"
+                                label="Enter Password"
                                 outlined 
                                 :error="Errors.accounts.password.type[index]"
                                 :no-error-icon="true"

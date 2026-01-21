@@ -51,7 +51,7 @@
         <employment-dialog v-model="activeDialog" dialog-name="EmploymentDialog" @saved="GetEmployee"/>
         <service-dialog v-model="activeDialog" dialog-name="ServiceDialog"/>
         <biometric-dialog v-model="activeDialog" dialog-name="BiometricDialog"/>
-        <photo-dialog v-model="activeDialog" dialog-name="PhotoDialog"/>
+        <photo-dialog v-model="activeDialog" dialog-name="PhotoDialog" @saved="GetEmployee"/>
         <education-dialog v-model="activeDialog" dialog-name="EducationDialog"/>
         <training-dialog v-model="activeDialog" dialog-name="TrainingDialog"/>
         <experience-dialog v-model="activeDialog" dialog-name="ExperienceDialog"/>
@@ -146,9 +146,9 @@ const tabs = [
     { label: 'employment', dialog: 'EmploymentDialog'},
     { label: 'service recrod', dialog: 'ServiceDialog'},
     { label: 'salary', dialog: 'SalaryDialog'},
+    { label: 'photo', dialog: 'PhotoDialog'},
     { label: 'account', dialog: 'AccountDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
-    { label: 'photo', dialog: 'PhotoDialog'},
     { label: 'education', dialog: 'EducationDialog'},
     { label: 'trainings', dialog: 'TrainingDialog'},
     { label: 'experiences', dialog: 'ExperienceDialog'},

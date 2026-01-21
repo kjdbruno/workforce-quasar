@@ -58,7 +58,7 @@ const components = {
 };
 
 const navs = [
-    { component: 'UserComponent', label: 'User' },
+    // { component: 'UserComponent', label: 'User' },
     { component: 'HolidayComponent', label: 'Holiday' },
     { component: 'SchoolComponent', label: 'School' },
     { component: 'DegreeComponent', label: 'Degree' },

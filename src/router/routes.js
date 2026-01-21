@@ -35,7 +35,7 @@ const routes = [
       if (!auth.isAuthenticated) {
         next('/')
       } else {
-        preference.component = preference.component ?? 'UserComponent'
+        preference.component = preference.component ?? 'HolidayComponent'
         next()
       }
     },
