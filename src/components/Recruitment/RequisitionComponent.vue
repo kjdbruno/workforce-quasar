@@ -285,7 +285,7 @@
                                 :no-error-icon="true"
                                 @update:model-value="formatDateNeeded"
                             /> -->
-                            <q-input outlined v-model="date">
+                            <q-input outlined v-model="date" label="Date Needed">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
                                 </q-popup-proxy>

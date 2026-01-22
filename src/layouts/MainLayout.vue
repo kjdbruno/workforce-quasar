@@ -4,7 +4,7 @@
         <q-header class="bg-white no-shadow q-mx-lg q-mt-md q-py-sm radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
             <q-toolbar class="header">
 
-                <q-btn flat round dense icon="menu" class="text-grey custom-border" @click="drawerClick"/>
+                <q-btn flat round dense icon="menu" class="text-grey" @click="drawerClick"/>
 
                 <q-toolbar-title class="text-grey text-uppercase">
                     {{ route.name }}
@@ -175,29 +175,6 @@ const indexStore = useIndexStore();
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-// const socketStore = useSocketStore();
-
-// const baseURL = process.env.VUE_APP_BACKEND_URL;
-
-// const leftDrawerOpen = ref(false)
-
-// function toggleLeftDrawer () {
-//     leftDrawerOpen.value = !leftDrawerOpen.value
-// }
-
-// // const isOnline = computed(() => socketStore.isOnline(authStore.id));
-
-// const formatDate = (timestamp) => {
-//     return moment(timestamp).fromNow();
-// };
-
-// const readNotification = () => {
-//     authStore.readNotification();
-// }
-
-// onMounted(() => {
-//     console.log(process.env.VUE_APP_BACKEND_URL);
-// });
 
 const drawer = ref(true)
 const miniState = ref(true)
@@ -229,8 +206,8 @@ const menuItems = [
     { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee' },
     { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave' },
     { iconPrimary: dtrPrimary, iconSecondary: dtrSecondary, label: 'dtr', to: '/dtr' },
+    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'overtime', to: '/overtime' },
     { iconPrimary: performancePrimary, iconSecondary: performanceSecondary, label: 'performance', to: '/performance' },
-    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'training', to: '/training' },
     { iconPrimary: disciplinaryPrimary, iconSecondary: disciplinarySecondary, label: 'disciplinary', to: '/disciplinary' },
     { iconPrimary: exitPrimary, iconSecondary: exitSecondary, label: 'separation', to: '/separation' },
     { iconPrimary: payrollPrimary, iconSecondary: payrollSecondary, label: 'payroll', to: '/payroll' },

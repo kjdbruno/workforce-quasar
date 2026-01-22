@@ -10,14 +10,17 @@
                     <img :src="FormatAvatar(photo?.avatar)" alt="Profile" class="profile-img" />
                 </div>
                 <div class="row">
-                    <q-file 
-                        v-model="file" 
-                        label="Upload Photo"
-                        outlined 
-                        :error="Errors.file.type"
-                        :no-error-icon="true"
-                        class="col-2"
-                    />
+                    <div>
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'credit' }}</div>
+                        <q-file 
+                            v-model="file" 
+                            label="Upload Photo"
+                            outlined 
+                            :error="Errors.file.type"
+                            :no-error-icon="true"
+                            class="col-2"
+                        />
+                    </div>
                 </div>
             </q-card-section>
             
@@ -125,7 +128,7 @@ const Validations = () => {
         isError = true;
     } else if (!allowedTypes.includes(file.value.type)) {
         Errors.file.type = true;
-        Errors.file.msg = 'file must be a PDF document';
+        Errors.file.msg = 'file must be a image file';
         isError = true;
     } else if (file.value.size > maxSize) {
         Errors.file.type = true;

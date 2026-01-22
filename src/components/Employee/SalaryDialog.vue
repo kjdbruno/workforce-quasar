@@ -40,6 +40,12 @@
                         </q-select>
                     </div>
                 </div>
+                <div class="q-mb-md">
+                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.salarytype.type ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
+                    <div class="q-gutter-sm">
+                        <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                    </div>
+                </div>
                 <div class="row q-col-gutter-xs q-mb-md">
                     <div class="col-2">
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dateStart.msg ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.msg ? Errors.dateStart.msg : 'date start (YYYY-MM-DD)' }}</div>
@@ -56,24 +62,6 @@
                                 <q-date v-model="dateEnd" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
                             </q-popup-proxy>
                         </q-input>
-                    </div>
-                </div>
-                <div class="q-mb-md">
-                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.salarytype.type ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
-                    <div class="q-gutter-sm">
-                        <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
-                    </div>
-                </div>
-                <div class="row q-col-gutter-xs q-mb-md">
-                    <div class="col-2">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.amount.msg ? 'text-negative' : 'text-grey'">{{ Errors.amount.msg ? Errors.amount.msg : 'amount' }}</div>
-                        <q-input 
-                            v-model="amount" 
-                            label="Enter Amount"
-                            outlined 
-                            :error="Errors.amount.type"
-                            :no-error-icon="true"
-                        />
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
@@ -109,9 +97,19 @@
                             </template>
                         </q-select>
                     </div>
+                    <div class="col-2">
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.amount.msg ? 'text-negative' : 'text-grey'">{{ Errors.amount.msg ? Errors.amount.msg : 'amount' }}</div>
+                        <q-input 
+                            v-model="amount" 
+                            label="Enter Amount"
+                            outlined 
+                            :error="Errors.amount.type"
+                            :no-error-icon="true"
+                        />
+                    </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
-                    <div class="col-2">
+                    <div class="col-4">
                         <div class="text-caption text-uppercase text-grey q-mb-xs">note</div>
                         <q-input 
                             v-model="note" 
