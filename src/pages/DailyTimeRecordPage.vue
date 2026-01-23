@@ -61,25 +61,19 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="text-caption text-uppercase" :class="Errors.dateStart.type ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.type ? Errors.dateStart.message : 'date start (YYYY-MM-DD)' }}</div>
-                            <q-input 
-                                v-model="dateStart" 
-                                label="Enter Date"
-                                outlined 
-                                :error="Errors.dateStart.type"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatStartDate(val)"
-                            />
+                            <q-input outlined v-model="dateStart" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="dateStart" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase" :class="Errors.dateEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.dateEnd.type ? Errors.dateEnd.message : 'date end (YYYY-MM-DD)' }}</div>
-                            <q-input 
-                                v-model="dateEnd" 
-                                label="Enter Date"
-                                outlined 
-                                :error="Errors.dateEnd.type"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatEndDate(val)"
-                            />
+                             <q-input outlined v-model="dateEnd" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-date v-model="dateEnd" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                     </div>
                 </q-card-section>
@@ -139,10 +133,20 @@
                             </div>
                             <div class="col-10">
                                 <div class="row items-center q-gutter-xs">
-                                    <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/>
+                                    <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;" >
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale" mask="##:##" fill-mask ref="popup" class="no-shadow custom-border radius-sm">
+                                            <q-time v-model="data.times[index]" mask="HH:mm" >
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Okay" color="primary" flat />
+                                                </div>
+                                            </q-time>
+                                        </q-popup-proxy>
+                                    </q-input>
+                                    <!-- <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/> -->
                                     <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" />
                                     <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" />
                                     <q-badge v-if="data.overtimes" rounded color="primary" :label="data.overtimes" />
+                                    <q-btn icon="arrow_upward" round unelevated color="primary" size="xs" @click="() => { UpdateDTR(attendances.id, employee.id, data) }"/>
                                 </div>
                             </div>
                         </div>
@@ -276,9 +280,8 @@ const month = ref(String(today.getMonth() + 1).padStart(2, '0'));
 const year = ref(String(today.getFullYear()));
 
 const id = ref('');
-const dateStart = ref('');
-const dateEnd = ref('');
-const description = ref('');
+const dateStart = ref(new Date().toISOString().split('T')[0]);
+const dateEnd = ref(new Date().toISOString().split('T')[0]);
 
 const isActive = ref(false);
 
@@ -287,9 +290,6 @@ const Errors = reactive({
         type: null, message: ''
     },
     dateEnd: { 
-        type: null, message: ''
-    },
-    description: { 
         type: null, message: ''
     }
 });
@@ -403,8 +403,8 @@ const NewDialog = () => {
 
 const ResetForm = () => {
     id.value = '';
-    dateStart.value = '';
-    dateEnd.value = '';
+    dateStart.value = new Date().toISOString().split('T')[0];
+    dateEnd.value = new Date().toISOString().split('T')[0];
     isActive.value = false;
     Errors.dateStart.type = false;
     Errors.dateEnd.type = false;
@@ -731,6 +731,41 @@ const GetAttendance = async (id) => {
         submitLoading.value = false;
     }
 }
+
+const UpdateDTR = async (id, employeeid, app) => {
+    submitLoading.value = true;
+    try {
+        const response = await api.post(`/attendance/dtr/${id}/update`, {
+                employeeid: employeeid,
+                attendances: app
+            });
+        GetAttendance(id)
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+
+    } finally {
+        submitLoading.value = false;
+    }
+}
+
+const popup = ref(null);
 
 onMounted(() => {
     LoadAll();

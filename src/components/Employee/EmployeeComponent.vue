@@ -486,10 +486,10 @@
                     </div>
                     <div class="q-mb-md">
                         <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.payrollgroupId.msg ? 'text-negative' : 'text-grey'">{{ Errors.payrollgroupId.msg ? Errors.payrollgroupId.msg : 'payroll group' }}</span>
+                            <span class="text-caption text-uppercase" :class="Errors.payrollgroup.msg ? 'text-negative' : 'text-grey'">{{ Errors.payrollgroup.msg ? Errors.payrollgroup.msg : 'payroll group' }}</span>
                         </div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in payrollgroups" v-model="payrollgroupId" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value.value" :label="value.label" class="text-capitalize"/>
+                            <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
@@ -699,7 +699,7 @@ const sssNo = ref('');
 const philhealthNo = ref('');
 const pagibigNo = ref('');
 const salarygroup = ref('');
-const payrollgroupId = ref('');
+const payrollgroup = ref('');
 const taxstatus = ref('');
 
 const Errors = reactive({
@@ -727,7 +727,7 @@ const Errors = reactive({
     philhealthNo: { type: null, msg: '' },
     pagibigNo: { type: null, msg: '' },
     salarygroup: { type: null, msg: '' },
-    payrollgroupId: { type: null, msg: '' },
+    payrollgroup: { type: null, msg: '' },
     taxstatus: { type: null, msg: '' },
 });
 
@@ -927,12 +927,12 @@ const Validations = () => {
         Errors.salarygroup.type = null;
     }
 
-    if (!payrollgroupId.value) {
-        Errors.payrollgroupId.type = true;
-        Errors.payrollgroupId.msg = ('payroll group is required');
+    if (!payrollgroup.value) {
+        Errors.payrollgroup.type = true;
+        Errors.payrollgroup.msg = ('payroll group is required');
         isError = true;
     } else {
-        Errors.payrollgroupId.type = null;
+        Errors.payrollgroup.type = null;
     }
 
     if (!taxstatus.value) {
@@ -982,7 +982,7 @@ const ResetForm = () => {
     philhealthNo.value = '';
     pagibigNo.value = '';
     salarygroup.value = '';
-    payrollgroupId.value = '';
+    payrollgroup.value = '';
     taxstatus.value = '';
 }
 
@@ -999,7 +999,6 @@ const ShowModal = () => {
     LoadSchedules();
     LoadPositions();
     LoadApplicants();
-    LoadPayrollGroups();
     ResetForm();
     ResetAllErrors();
 }
@@ -1023,14 +1022,13 @@ const salarygroups = ref([
     { value: "ADJUST", label: "Salary Adjustment" },
     { value: "GOVT", label: "Government Mandated Increase" },
 ]);
-const payrollgroups = ref([]);
+const payrollgroups = ref(["Montly", "Semi-Monthly", "Weekly"]);
 const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
 
 const filteredPositions = ref([]);
 const filteredCompanies = ref([]);
 const filteredDepartments = ref([]);
 const filteredSchedules = ref([]);
-const filteredPayrollGroups = ref([]);
 
 const createFilterFn = (sourceRef, targetRef) => {
     return (val, update) => {
@@ -1159,16 +1157,6 @@ const LoadPositions = async () => {
     }
 };
 
-const LoadPayrollGroups = async () => {
-    try {
-        const { data } = await api.get(`/employee/option/payrollgroup`);
-        payrollgroups.value = normalizeOptions(data)
-        filteredPayrollGroups.value = [...payrollgroups.value]
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
 const PopulateData = (app) => {
     firstname.value = app.first_name;
     middlename.value = app.middle_name;
@@ -1220,7 +1208,7 @@ const Save = async () => {
         Data.append("scheduleId", scheduleId.value);
         Data.append("employmentstatus", employmentstatus.value);
         Data.append("salarygroup", salarygroup.value);
-        Data.append("payrollgroupId", payrollgroupId.value);
+        Data.append("payrollgroup", payrollgroup.value);
         Data.append("taxstatus", taxstatus.value);
         const response = await api.post('/employee', Data, {
             headers: {

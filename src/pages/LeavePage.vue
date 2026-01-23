@@ -149,25 +149,19 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.datestart.type ? 'text-negative' : 'text-grey'">{{ Errors.datestart.type ? Errors.datestart.message : 'date start' }}</div>
-                            <q-input 
-                                v-model="datestart" 
-                                label="Enter Date"
-                                outlined 
-                                :error="Errors.datestart.type"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatStartDate(val)"
-                            />
+                            <q-input outlined v-model="datestart" label="Enter Date" :error="Errors.datestart.type" no-error-icon>
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" ref="popup">
+                                    <q-date v-model="datestart" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide(); } "/>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dateend.type ? 'text-negative' : 'text-grey'">{{ Errors.dateend.type ? Errors.dateend.message : 'date end' }}</div>
-                            <q-input 
-                                v-model="dateend" 
-                                label="Enter Date"
-                                outlined 
-                                :error="Errors.dateend.type"
-                                :no-error-icon="true"
-                                @update:model-value="val => FormatEndDate(val)"
-                            />
+                            <q-input outlined v-model="dateend" label="Enter Date" :error="Errors.dateend.type" no-error-icon>
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" ref="popup">
+                                    <q-date v-model="dateend" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide(); } "/>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-1">
                             <div class="text-caption text-uppercase text-grey q-mb-xs">day/s</div>
@@ -217,6 +211,7 @@
                         <div class="text-body1 text-uppercase">{{ FormatDateRange(info ?? '') }}</div>
                     </div>
                     <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey">no of day</div>
                         <div class="text-body1 text-uppercase">{{ FormatDay(info ?? '') }}</div>
                     </div>
                     <div class="q-mb-md">
@@ -332,11 +327,12 @@ const typeid = ref('');
 const datestart = ref('');
 const dateend = ref('');
 const days = computed(() => {
-    if (!datestart.value || !dateend.value) return '';
-    const start = moment(datestart.value, "YYYY-MM-DD");
-    const end = moment(dateend.value, "YYYY-MM-DD");
-    const diff = start.diff(end, 'days') + 1;
-    return diff > 0 ? diff : 0;
+    if (!datestart.value || !dateend.value) return ''
+    const start = moment(datestart.value, 'YYYY-MM-DD')
+    const end = moment(dateend.value, 'YYYY-MM-DD')
+    // Calculate difference in days
+    const diff = end.diff(start, 'days') + 1 // +1 to include both start and end dates
+    return diff > 0 ? diff : 0
 });
 const reason = ref('');
 const isactive = ref(false);
@@ -515,7 +511,7 @@ const FormatDay = (app) => {
         const day = d.getDay(); // 0 = Sunday, 6 = Saturday
 
         if (day !== 0 && day !== 6) {
-        count++;
+            count++;
         }
     }
 
@@ -575,28 +571,24 @@ const LoadLeaveTypes = async () => {
     }
 };
 
-const FormatStartDate = (val) => {
-    datestart.value = FormatToYMD(val)
-}
-const FormatEndDate = (val) => {
-    dateend.value = FormatToYMD(val)
-}
 const FormatToYMD = (val) => {
-    if (!val) return ''
+  if (!val) return ''
 
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
+  // Keep only digits and limit to 8 (YYYYMMDD)
+  const digits = val.replace(/\D/g, '').slice(0, 8)
 
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    return formatted
+  if (digits.length <= 4) {
+    // Just year
+    return digits
+  } else if (digits.length <= 6) {
+    // Year + month
+    return `${digits.slice(0, 4)}-${digits.slice(4)}`
+  } else {
+    // Year + month + day
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
+  }
 }
+
 
 const ResetForm = () => {
     id.value = '';
@@ -816,6 +808,8 @@ const applyBackendErrors = (backendErrors) => {
         }
     })
 }
+
+const popup = ref(null);
 
 onMounted(() => {
     LoadAll()

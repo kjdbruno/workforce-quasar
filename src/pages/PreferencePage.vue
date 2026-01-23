@@ -60,17 +60,17 @@ const components = {
 const navs = [
     // { component: 'UserComponent', label: 'User' },
     { component: 'HolidayComponent', label: 'Holiday' },
-    { component: 'SchoolComponent', label: 'School' },
-    { component: 'DegreeComponent', label: 'Degree' },
-    { component: 'IncidentClassComponent', label: 'Incident class' },
-    { component: 'IncidentRoleComponent', label: 'incident role' },
+    // { component: 'SchoolComponent', label: 'School' },
+    // { component: 'DegreeComponent', label: 'Degree' },
+    // { component: 'IncidentClassComponent', label: 'Incident class' },
+    // { component: 'IncidentRoleComponent', label: 'incident role' },
     { component: 'DepartmentComponent', label: 'department' },
     { component: 'CompanyComponent', label: 'company' },
     { component: 'PositionComponent', label: 'position' },
     { component: 'ScheduleComponent', label: 'schedule' },
     { component: 'LeaveComponent', label: 'leave' },
     { component: 'SignatoryComponent', label: 'signatory' },
-    { component: 'PayrollGroupComponent', label: 'payroll group' },
+    // { component: 'PayrollGroupComponent', label: 'payroll group' },
 ]
 
 </script>

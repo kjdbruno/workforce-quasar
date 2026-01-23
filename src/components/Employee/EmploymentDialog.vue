@@ -232,6 +232,12 @@
                             </template>
                         </q-select>
                     </div>
+                    <div class="col-10">
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.payrollgroup.msg ? 'text-negative' : 'text-grey'">{{ Errors.payrollgroup.msg ? Errors.payrollgroup.msg : 'payroll group' }}</div>
+                        <div class="q-gutter-sm">
+                            <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
+                        </div>
+                    </div>
                 </div>
             </q-card-section>
             
@@ -285,6 +291,7 @@ const sssNo = ref('');
 const philhealthNo = ref('');
 const pagibigNo = ref('');
 const taxstatus = ref('');
+const payrollgroup = ref('');
 
 const Errors = reactive({
     employeeNo: { type: null, msg: '' },
@@ -297,7 +304,8 @@ const Errors = reactive({
     sssNo: { type: null, msg: '' },
     philhealthNo: { type: null, msg: '' },
     pagibigNo: { type: null, msg: '' },
-    taxstatus: { type: null, msg: null }
+    taxstatus: { type: null, msg: null },
+    payrollgroup: { type: null, msg: '' },
 });
 
 const Validations = () => {
@@ -384,6 +392,14 @@ const Validations = () => {
         Errors.taxstatus.type = null;
     }
 
+    if (!payrollgroup.value) {
+        Errors.payrollgroup.type = true;
+        Errors.payrollgroup.msg = ('payroll group is required');
+        isError = true;
+    } else {
+        Errors.payrollgroup.type = null;
+    }
+
     if (isError) {
         Toast.fire({
             icon: "error",
@@ -418,7 +434,7 @@ const formatDateHired = (val) => {
     dateHired.value = formatted
 }
 
-
+const payrollgroups = ref(["Montly", "Semi-Monthly", "Weekly"]);
 const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
 const companies = ref([]);
 const departments = ref([]);
@@ -552,6 +568,7 @@ const PopulateData = () => {
     philhealthNo.value = app.employment.philhealth_no;
     pagibigNo.value = app.employment.pagibig_no;
     taxstatus.value = app.employment.tax_status;
+    payrollgroup.value = app.employment.payroll_group;
 }
 
 const Save = async () => {
@@ -568,7 +585,8 @@ const Save = async () => {
             sssNo: sssNo.value,
             pagibigNo: pagibigNo.value,
             philhealthNo: philhealthNo.value,
-            taxstatus: taxstatus.value
+            taxstatus: taxstatus.value,
+            payrollgroup: payrollgroup.value
         });
         emit('saved');
         emit('update:modelValue', null);

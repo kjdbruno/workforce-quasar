@@ -47,13 +47,13 @@
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                <q-card @click="() => { Modify(data); Dialog = true; LoadPersonnels(); isEdit = true; GetOvertime(data.id) ;}" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
+                <q-card @click="() => { GetOvertime(data.id); OvertimeDialog = true}" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ FormatDate(data?.date) }}</div>
-                        <div class="text-caption text-capitalize text-grey">{{ data?.status }}</div>
+                        <div class="text-caption text-capitalize">{{ FormatTimeRange(data) }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width q-pa-sm">
-                        <div class="text-caption text-capitalize">{{ FormatTimeRange(data) }}</div>
+                        <div class="text-caption text-capitalize text-grey">{{ data?.status }}</div>
                     </q-card-section>
                 </q-card>
             </div>
@@ -78,7 +78,7 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeStart.type ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.type ? Errors.timeStart.msg : 'start time' }}</div>
-                            <q-input outlined v-model="timeStart" label="Enter Time" :error="Errors.timeStart.type" :no-error-icon="true">
+                            <q-input outlined v-model="timeStart" label="Enter Time" :error="Errors.timeStart.type" :no-error-icon="true" mask="##:##" fill-mask>
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-time v-model="timeStart" mask="HH:mm" >
                                         <div class="row items-center justify-end">
@@ -90,7 +90,7 @@
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.type ? Errors.timeEnd.msg : 'time end' }}</div>
-                            <q-input outlined v-model="timeEnd" label="Enter Time" :error="Errors.timeEnd.type" :no-error-icon="true">
+                            <q-input outlined v-model="timeEnd" label="Enter Time" :error="Errors.timeEnd.type" :no-error-icon="true" mask="##:##" fill-mask>
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-time v-model="timeEnd" mask="HH:mm" >
                                         <div class="row items-center justify-end">
@@ -164,6 +164,48 @@
                             </div>
                         </div>
                     </div>
+                </q-card-section>
+                <q-card-actions class="q-pa-lg bg">
+                    <div class="q-gutter-sm">
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddEmployee" outline/>
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { Dialog = false; }" outline/>
+                    </div>
+                </q-card-actions>
+                <q-inner-loading :showing="submitLoading">
+                    <div class="text-center">
+                        <q-spinner-puff size="md"/>
+                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
+                    </div>
+                </q-inner-loading>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="OvertimeDialog" full-height position="right" persistent square class="dialog">
+            <q-card class="dialog-card column full-height">
+                <q-card-section class="q-pa-lg">
+                    <div class="text-h6 text-uppercase">overtime application</div>
+                </q-card-section>
+                <q-separator inset />
+                <q-card-section class="col q-pa-lg scroll">
+                    <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey">date</div>
+                        <div class="text-body1 text-uppercase">{{ FormatDate(info?.date) }}</div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey">time</div>
+                        <div class="text-body1 text-uppercase">{{ FormatTimeRange(info) }}</div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey">status</div>
+                        <div class="text-body1 text-uppercase">{{ info?.status }}</div>
+                    </div>
+                    <div class="q-mb-md">
+                        <div class="text-caption text-uppercase text-grey">employee</div>
+                        <div v-for="e in info?.applications" class="q-mb-xs">
+                            <div class="text-body1 text-uppercase">{{ FormatName(e.employee) }}</div>
+                            <div class="text-caption text-uppercase">{{ e?.employee?.employment?.position.name }}</div>
+                        </div>
+                    </div>
                     <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
                         <div v-for="(dt, index) in info?.approvals">
                             <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
@@ -177,8 +219,7 @@
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                        <q-btn v-if="canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
+                        <q-btn v-if="canApprove && info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
                             <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                                 <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
                                     <q-card-section>
@@ -192,9 +233,23 @@
                                 </q-card>
                             </q-menu>
                         </q-btn>
-                        <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddEmployee" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { Dialog = false; }" outline/>
+                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="modify" @click="() => { Modify(info); isEdit = true; Dialog = true; OvertimeDialog = false; LoadPersonnels(); }" />
+                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
+                            <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                                <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
+                                    <q-card-section>
+                                        <div class="text-h6 text-center text-uppercase">
+                                            proceed to cancel
+                                        </div>
+                                    </q-card-section>
+                                    <q-card-actions>
+                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Cancel(info?.id)"/>
+                                    </q-card-actions>
+                                </q-card>
+                            </q-menu>
+                        </q-btn>
+                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(info?.id)" />
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { OvertimeDialog = false; }" outline/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
@@ -473,6 +528,7 @@ const Save = async () => {
 }
 
 const Modify = (app) => {
+    id.value = app.id,
     date.value = app.date;
     timeStart.value = app.time_start;
     timeEnd.value = app.time_end;
@@ -488,6 +544,7 @@ const MapApplicants = (data = []) => {
 }
 
 const info = ref([])
+const OvertimeDialog = ref(false);
 
 const GetOvertime = async (id) => {
     submitLoading.value = true;
@@ -523,6 +580,105 @@ const canApprove = computed(() => {
     // Check if the current user is the approver of the next pending approval
     return nextPending.setting?.approver?.id === AuthStore.user?.id;
 });
+
+const Approve = async (id) => {
+    submitLoading.value = true;
+    const userId = Number(AuthStore.user.id);
+    const overtime = info.value;
+    const myRequest = overtime.approvals.find(approval =>
+    Number(
+            approval?.setting?.approver?.employeeAccount?.user_id
+        ) === Number(userId)
+    );
+    const approvalid = myRequest?.id ?? null;
+
+    try {
+        const response = await api.post(`/overtime/${id}/approve`, {
+            approvalid
+        });
+        LoadAll()
+        OvertimeDialog.value = false;
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+
+    } finally {
+        submitLoading.value = false;
+    }
+}
+
+const Cancel = async (id) => {
+
+    submitLoading.value = true;
+
+    try {
+
+        const response = await api.post(`/overtime/${id}/cancel`)
+        LoadAll()
+        OvertimeDialog.value = false;
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+
+    } catch (e) {
+        
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+
+    } finally {
+
+        submitLoading.value = false;
+
+    }
+}
+
+const printDialog = ref(false);
+const pdf = ref(null);
+
+const Print = async (id) => {
+    submitLoading.value = true;
+    try {
+        const res = await api.get(`/overtime/${id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+        submitLoading.value = false;
+    } catch (error) {
+        submitLoading.value = false;
+        console.error("Error generating PDF:", error);
+    }
+}
 
 const applyBackendErrors = (backendErrors) => {
     const errorsArray = Array.isArray(backendErrors)
@@ -568,13 +724,12 @@ const FormatDate = (date) => {
 const FormatTimeRange = (data) => {
     if (!data?.time_start || !data?.time_end) return '';
 
-    // Optional: format to 12-hour AM/PM
-    const start = new Date(`1970-01-01T${data.time_start}Z`);
-    const end = new Date(`1970-01-01T${data.time_end}Z`);
+  const start = new Date(`1970-01-01T${data.time_start}`);
+  const end = new Date(`1970-01-01T${data.time_end}`);
 
-    const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const options = { hour: '2-digit', minute: '2-digit', hour12: true };
 
-    return `${start.toLocaleTimeString('en-PH', options)} - ${end.toLocaleTimeString('en-PH', options)}`;
+  return `${start.toLocaleTimeString('en-PH', options)} - ${end.toLocaleTimeString('en-PH', options)}`;
 };
 
 
