@@ -30,8 +30,8 @@
                         <div class="text-caption text-grey">{{ FormatOrdinal(data.order) }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ data.owner?.name }}</div>
-                        <div class="text-subtitle2 text-grey text-uppercase text-italic">{{ data.approver?.name }}</div>
+                        <div class="text-caption text-grey text-uppercase">{{ data.owner?.name }}</div>
+                        <div class="text-subtitle2 text-uppercase text-italic">{{ data.approver?.name }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>

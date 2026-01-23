@@ -49,7 +49,7 @@
                             </div>
                             <q-input 
                                 v-model="name" 
-                                label="Enter Schedule Name"
+                                label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
@@ -57,30 +57,28 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.timeStart.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.msg ? Errors.timeStart.msg : 'time start' }}</span>
-                            </div>
-                            <q-input 
-                                v-model="timeStart" 
-                                label="HH:MM"
-                                outlined
-                                :error="Errors.timeStart.type"
-                                :no-error-icon="true"
-                                @update:model-value="formatTimeStart"
-                            />
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeStart.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.msg ? Errors.timeStart.msg : 'time start' }}</div>
+                            <q-input outlined v-model="timeStart" label="Enter Time" :error="Errors.timeStart.type" :no-error-icon="true" mask="##:##" fill-mask>
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-time v-model="timeStart" mask="HH:mm" >
+                                        <div class="row items-center justify-end">
+                                            <q-btn v-close-popup label="Okay" color="primary" flat />
+                                        </div>
+                                    </q-time>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.timeEnd.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.msg ? Errors.timeEnd.msg : 'time end' }}</span>
-                            </div>
-                            <q-input 
-                                v-model="timeEnd" 
-                                label="HH:MM"
-                                outlined 
-                                :error="Errors.timeEnd.type"
-                                :no-error-icon="true"
-                                @update:model-value="formatTimeEnd"
-                            />
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeEnd.msg ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.msg ? Errors.timeEnd.msg : 'time end' }}</div>
+                            <q-input outlined v-model="timeEnd" label="Enter Time" :error="Errors.timeEnd.type" :no-error-icon="true" mask="##:##" fill-mask>
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-time v-model="timeEnd" mask="HH:mm" >
+                                        <div class="row items-center justify-end">
+                                            <q-btn v-close-popup label="Okay" color="primary" flat />
+                                        </div>
+                                    </q-time>
+                                </q-popup-proxy>
+                            </q-input>
                         </div>
                     </div>
                 </q-card-section>
@@ -313,9 +311,14 @@ const ResetForm = () => {
     timeStart.value = '';
     timeEnd.value = '';
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.timeStart.type = null;
-    Errors.timeEnd.type = null;
+    ResetAllErrors();
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Save = async () => {

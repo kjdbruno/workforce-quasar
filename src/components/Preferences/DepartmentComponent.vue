@@ -45,24 +45,24 @@
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'department name' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'name' }}</span>
                             </div>
                             <q-input 
                                 v-model="name" 
-                                label="Enter Department Name"
+                                label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
+                        <div class="col-1">
                             <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.alias.msg ? 'text-negative' : 'text-grey'">{{ Errors.alias.msg ? Errors.alias.msg : 'department alias' }}</span>
+                                <span class="text-caption text-uppercase" :class="Errors.alias.msg ? 'text-negative' : 'text-grey'">{{ Errors.alias.msg ? Errors.alias.msg : 'alias' }}</span>
                             </div>
                             <q-input 
                                 v-model="alias" 
-                                label="Enter Department Alias"
+                                label="Enter Alias"
                                 outlined 
                                 :error="Errors.alias.type"
                                 :no-error-icon="true"
@@ -279,8 +279,14 @@ const ResetForm = () => {
     name.value = '';
     alias.value = '';
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.alias.type = null;
+    ResetAllErrors()
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Save = async () => {

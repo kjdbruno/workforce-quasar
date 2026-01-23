@@ -182,8 +182,8 @@ const educations = ref([
         schoollevel: "",
         schoolId: "",
         courseId: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     }
 ]);
 
@@ -192,8 +192,8 @@ const EmptyEducation = () => ({
     schoollevel: "",
     schoolId: "",
     courseId: "",
-    startDate: "",
-    endDate: ""
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
 })
 
 const GetEducation = async (id) => {
@@ -379,12 +379,6 @@ const LoadCourses = async () => {
     }
 };
 
-const FormatStartDate = (val, index) => {
-    educations.value[index].startDate = FormatToYMD(val)
-}
-const FormatEndDate = (val, index) => {
-      educations.value[index].endDate = FormatToYMD(val)
-}
 const FormatToYMD = (val) => {
     if (!val) return ''
 
@@ -409,8 +403,8 @@ const AddEducation = () => {
         schoollevel: "",
         schoolId: "",
         courseId: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     });
 }
 

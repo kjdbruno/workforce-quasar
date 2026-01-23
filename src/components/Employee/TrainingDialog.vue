@@ -137,8 +137,8 @@ const trainings = ref([
     {
         id: "",
         title: '',
-        startDate: '',
-        endDate: '',
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         hour: '',
         trainingtype: '',
     }
@@ -147,8 +147,8 @@ const EmptyTraining = () => ({
     id: "",
     trainingtype: "",
     title: "",
-    startDate: "",
-    endDate: "",
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
     hour: ""
 })
 
@@ -289,37 +289,14 @@ const Validations = () => {
 
 const trainingtypes = ref(["Managerial", "Supervisory", "Technical", "Orientation", "Compliance", "Seminar", "Workshop", "Conference", "Other"]);
 
-const FormatStartDate = (val, index) => {
-    trainings.value[index].startDate = FormatToYMD(val)    
-}
-const FormatEndDate = (val, index) => {
-    trainings.value[index].endDate = FormatToYMD(val)
-}
-const FormatToYMD = (val) => {
-    if (!val) return ''
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
-
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    return formatted
-}
-
 const AddTraining = () => {
     const t = trainings.value;
     t.push({
         id: "",
         trainingtype: "",
         title: "",
-        startDate: "",
-        endDate: "",
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         hour: ""
     });
 }

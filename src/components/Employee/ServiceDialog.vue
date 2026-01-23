@@ -23,7 +23,7 @@
                         </q-card>
                     </div>
                     <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                        <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                        <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id">
                             <q-card-section class="text-center full-width">
                                 <div class="text-subtitle2 text-uppercase">{{ formatCurrency(app?.amount) }}</div>
                                 <div class="text-caption text-uppercase">{{ app?.salarytype }}</div>
@@ -33,6 +33,9 @@
                                 <div class="text-caption text-grey">{{ formatDateRange(app) }}</div>
                             </q-card-section>
                             <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="app.is_active ? 'bg-positive' : 'bg-negative'"></div>
+                            <div class="absolute-top-right" v-if="app.is_active">
+                                <q-radio v-model="salaryId" :val="app.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="md" />
+                            </div>
                         </q-card>
                     </div>
                 </div>
@@ -40,6 +43,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
+                    <q-btn v-if="salaryId != ''" unelevated size="md" color="primary" class="btn text-capitalize" label="remove" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(EmployeeStore.data?.id)" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
@@ -143,6 +147,7 @@ const MapSalarySchedules = (data = []) => {
 
 const PopulateData = () => {
     GetServiceRecord(EmployeeStore.data?.id)
+    salaryId.value = '';
 }
 
 const Errors = reactive({
@@ -205,6 +210,39 @@ const Print = async (id) => {
         console.error("Error generating PDF:", error);
     }
 }
+
+const salaryId = ref('');
+
+const Save = async () => {
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/salary/service`, {
+            salaryId: salaryId.value,
+        });
+        GetServiceRecord(EmployeeStore.data?.id);
+        salaryId.value = '';
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        SubmitLoading.value = false;
+    }
+};
 
 </script>
 

@@ -23,7 +23,7 @@
                                 <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.used.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.used.msg ? Errors.leaves.used.msg : 'used' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.balance.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.balance.msg ? Errors.leaves.balance.msg : 'balance' }}</div>
+                                <div class="text-caption text-uppercase q-mb-xs text-grey">balance</div>
                             </div>
                         </div>
                         <div class="row q-col-gutter-xs q-mb-xs" v-for="(app, index) in leaves" :key="index">
@@ -33,6 +33,7 @@
                                     outlined 
                                     :no-error-icon="true"
                                     :readonly="true"
+                                    class="text-capitalize"
                                 />
                             </div>
                             <div class="col-1">
@@ -47,7 +48,7 @@
                                 <q-input 
                                     v-model="app.earned" 
                                     :error="Errors.leaves.earned.type[index]"
-                                    outlined 
+                                    outlined
                                 />
                             </div>
                             <div class="col-1">
@@ -59,9 +60,9 @@
                             </div>
                             <div class="col-1">
                                 <q-input 
-                                    v-model="app.balance" 
-                                    :error="Errors.leaves.balance.type[index]"
-                                    outlined 
+                                    :model-value="(Number(app.earned) || 0) - (Number(app.used) || 0)"
+                                    outlined
+                                    :readonly="true"
                                 />
                             </div>
                         </div>
@@ -284,9 +285,6 @@ const Errors = reactive({
         },
         used: {
             type: [], msg: ''
-        },
-        balance: {
-            type: [], msg: ''
         }
     }
 });
@@ -295,7 +293,6 @@ const initErrors = () => {
     Errors.leaves.credit.type = leaves.value.map(() => null);
     Errors.leaves.earned.type = leaves.value.map(() => null);
     Errors.leaves.used.type = leaves.value.map(() => null);
-    Errors.leaves.balance.type = leaves.value.map(() => null);
 }
 
 const Validations = () => {
@@ -305,7 +302,6 @@ const Validations = () => {
     Errors.leaves.credit = { type: null, msg: '' }
     Errors.leaves.earned = { type: null, msg: '' }
     Errors.leaves.used = { type: null, msg: '' }
-    Errors.leaves.balance = { type: null, msg: '' }
 
     initErrors()
     
@@ -325,11 +321,6 @@ const Validations = () => {
             Errors.leaves.used.msg = 'used is required';
             isError = true;
         }
-        if (!e.balance) {
-            Errors.leaves.balance.type[index] = true;
-            Errors.leaves.balance.msg = 'balance is required';
-            isError = true;
-        } 
     });
 
     if (isError) {
@@ -450,6 +441,19 @@ const Print = async (id) => {
         console.error("Error generating PDF:", error);
     }
 }
+
+const UpdateBalance = (index, newValue, type) => {
+  const leave = leaves[index];
+  if (!leave) return;
+
+  // Update the field first
+  if (type === 'earned') leave.earned = Number(newValue) || 0;
+  if (type === 'used') leave.used = Number(newValue) || 0;
+
+  // Compute balance
+  leave.balance = (Number(leave.earned) || 0) - (Number(leave.used) || 0);
+};
+
 
 </script>
 
