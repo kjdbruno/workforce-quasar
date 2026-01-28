@@ -418,8 +418,6 @@ onMounted(() => {
     LoadAll();
 })
 
-const popup = ref(null)
-
 </script>
 
 <style scoped>
