@@ -279,8 +279,14 @@ const ResetForm = () => {
     name.value = '';
     description.value = '';
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.description.type = null;
+    ResetAllErrors();
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Save = async () => {

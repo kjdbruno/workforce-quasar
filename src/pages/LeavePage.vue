@@ -50,10 +50,10 @@
                 <q-card @click="() => { GetLeave(data.id); LeaveDialog = true; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ FormatName(data?.employee) }}</div>
-                        <div class="text-caption text-capitalized">{{ data?.status }}</div>
+                        <div class="text-caption text-capitalize">{{ data?.status }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width q-pa-sm">
-                        <div class="text-caption text-capitalized">{{ data?.leaveType?.name }}</div>
+                        <div class="text-caption text-capitalize">{{ data?.leaveType?.name }}</div>
                         <div class="text-caption">{{ FormatDateRange(data) }}</div>
                         <div class="text-caption text-grey">{{ FormatDay(data) }}</div>
                     </q-card-section>
@@ -83,6 +83,7 @@
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
                                 label="Choose Employee"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -115,6 +116,7 @@
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
                                 label="Choose Leave Type"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>
@@ -324,8 +326,8 @@ const filter = ref('');
 const id = ref('');
 const employeeid = ref('');
 const typeid = ref('');
-const datestart = ref('');
-const dateend = ref('');
+const datestart = ref(new Date().toISOString().split('T')[0]);
+const dateend = ref(new Date().toISOString().split('T')[0]);
 const days = computed(() => {
     if (!datestart.value || !dateend.value) return ''
     const start = moment(datestart.value, 'YYYY-MM-DD')
@@ -594,15 +596,18 @@ const ResetForm = () => {
     id.value = '';
     employeeid.value = '';
     typeid.value = '';
-    datestart.value = '';
-    dateend.value = '';
+    datestart.value = new Date().toISOString().split('T')[0];
+    dateend.value = new Date().toISOString().split('T')[0];
     reason.value = '';
     isactive.value = false;
-    Errors.employeeid.type = false;
-    Errors.typeid.type = false;
-    Errors.datestart.type = false;
-    Errors.dateend.type = false;
-    Errors.reason.type = false;
+    ResetAllErrors()
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Dialog = ref(false);

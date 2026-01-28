@@ -52,7 +52,7 @@
                                 outlined 
                                 :error="Errors.code.type"
                                 :no-error-icon="true"
-                                input-class="text-capitalize"
+                                input-class="text-uppercase"
                             />
                         </div>
                         <div class="col-3">
@@ -355,13 +355,18 @@ const ResetForm = () => {
     code.value = '';
     name.value = '';
     credit.value = '';
+    loatype.value = '';
     cancarryover.value = false;
     affectspayroll.value = false;
     isActive.value = false;
-    Errors.code.type = null;
-    Errors.name.type = null;
-    Errors.credit.type = null;
-    Errors.loatype.type = null;
+    ResetAllErrors()
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Save = async () => {

@@ -109,8 +109,8 @@ const experiences = ref([
     {
         id: "",
         position: '',
-        startDate: '',
-        endDate: '',
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
         description: ''
     }
 ]);
@@ -118,8 +118,8 @@ const experiences = ref([
 const EmptyExperience = () => ({
     id: '',
     position: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
     description: ''
 })
 
@@ -242,36 +242,13 @@ const Validations = () => {
     return !isError
 }
 
-const FormatStartDate = (val, index) => {
-    experiences.value[index].startDate = FormatToYMD(val)
-}
-const FormatEndDate = (val, index) => {
-    experiences.value[index].endDate = FormatToYMD(val)
-}
-const FormatToYMD = (val) => {
-    if (!val) return ''
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
-
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    return formatted
-}
-
 const AddExperience = () => {
     const e = experiences.value;
-    e.unshift({
+    e.push({
         position: "",
         description: "",
-        startDate: "",
-        endDate: ""
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
     });
 }
 

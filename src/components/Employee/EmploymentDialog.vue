@@ -434,7 +434,7 @@ const formatDateHired = (val) => {
     dateHired.value = formatted
 }
 
-const payrollgroups = ref(["Montly", "Semi-Monthly", "Weekly"]);
+const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
 const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
 const companies = ref([]);
 const departments = ref([]);

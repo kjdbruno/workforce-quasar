@@ -48,6 +48,7 @@
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
+                                label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
@@ -259,8 +260,14 @@ const ResetForm = () => {
     name.value = '';
     alias.value = '';
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.alias.type = null;
+    ResetAllErrors()
+}
+
+const ResetAllErrors = () => {
+    Object.keys(Errors).forEach(key => {
+        Errors[key].type = null;
+        Errors[key].msg = '';
+    });
 }
 
 const Save = async () => {

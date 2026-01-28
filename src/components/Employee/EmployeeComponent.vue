@@ -34,6 +34,7 @@
                         <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
                         <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
                     </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
@@ -76,12 +77,12 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="q-mb-xl">
+                    <div class="q-mb-xl" v-if="applicants.length">
                         <div class="q-mb-sm">
                             <span class="text-caption text-uppercase text-grey q-mr-sm">choose hired applicant</span>
                         </div>
                         <div class="card-grid">
-                            <div v-if="applicants.length === 0" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                            <!-- <div v-if="applicants.length === 0" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
                                 <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label" >
                                     <q-card-section class="text-center full-width">
                                         <div>
@@ -90,7 +91,7 @@
                                         <div class="text-caption text-capitalize text-grey">no hired applicant</div>
                                     </q-card-section>
                                 </q-card>
-                            </div>
+                            </div> -->
                             <div v-for="(data, index) in applicants" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
                                 <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label" :class="{ 'card--active': applicant === data }" @click="() => { applicant = data; PopulateData(data) }">
                                     <q-card-section class="text-center full-width">
@@ -1022,7 +1023,7 @@ const salarygroups = ref([
     { value: "ADJUST", label: "Salary Adjustment" },
     { value: "GOVT", label: "Government Mandated Increase" },
 ]);
-const payrollgroups = ref(["Montly", "Semi-Monthly", "Weekly"]);
+const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
 const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
 
 const filteredPositions = ref([]);
@@ -1052,20 +1053,21 @@ const formatTime = (time) => {
     return `${hour12}:${m}${ampm}`
 }
 
-function formatCurrency(salaryRange, currency = 'PHP') {
-    if (!salaryRange) return '';
+function formatCurrency(amountStr, currency = 'PHP') {
+        if (!amountStr) return '';
 
-    return salaryRange
-        .split('-')
-        .map(p => {
-            const num = parseFloat(p.replace(/,/g, ''));
-            return num.toLocaleString('en-PH', {
-                style: 'currency',
-                currency,
-                minimumFractionDigits: 2
-            });
-        })
-        .join(' - ');
+        // Extract numeric value (handles "16,500.00 | Monthly")
+        const numeric = amountStr.split('|')[0].trim();
+
+        const num = parseFloat(numeric.replace(/,/g, ''));
+
+        if (isNaN(num)) return amountStr; // fallback
+
+        return num.toLocaleString('en-PH', {
+            style: 'currency',
+            currency,
+            minimumFractionDigits: 2
+        });
 }
 
 const normalizeOptions = (data = []) => data.map(d => {
@@ -1087,7 +1089,7 @@ const normalizeOptions = (data = []) => data.map(d => {
         const cost = formatCurrency(d.amount)
 
         return {
-            label: `${baseLabel} (${cost})`,
+            label: `${baseLabel} (${cost} ${d.salary_type})`,
             value: Number(d.value ?? d.id),
             status: d.status ?? null
         }
