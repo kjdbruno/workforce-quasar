@@ -37,6 +37,7 @@ import ScheduleComponent from 'src/components/Preferences/ScheduleComponent.vue'
 import LeaveComponent from 'src/components/Preferences/LeaveComponent.vue';
 import SignatoryComponent from 'src/components/Preferences/SignatoryComponent.vue';
 import PayrollGroupComponent from 'src/components/Preferences/PayrollGroupComponent.vue';
+import ShiftComponent from 'src/components/Preferences/ShiftComponent.vue';
 
 
 const PreferenceStore = usePreferenceStore();
@@ -44,6 +45,7 @@ const PreferenceStore = usePreferenceStore();
 const components = {
     UserComponent,
     HolidayComponent,
+    ShiftComponent,
     SchoolComponent,
     DegreeComponent,
     IncidentClassComponent,
@@ -60,14 +62,15 @@ const components = {
 const navs = [
     // { component: 'UserComponent', label: 'User' },
     { component: 'HolidayComponent', label: 'Holiday' },
+    { component: 'ShiftComponent', label: 'Shift' },
     // { component: 'SchoolComponent', label: 'School' },
     // { component: 'DegreeComponent', label: 'Degree' },
     // { component: 'IncidentClassComponent', label: 'Incident class' },
     // { component: 'IncidentRoleComponent', label: 'incident role' },
     { component: 'DepartmentComponent', label: 'department' },
-    { component: 'CompanyComponent', label: 'company' },
+    // { component: 'CompanyComponent', label: 'company' },
     { component: 'PositionComponent', label: 'position' },
-    { component: 'ScheduleComponent', label: 'schedule' },
+    // { component: 'ScheduleComponent', label: 'schedule' },
     { component: 'LeaveComponent', label: 'leave' },
     { component: 'SignatoryComponent', label: 'signatory' },
     // { component: 'PayrollGroupComponent', label: 'payroll group' },

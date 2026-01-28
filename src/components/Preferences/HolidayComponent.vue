@@ -46,7 +46,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-xs">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.name.msg : 'name' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
@@ -58,7 +58,7 @@
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.msg : 'date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="date" label="Date Needed">
+                            <q-input outlined v-model="date" label="Enter Date" :error="Errors.date.type" :no-error-icon="true">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
                                 </q-popup-proxy>
@@ -68,6 +68,7 @@
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.multiplier.type ? Errors.multiplier.msg : 'multiplier' }}</div>
                             <q-input 
                                 v-model="multiplier" 
+                                label="Enter Multiplier"
                                 outlined 
                                 :error="Errors.multiplier.type"
                                 :no-error-icon="true"
@@ -176,7 +177,7 @@ const Validations = () => {
 
     if (!name.value) {
         Errors.name.type = true
-        Errors.name.msg = ('Name is required')
+        Errors.name.msg = ('required')
         isError = true
     } else {
         Errors.name.type = null
@@ -184,7 +185,7 @@ const Validations = () => {
 
     if (!date.value) {
         Errors.date.type = true
-        Errors.date.msg = ('date is required')
+        Errors.date.msg = ('required')
         isError = true
     } else {
         Errors.date.type = null
@@ -192,7 +193,7 @@ const Validations = () => {
 
     if (!multiplier.value) {
         Errors.multiplier.type = true
-        Errors.multiplier.msg = ('multiplier is required')
+        Errors.multiplier.msg = ('required')
         isError = true
     } else {
         Errors.multiplier.type = null
@@ -414,6 +415,8 @@ const formatDate = (date) => {
 onMounted(() => {
     LoadAll();
 })
+
+const popup = ref(null)
 
 </script>
 

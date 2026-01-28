@@ -44,25 +44,21 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'department name' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
-                                label="Enter Department Name"
+                                label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.alias.msg ? 'text-negative' : 'text-grey'">{{ Errors.alias.msg ? Errors.alias.msg : 'department alias' }}</span>
-                            </div>
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.alias.type ? 'text-negative' : 'text-grey'">{{ Errors.alias.type ? Errors.alias.msg : 'code' }}</div>
                             <q-input 
                                 v-model="alias" 
-                                label="Enter Department Alias"
+                                label="Enter Code"
                                 outlined 
                                 :error="Errors.alias.type"
                                 :no-error-icon="true"
@@ -150,32 +146,16 @@ const alias = ref('');
 const isActive = ref(false);
 
 const Errors = reactive({
-    name: { 
-        type: null, msg: ''
-    },
-    alias: {
-        type: null, msg: ''
-    }
+    name: { type: null, msg: '' },
+    alias: { type: null, msg: '' }
 });
 
 const Validations = () => {
     
     let isError = false;
 
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.msg = 'Name is required'
-        isError = true
-    } else {
-        Errors.name.type = null
-    }
-    if (!alias.value) {
-        Errors.alias.type = true
-        Errors.alias.msg = 'alias is required'
-        isError = true
-    } else {
-        Errors.alias.type = null
-    }
+    if (!name.value) { Errors.name.type = true; Errors.name.msg = 'required'; isError = true; } else { Errors.name.type = null}
+    if (!alias.value) { Errors.alias.type = true; Errors.alias.msg = 'required'; isError = true; } else { Errors.alias.type = null }
 
     if (isError) {
         Toast.fire({
@@ -297,11 +277,7 @@ const Save = async () => {
                 alias: alias.value
             });
         dialog.value = false;
-        if (id.value && isEdit) {
-            UpdateList(response.data.department);
-        } else {
-            LoadAll();
-        }
+        LoadAll();
         Toast.fire({
             icon: "success",
             html: `

@@ -419,3 +419,31 @@ body {
 {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
 }
+
+/* SUCCESS */
+.swal-toast.swal2-icon-success {
+  background-color: $positive !important; /* green */
+  color: #ffffff !important;
+}
+
+/* ERROR */
+.swal-toast.swal2-icon-error {
+  background-color: $negative !important; /* red */
+  color: #ffffff !important;
+}
+
+/* shared white text */
+.swal-toast .swal2-title,
+.swal-toast .swal2-html-container {
+  color: #ffffff !important;
+}
+
+/* icon white */
+.swal-toast .swal2-icon {
+  color: #ffffff !important;
+}
+
+/* progress bar */
+.swal-toast .swal2-timer-progress-bar {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
