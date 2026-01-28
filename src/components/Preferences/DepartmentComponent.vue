@@ -48,7 +48,6 @@
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
-                                label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
