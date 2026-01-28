@@ -79,7 +79,7 @@
                                 <q-radio v-for="value in types" v-model="type" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
                             </div>
                         </div>
-                        <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="row q-col-gutter-xs q-mb-xl">
                             <div class="col-3">
                                 <div class="text-caption text-uppercase" :class="Errors.ownerid.msg ? 'text-negative' : 'text-grey'">{{ Errors.ownerid.msg ? Errors.ownerid.msg : 'owner' }}</div>
                                 <q-select
@@ -115,12 +115,25 @@
                                 </q-select>
                             </div>
                         </div>
-                        <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="row q-col-gutter-xs q-mb-xs">
                             <div class="col-3">
-                                <div class="text-caption text-uppercase" :class="Errors.approverid.type ? 'text-negative' : 'text-grey'">{{ Errors.approverid.type ? Errors.approverid.msg : 'approver' }}</div>
+                                <div class="text-caption text-uppercase" :class="Errors.signatories.approverid.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.approverid.msg ? Errors.signatories.approverid.msg : 'approver' }}</div>
+                            </div>
+                            <div class="col-2">
+                                <div class="text-caption text-uppercase" :class="Errors.signatories.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.description.msg ? Errors.signatories.description.msg : 'description' }}</div>
+                            </div>
+                            <div class="col-2">
+                                <div class="text-caption text-uppercase" :class="Errors.signatories.signature.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.signature.msg ? Errors.signatories.signature.msg : 'signature' }}</div>
+                            </div>
+                            <div class="col-1">
+                                <div class="text-caption text-uppercase" :class="Errors.signatories.order.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.order.msg ? Errors.signatories.order.msg : 'order' }}</div>
+                            </div>
+                        </div>
+                        <div class="row q-col-gutter-xs q-mb-xs" v-for="(value, index) in signatories">
+                            <div class="col-3">
                                 <q-select
                                     outlined
-                                    v-model="approverid"
+                                    v-model="value.approverid"
                                     label="Choose Approver"
                                     emit-value
                                     map-options
@@ -128,7 +141,7 @@
                                     input-debounce="300"
                                     :options="filteredApprovers"
                                     @filter="filterApproverFn"
-                                    :error="Errors.approverid.type"
+                                    :error="Errors.signatories.approverid.type[index]"
                                     dropdown-icon="keyboard_arrow_down"
                                     :no-error-icon="true"
                                     class="text-capitalize"
@@ -151,35 +164,45 @@
                                 </q-select>
                             </div>
                             <div class="col-2">
-                                <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'description' }}</div>
                                 <q-input 
-                                    v-model="description" 
+                                    v-model="value.description" 
                                     label="Enter Description"
                                     outlined 
-                                    :error="Errors.description.type"
+                                    :error="Errors.signatories.description.type[index]"
                                     :no-error-icon="true"
                                     input-class="text-capitalize"
                                 />
                             </div>
                             <div class="col-2">
-                                <div class="text-caption text-uppercase" :class="Errors.signature.type ? 'text-negative' : 'text-grey'">{{ Errors.signature.type ? Errors.signature.msg : 'signature' }}</div>
                                 <q-file 
-                                    v-model="signature" 
+                                    v-model="value.signature" 
                                     label="Upload Signature"
                                     outlined 
-                                    :error="Errors.signature.type"
+                                    :error="Errors.signatories.signature.type[index]"
                                     :no-error-icon="true"
                                 />
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase" :class="Errors.order.type ? 'text-negative' : 'text-grey'">{{ Errors.order.type ? Errors.order.msg : 'order' }}</div>
                                 <q-input 
-                                    v-model="order" 
+                                    v-model="value.order" 
                                     label="Enter Order"
                                     outlined 
-                                    :error="Errors.order.type"
+                                    :error="Errors.signatories.order.type[index]"
                                     :no-error-icon="true"
                                     input-class="text-capitalize"
+                                />
+                            </div>
+                            <div class="col-1">
+                                <q-btn 
+                                    v-if="signatories.length > 1" 
+                                    round 
+                                    icon="delete" 
+                                    flat 
+                                    unelevated 
+                                    color="grey" 
+                                    @click="RemoveSignatory(index)" 
+                                    size="sm"
+                                    class="q-mt-md"
                                 />
                             </div>
                         </div>
@@ -190,6 +213,7 @@
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isDetail" unelevated size="md" color="primary" class="btn text-capitalize" :label="info?.is_active ? 'disable' : 'enable'" @click="Toggle(info)"/>
+                        <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { AddSignatory() }" outline/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
                 </q-card-actions>
@@ -263,11 +287,7 @@ const submitLoading = ref(false);
 const id = ref('');
 const type = ref('');
 const ownerid = ref('');
-const approverid = ref('');
-const description = ref('');
-const signature = ref('');
-const order = ref('');
-
+const signatories = ref([{ id: "", approverid: "", description: "", signature: "", order: "" }])
 const isActive = ref(false);
 
 const Errors = reactive({
@@ -277,23 +297,37 @@ const Errors = reactive({
     ownerid: { 
         type: null, msg: '' 
     },
-    approverid: { 
-        type: null, msg: '' 
-    },
-    description: { 
-        type: null, msg: '' 
-    },
-    signature: { 
-        type: null, msg: '' 
-    },
-    order: { 
-        type: null, msg: '' 
+    signatories: {
+        approverid: {
+            type: [], msg: ''
+        },
+        description: {
+            type: [], msg: ''
+        },
+        signature: {
+            type: [], msg: ''
+        },
+        order: {
+            type: [], msg: ''
+        }
     },
 });
+
+const initErrors = () => {
+    Errors.signatories.approverid.type = signatories.value.map(() => null);
+    Errors.signatories.description.type = signatories.value.map(() => null);
+    Errors.signatories.signature.type = signatories.value.map(() => null);
+    Errors.signatories.order.type = signatories.value.map(() => null);
+}
 
 const Validations = () => {
     
     let isError = false;
+
+    Errors.signatories.approverid = { type: null, msg: '' }
+    Errors.signatories.description = { type: null, msg: '' }
+    Errors.signatories.signature = { type: null, msg: '' }
+    Errors.signatories.order = { type: null, msg: '' }
 
     if (!type.value) {
         Errors.type.type = true
@@ -309,34 +343,31 @@ const Validations = () => {
     } else {
         Errors.ownerid.type = null
     }
-    if (!approverid.value) {
-        Errors.approverid.type = true
-        Errors.approverid.msg = 'approver is required'
-        isError = true
-    } else {
-        Errors.approverid.type = null
-    }
-    if (!description.value) {
-        Errors.description.type = true
-        Errors.description.msg = 'description is required'
-        isError = true
-    } else {
-        Errors.description.type = null
-    }
-    if (!signature.value) {
-        Errors.signature.type = true
-        Errors.signature.msg = 'signature is required'
-        isError = true
-    } else {
-        Errors.signature.type = null
-    }
-    if (!order.value) {
-        Errors.order.type = true
-        Errors.order.msg = 'order is required'
-        isError = true
-    } else {
-        Errors.order.type = null
-    }
+    
+    initErrors()
+    
+    signatories.value.forEach((e, index) => {
+        if (!e.approverid) {
+            Errors.signatories.approverid.type[index] = true;
+            Errors.signatories.approverid.msg = 'required';
+            isError = true;
+        }
+        if (!e.description) {
+            Errors.signatories.description.type[index] = true;
+            Errors.signatories.description.msg = 'required';
+            isError = true;
+        }
+        if (!e.signature) {
+            Errors.signatories.signature.type[index] = true;
+            Errors.signatories.signature.msg = 'required';
+            isError = true;
+        }
+        if (!e.order) {
+            Errors.signatories.order.type[index] = true;
+            Errors.signatories.order.msg = 'required';
+            isError = true;
+        }
+    });
     
     if (isError) {
         Toast.fire({
@@ -438,18 +469,8 @@ const ResetForm = () => {
     id.value = '';
     type.value = '';
     ownerid.value = '';
-    type.value = '';
-    approverid.value = '';
-    description.value = '';
-    signature.value = '';
-    order.value = '';
+    signatories.value = [{ id: "", approverid: "", description: "", signature: "", order: "" }]
     isActive.value = false;
-    Errors.type.type = null;
-    Errors.ownerid.type = null;
-    Errors.approverid.type = null;
-    Errors.description.type = null;
-    Errors.signature.type = null;
-    Errors.order.type = null;
 }
 
 const Save = async () => {
@@ -459,10 +480,18 @@ const Save = async () => {
         const Data = new FormData();
         Data.append('ownerid', ownerid.value);
         Data.append('type', type.value);
-        Data.append('approverid', approverid.value);
-        Data.append('description', description.value);
-        Data.append('order', order.value);
-        Data.append('file', signature.value);
+        Data.append("signatories", JSON.stringify(
+            signatories.value.map(s => ({
+                approverid: s.approverid,
+                description: s.description,
+                order: s.order
+            }))
+        ));
+        signatories.value.forEach((s) => {
+            const file = Array.isArray(s.signature) ? s.signature[0] : s.signature;
+            if (file instanceof File) Data.append("files", file);
+            else Data.append("files", "");
+        });
         const response = await api.post(`/signatory`, Data, {
             headers: {
                 "Content-Type": "multipart/form-data"
@@ -599,6 +628,22 @@ function FormatOrdinal(n) {
 
 const FormatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
+}
+
+const AddSignatory = () => {
+    const e = signatories.value;
+    e.unshift({
+        id: "",
+        approverid: "",
+        description: "",
+        signature: "",
+        order: ""
+    });
+}
+
+const RemoveSignatory = (index) => {
+    const e = signatories.value;
+    e.splice(index, 1);
 }
 
 onMounted(() => {

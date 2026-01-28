@@ -1114,6 +1114,7 @@ const initErrors = () => {
     Errors.experiences.startDate.type = experiences.value.map(() => null);
     Errors.experiences.endDate.type = experiences.value.map(() => null);
     Errors.experiences.description.type = experiences.value.map(() => null);
+    
     Errors.documents.file.type = documents.value.map(() => null);
 }
 

@@ -45,9 +45,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'position' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Position"
@@ -60,9 +58,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.description.msg ? Errors.description.msg : 'job description' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'job description' }}</div>
                             <q-input 
                                 v-model="description" 
                                 label="Enter Job Description"
@@ -75,9 +71,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="q-mb-xs">
-                                <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
                             <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
                                 <q-input
                                     v-model="qualifications[index]"
@@ -98,18 +92,14 @@
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase" :class="Errors.salarytype.msg ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.msg ? Errors.salarytype.msg : 'salary type' }}</span>
-                        </div>
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.salarytype.type ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
                         <div class="q-gutter-sm">
                             <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.monthly.msg ? 'text-negative' : 'text-grey'">{{ Errors.monthly.msg ? Errors.monthly.msg : 'monthly salary' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.monthly.type ? 'text-negative' : 'text-grey'">{{ Errors.monthly.type ? Errors.monthly.msg : 'monthly salary' }}</div>
                             <q-input 
                                 v-model="monthly" 
                                 label="Enter Amount"
@@ -120,9 +110,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.daily.msg ? 'text-negative' : 'text-grey'">{{ Errors.daily.msg ? Errors.daily.msg : 'daily salary' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.daily.type ? 'text-negative' : 'text-grey'">{{ Errors.daily.type ? Errors.daily.msg : 'daily salary' }}</div>
                             <q-input 
                                 v-model="daily" 
                                 label="Enter Amount"
@@ -133,9 +121,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase" :class="Errors.hourly.msg ? 'text-negative' : 'text-grey'">{{ Errors.hourly.msg ? Errors.hourly.msg : 'hourly salary' }}</span>
-                            </div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.hourly.type ? 'text-negative' : 'text-grey'">{{ Errors.hourly.type ? Errors.hourly.msg : 'hourly salary' }}</div>
                             <q-input 
                                 v-model="hourly" 
                                 label="Enter Amount"
@@ -235,29 +221,13 @@ const qualifications = ref([""]);
 const isActive = ref(false);
 
 const Errors = reactive({
-    name: { 
-        type: null, msg: ''
-    },
-    monthly: { 
-        type: null, msg: ''
-    },
-    daily: { 
-        type: null, msg: ''
-    },
-    hourly: { 
-        type: null, msg: ''
-    },
-    salarytype: { 
-        type: null, msg: ''
-    },
-    description: {
-        type: null, msg: ''
-    },
-    qualifications: {
-        name: {
-            type: [], msg: ''
-        }
-    },
+    name: { type: null, msg: '' },
+    monthly: { type: null, msg: '' },
+    daily: { type: null, msg: '' },
+    hourly: { type: null, msg: '' },
+    salarytype: { type: null, msg: '' },
+    description: { type: null, msg: '' },
+    qualifications: { name: { type: [], msg: '' } },
 });
 
 const initErrors = () => {
@@ -270,53 +240,12 @@ const Validations = () => {
 
     Errors.qualifications.name = { type: null, msg: '' }
     
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.msg = 'position is required!'
-        isError = true
-    } else {
-        Errors.name.type = null
-    }
-
-    if (!monthly.value) {
-        Errors.monthly.type = true
-        Errors.monthly.msg = 'monthly salary is required!'
-        isError = true
-    } else {
-        Errors.monthly.type = null
-    }
-
-    if (!daily.value) {
-        Errors.daily.type = true
-        Errors.daily.msg = 'daily salary is required!'
-        isError = true
-    } else {
-        Errors.daily.type = null
-    }
-
-    if (!hourly.value) {
-        Errors.hourly.type = true
-        Errors.hourly.msg = 'hourly salary is required!'
-        isError = true
-    } else {
-        Errors.hourly.type = null
-    }
-
-    if (!salarytype.value) {
-        Errors.salarytype.type = true
-        Errors.salarytype.msg = 'salary type is required!'
-        isError = true
-    } else {
-        Errors.salarytype.type = null
-    }
-
-    if (!description.value) {
-        Errors.description.type = true
-        Errors.description.msg = 'job decription is required'
-        isError = true
-    } else {
-        Errors.description.type = null
-    }
+    if (!name.value) { Errors.name.type = true; Errors.name.msg = 'required'; isError = true } else { Errors.name.type = null; }
+    if (!monthly.value) { Errors.monthly.type = true; Errors.monthly.msg = 'required'; isError = true } else { Errors.monthly.type = null; }
+    if (!daily.value) { Errors.daily.type = true; Errors.daily.msg = 'required'; isError = true; } else { Errors.daily.type = null; }
+    if (!hourly.value) { Errors.hourly.type = true; Errors.hourly.msg = 'required'; isError = true; } else { Errors.hourly.type = null; }
+    if (!salarytype.value) { Errors.salarytype.type = true; Errors.salarytype.msg = 'required'; isError = true; } else { Errors.salarytype.type = null; }
+    if (!description.value) { Errors.description.type = true; Errors.description.msg = 'required'; isError = true; } else { Errors.description.type = null; }
 
    initErrors()
     
@@ -472,11 +401,7 @@ const Save = async () => {
                 qualifications: qualifications.value
             });
         dialog.value = false;
-        if (id.value && isEdit) {
-            UpdateList(response.data.data);
-        } else {
-            LoadAll();
-        }
+        LoadAll();
         Toast.fire({
             icon: "success",
             html: `

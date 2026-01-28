@@ -45,7 +45,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-1">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.code.msg ? 'text-negative' : 'text-grey'">{{ Errors.code.msg ? Errors.code.msg : 'code' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.code.type ? 'text-negative' : 'text-grey'">{{ Errors.code.type ? Errors.code.msg : 'code' }}</div>
                             <q-input 
                                 v-model="code" 
                                 label="Enter Code"
@@ -56,7 +56,7 @@
                             />
                         </div>
                         <div class="col-3">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.name.msg ? Errors.name.msg : 'name' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
@@ -67,7 +67,7 @@
                             />
                         </div>
                         <div class="col-1">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.credit.msg ? 'text-negative' : 'text-grey'">{{ Errors.credit.msg ? Errors.credit.msg : 'credit' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.credit.type ? 'text-negative' : 'text-grey'">{{ Errors.credit.type ? Errors.credit.msg : 'credit' }}</div>
                             <q-input 
                                 v-model="credit" 
                                 label="Enter Credit"
@@ -78,7 +78,7 @@
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.loatype.msg ? 'text-negative' : 'text-grey'">{{ Errors.loatype.msg ? Errors.loatype.msg : 'loa type' }}</div>
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.loatype.type ? 'text-negative' : 'text-grey'">{{ Errors.loatype.type ? Errors.loatype.msg : 'loa type' }}</div>
                         <q-radio
                             v-for="(v, index) in loatypes" 
                             right-label 
@@ -197,57 +197,22 @@ const affectspayroll = ref(false);
 const isActive = ref(false);
 
 const Errors = reactive({
-    code: { 
-        type: null, msg: '' 
-    },
-    name: { 
-        type: null, msg: '' 
-    },
-    credit: { 
-        type: null, msg: '' 
-    },
-    loatype: { 
-        type: null, msg: '' 
-    }
+    code: { type: null, msg: '' },
+    name: { type: null, msg: '' },
+    credit: { type: null, msg: '' },
+    loatype: { type: null, msg: '' }
 });
 
 const Validations = () => {
     
     let isError = false;
 
-    if (!code.value) {
-        Errors.code.type = true
-        Errors.code.msg = ('Code is required')
-        isError = true
-    } else {
-        Errors.code.type = null
-    }
-    if (!name.value) {
-        Errors.name.type = true
-        Errors.name.msg = ('Name is required')
-        isError = true
-    } else {
-        Errors.name.type = null
-    }
     const creditPattern = /^[0-9]+(\.[0-9]+)?$/;
-    if (!credit.value) {
-        Errors.credit.type = true
-        Errors.credit.msg = ('credit is required')
-        isError = true
-    } else if (!creditPattern.test(credit.value)) {
-        Errors.credit.type = true
-        Errors.credit.msg = ('credit must be a valid number')
-        isError = true
-    } else {
-        Errors.credit.type = null
-    }
-    if (!loatype.value) {
-        Errors.loatype.type = true
-        Errors.loatype.msg = ('loa type is required')
-        isError = true
-    } else {
-        Errors.loatype.type = null
-    }
+
+    if (!code.value) { Errors.code.type = true; Errors.code.msg = ('required'); isError = true; } else { Errors.code.type = null; }
+    if (!name.value) { Errors.name.type = true; Errors.name.msg = ('required'); isError = true; } else { Errors.name.type = null; }
+    if (!credit.value) { Errors.credit.type = true; Errors.credit.msg = ('required'); isError = true; } else if (!creditPattern.test(credit.value)) { Errors.credit.type = true; Errors.credit.msg = ('invalid'); isError = true; } else { Errors.credit.type = null; }
+    if (!loatype.value) { Errors.loatype.type = true; Errors.loatype.msg = ('required'); isError = true; } else { Errors.loatype.type = null; }
 
     if (isError) {
         Toast.fire({
@@ -391,11 +356,7 @@ const Save = async () => {
                 affectspayroll: affectspayroll.value
             });
         dialog.value = false;
-        if (id.value && isEdit) {
-            UpdateList(response.data.leavetype);
-        } else {
-            LoadAll();
-        }
+        LoadAll();
         Toast.fire({
             icon: "success",
             html: `
