@@ -23,7 +23,7 @@
                         </q-card>
                     </div>
                     <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                        <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id">
+                        <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id" :class="{ 'card--disabled': !app.is_active }">
                             <q-card-section class="text-center full-width">
                                 <div class="text-subtitle2 text-uppercase">{{ formatCurrency(app?.amount) }}</div>
                                 <div class="text-caption text-uppercase">{{ app?.salarytype }}</div>
@@ -216,9 +216,7 @@ const salaryId = ref('');
 const Save = async () => {
     SubmitLoading.value = true;
     try {
-        const response = await api.post(`/salary/service`, {
-            salaryId: salaryId.value,
-        });
+        const response = await api.post(`/employee/${salaryId.value}/salary/disable`);
         GetServiceRecord(EmployeeStore.data?.id);
         salaryId.value = '';
         Toast.fire({
@@ -247,8 +245,12 @@ const Save = async () => {
 </script>
 
 <style scoped lang="css">
-    .card
-    {
-        box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
-    }
+.card
+{
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
+}
+.card--disabled {
+    opacity: 0.8;
+    pointer-events: none;
+}
 </style>

@@ -43,6 +43,17 @@
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.alias.type ? 'text-negative' : 'text-grey'">{{ Errors.alias.type ? Errors.alias.msg : 'code' }}</div>
+                            <q-input 
+                                v-model="alias" 
+                                label="Enter Code"
+                                outlined 
+                                :error="Errors.alias.type"
+                                :no-error-icon="true"
+                                class="text-capitalize"
+                            />
+                        </div>
                         <div class="col-3">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
@@ -52,16 +63,6 @@
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-1">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.alias.type ? 'text-negative' : 'text-grey'">{{ Errors.alias.type ? Errors.alias.msg : 'code' }}</div>
-                            <q-input 
-                                v-model="alias" 
-                                label="Enter Code"
-                                outlined 
-                                :error="Errors.alias.type"
-                                :no-error-icon="true"
                             />
                         </div>
                     </div>

@@ -443,6 +443,8 @@
                                             v-model="shiftId"
                                             label="Choose Shift"
                                             use-input
+                                            emit-value
+                                            map-options
                                             input-debounce="300"
                                             :options="filteredShifts"
                                             @filter="filterShiftFn"
@@ -501,8 +503,9 @@
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn v-if="step > 0" unelevated size="md" color="primary" class="btn text-capitalize" label="back"  @click="step--"/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" :label="step === totalSteps - 1 ? 'save' : 'next'" @click="step === totalSteps - 1 ? Save() : NextStep()" />
+                        <q-btn v-if="step > 0" unelevated size="md" color="primary" class="btn text-capitalize" label="back"  @click="() => { PreviousStep(); }"/>
+                        <q-btn v-if="step < totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="next"  @click="() => { NextStep(); }"/>
+                        <q-btn v-if="step === totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save() }" />
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" v-close-popup outline/>
                     </div>
                 </q-card-actions>
@@ -689,37 +692,62 @@ const clearErr = (key) => (Errors[key].type = null, Errors[key].msg = '', false)
 const req = (key, val) => (!val ? setErr(key, 'required') : clearErr(key))
 const maxLen = (key, val, n, msg = 'invalid') => (val && String(val).length > n ? setErr(key, msg) : clearErr(key))
 const match = (key, val, regex, msg = 'invalid') => (!val ? setErr(key, 'required') : (!regex.test(val) ? setErr(key, msg) : clearErr(key)))
+const isAtLeast15YearsOld = (birthdate) => {
+    if (!birthdate) return false;
+
+    const today = new Date();
+    const dob = new Date(birthdate);
+
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    return age >= 15;
+};
 
 const ValidateEmployee = () => {
-  const allowedSuffixes = ['SR','JR','II','III','IV','V','VI','VII','VIII','IX','X']
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const allowedSuffixes = ['SR','JR','II','III','IV','V','VI','VII','VIII','IX','X']
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const phMobileRegex = /^09\d{9}$/
 
-  let isError = false
+    let isError = false
 
-  isError ||= req('firstname', firstname.value)
-  isError ||= req('middlename', middlename.value)
-  isError ||= req('lastname', lastname.value)
+    isError ||= req('firstname', firstname.value)
+    isError ||= req('middlename', middlename.value)
+    isError ||= req('lastname', lastname.value)
 
-  isError ||= (suffix.value && !allowedSuffixes.includes(suffix.value.trim().toUpperCase()))
-    ? setErr('suffix', 'invalid')
-    : clearErr('suffix')
+    isError ||= (suffix.value && !allowedSuffixes.includes(suffix.value.trim().toUpperCase()))
+        ? setErr('suffix', 'invalid')
+        : clearErr('suffix')
 
-  isError ||= req('sex', sex.value)
-  isError ||= req('civilstatus', civilstatus.value)
-  isError ||= req('birthdate', birthdate.value)
-  isError ||= req('birthplace', birthplace.value)
+    isError ||= req('sex', sex.value)
+    isError ||= req('civilstatus', civilstatus.value)
 
-  // email: required + regex + max 100
-  if (!email.value) isError ||= setErr('email', 'required')
-  else if (!emailRegex.test(email.value)) isError ||= setErr('email', 'invalid')
-  else if (email.value.length > 100) isError ||= setErr('email', 'invalid')
-  else clearErr('email')
+    if (!birthdate.value) isError ||= setErr('birthdate', 'required')
+    else if (!isAtLeast15YearsOld(birthdate.value))
+    isError ||= setErr('birthdate', 'invalid')
+    else clearErr('birthdate')
 
-  isError ||= req('contactNo', contactNo.value)
-  isError ||= req('address', address.value)
+    isError ||= req('birthplace', birthplace.value)
 
-  if (isError) failToast()
-  return !isError
+    // email: required + format + max length
+    if (!email.value) isError ||= setErr('email', 'required')
+    else if (!emailRegex.test(email.value)) isError ||= setErr('email', 'invalid')
+    else if (email.value.length > 100) isError ||= setErr('email', 'invalid')
+    else clearErr('email')
+
+    // PH mobile number
+    if (!contactNo.value) isError ||= setErr('contactNo', 'required')
+    else if (!phMobileRegex.test(contactNo.value)) isError ||= setErr('contactNo', 'invalid')
+    else clearErr('contactNo')
+
+    isError ||= req('address', address.value)
+
+    if (isError) failToast()
+    return !isError
 }
 
 const ValidateEmployment = () => {
@@ -940,38 +968,39 @@ const Save = async () => {
     ApplicationSubmitting.value = true;
     const applicantId = applicant.value?.id ?? null;
     try {
-        const Data = new FormData();
-        Data.append("applicantId", applicantId ?? "");
-        Data.append("firstname", firstname.value);
-        Data.append("middlename", middlename.value);
-        Data.append("lastname", lastname.value);
-        Data.append("suffix", suffix.value);
-        Data.append("sex", sex.value);
-        Data.append("civilstatus", civilstatus.value);
-        Data.append("birthdate", birthdate.value);
-        Data.append("birthplace", birthplace.value);
-        Data.append("address", address.value);
-        Data.append("bloodtype", bloodtype.value);
-        Data.append("email", email.value);
-        Data.append("contactNo", contactNo.value);
-        Data.append("employeeNo", employeeNo.value);
-        Data.append("dateHired", dateHired.value);
-        Data.append("tin", tin.value);
-        Data.append("sssNo", sssNo.value);
-        Data.append("philhealthNo", philhealthNo.value);
-        Data.append("pagibigNo", pagibigNo.value);
-        Data.append("positionId", positionId.value);
-        Data.append("companyId", companyId.value);
-        Data.append("departmentId", departmentId.value);
-        Data.append("scheduleId", scheduleId.value);
-        Data.append("employmentstatus", employmentstatus.value);
-        Data.append("salarygroup", salarygroup.value);
-        Data.append("payrollgroup", payrollgroup.value);
-        Data.append("taxstatus", taxstatus.value);
-        const response = await api.post('/employee', Data, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
+        const response = await api.post('/employee', {
+            //employee
+            applicantId,
+            firstname: firstname.value,
+            middlename: middlename.value,
+            lastname: lastname.value,
+            suffix: suffix.value,
+            sex: sex.value,
+            civilstatus: civilstatus.value,
+            birthdate: birthdate.value,
+            birthplace: birthplace.value,
+            address: address.value,
+            email: email.value,
+            contactNo: contactNo.value,
+            //employment
+            employeeNo: employeeNo.value,
+            dateHired: dateHired.value,
+            tin: tin.value,
+            sssNo: sssNo.value,
+            philhealthNo: philhealthNo.value,
+            pagibigNo: pagibigNo.value,
+            positionId: positionId.value,
+            departmentId: departmentId.value,
+            employmentstatus: employmentstatus.value,
+            //salary
+            salarygroup: salarygroup.value,
+            payrollgroup: payrollgroup.value,
+            taxstatus: taxstatus.value,
+            //shift
+            shiftId: shiftId.value,
+            effectiveFrom: effectiveFrom.value,
+            effectiveTo: effectiveTo.value,
+            notes: notes.value
         });
         modal.value = false;
         LoadAll()
@@ -1046,12 +1075,15 @@ const validators = [
 ]
 
 const NextStep = () => {
-    const validate = validators[step.value]
-    if (validate && !validate()) return
+  const validate = validators[step.value];
+  if (validate && !validate()) return;
 
-    if (step.value < totalSteps - 1) step.value++
-    else Save()
-}
+  step.value++;
+};
+
+const PreviousStep = () => {
+    if (step.value > 0) step.value--;
+};
 
 </script>
 

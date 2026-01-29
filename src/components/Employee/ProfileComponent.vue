@@ -144,8 +144,8 @@ const EmployeeStore = useEmployeeStore();
 const tabs = [
     { label: 'profile', dialog: 'ProfileDialog'},
     { label: 'employment', dialog: 'EmploymentDialog'},
-    { label: 'service recrod', dialog: 'ServiceDialog'},
     { label: 'salary', dialog: 'SalaryDialog'},
+    { label: 'service recrod', dialog: 'ServiceDialog'},
     { label: 'photo', dialog: 'PhotoDialog'},
     { label: 'account', dialog: 'AccountDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
@@ -197,7 +197,7 @@ const employee = ref([]);
 const GetEmployee = async () => {
     loading.value = true;
     try {
-        const response = await api.get(`/employee/information/${EmployeeStore.data?.id}`);
+        const response = await api.get(`/employee/${EmployeeStore.data?.id}/information`);
         employee.value = response.data.record;
 
     } catch (error) {
