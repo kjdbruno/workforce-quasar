@@ -105,7 +105,7 @@
                             </q-input>
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.contactNo.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.contactNo.msg ? Errors.dependents.contactNo.msg : 'contactNo' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dependents.contactNo.msg ? 'text-negative' : 'text-grey'">{{ Errors.dependents.contactNo.msg ? Errors.dependents.contactNo.msg : 'contact No' }}</div>
                             <q-input 
                                 v-model="value.contactNo" 
                                 label="Enter Contact No."
