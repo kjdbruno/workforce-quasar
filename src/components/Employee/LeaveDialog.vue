@@ -119,8 +119,8 @@
                                     <div class="text-caption text-uppercase text-grey">{{ app?.status }}</div>
                                 </q-card-section>
                                 <q-card-section class="full-width">
-                                    <div class="text-caption">{{ FormatDateRange(app) }}</div>
-                                    <div class="text-caption text-uppercase text-grey">{{ FormatDay(app) }}</div>
+                                    <div class="text-caption">{{ FormatLeaveDate(app?.date_from, app?.date_to) }}</div>
+                                    <div class="text-caption text-uppercase text-grey">{{ ComputeLeaveDays(app?.date_from, app?.date_to) }} day/s</div>
                                 </q-card-section>
                             </q-card>
                         </div>
@@ -383,44 +383,48 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
-const FormatDateRange = (app) => {
-    const from = new Date(app.date_from);
-    const to = new Date(app.date_to);
+const FormatLeaveDate = (dateFrom, dateTo, locale = 'en-US') => {
+    if (!dateFrom) return ''
 
-    const options = { month: 'short', day: 'numeric' };
-    const year = from.getFullYear();
+    const from = new Date(dateFrom)
+    const to = new Date(dateTo || dateFrom)
 
-    const fromText = from.toLocaleDateString('en-US', options);
-    const toText = to.toLocaleDateString('en-US', options);
+    const sameDay =
+        from.getFullYear() === to.getFullYear() &&
+        from.getMonth() === to.getMonth() &&
+        from.getDate() === to.getDate()
 
-    // Same month
-    if (from.getMonth() === to.getMonth()) {
-        return `${fromText}–${to.getDate()}, ${year}`;
+    const monthName = (d) => d.toLocaleString(locale, { month: 'long' })
+    const dayNum = (d) => d.getDate()
+    const yearNum = (d) => d.getFullYear()
+
+    if (sameDay) {
+        // February 1, 2026
+        return `${monthName(from)} ${dayNum(from)}, ${yearNum(from)}`
     }
 
-    return `${fromText} – ${toText}, ${year}`;
-};
-
-const FormatDay = (app) => {
-    let count = 0;
-
-    const start = new Date(app.date_from);
-    const end = new Date(app.date_to);
-
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const day = d.getDay(); // 0 = Sunday, 6 = Saturday
-
-        if (day !== 0 && day !== 6) {
-        count++;
-        }
+    // Same month & year: February 1-3, 2026
+    if (from.getMonth() === to.getMonth() && from.getFullYear() === to.getFullYear()) {
+        return `${monthName(from)} ${dayNum(from)}-${dayNum(to)}, ${yearNum(from)}`
     }
 
-    // 👇 format label
-    return `${count} ${count === 1 ? 'day' : 'days'}`;
-};
+    // Different month/year: February 28 - March 2, 2026
+    return `${monthName(from)} ${dayNum(from)}, ${yearNum(from)} - ${monthName(to)} ${dayNum(to)}, ${yearNum(to)}`
+}
+
+const ComputeLeaveDays = (dateFrom, dateTo) => {
+    if (!dateFrom) return 0
+
+    const from = new Date(dateFrom)
+    const to = new Date(dateTo || dateFrom)
+
+    // normalize to midnight to avoid timezone issues
+    from.setHours(0, 0, 0, 0)
+    to.setHours(0, 0, 0, 0)
+
+    const diff = Math.round((to - from) / (1000 * 60 * 60 * 24))
+    return diff >= 0 ? diff + 1 : 0 // +1 for inclusive
+}
 
 const printDialog = ref(false);
 const pdf = ref(null);

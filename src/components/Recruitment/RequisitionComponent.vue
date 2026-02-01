@@ -29,7 +29,7 @@
                         <div class="text-subtitle2 text-uppercase">{{ data?.position?.name }}</div>
                     </q-card-section>
                     <q-card-section class="full-width">
-                        <div class="text-caption text-uppercase">{{ formatCurrency(data?.salary_range) }} {{ data?.position?.salary_type }}</div>
+                        <div class="text-caption text-uppercase">{{ FormatCurrency(data?.position?.salary_amount) }} {{ data?.position?.salary_type }}</div>
                         <div class="text-caption text-grey">{{ data?.status }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status === 'Requested' ? 'bg-blue' : (data.status === 'Approved' ? 'bg-positive' : (data.status === 'Rejected' ? 'bg-negative' : (data.status === 'Filled' ? 'bg-primary' : null)))"/>
@@ -249,8 +249,8 @@
                         <div class="text-body1 text-uppercase">{{ info?.position?.name }}</div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">salary range</div>
-                        <div class="text-body1 text-uppercase">{{ formatCurrency(info?.salary_range) }} {{ info?.position?.salary_type }}</div>
+                        <div class="text-caption text-uppercase text-grey">salary</div>
+                        <div class="text-body1 text-uppercase">{{ FormatCurrency(info?.position?.salary_amount) }} {{ info?.position?.salary_type }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">status</div>
@@ -856,21 +856,19 @@ const formatSalaryRange = (val) => {
     return max ? `${min} - ${max}` : min
 }
 
-function formatCurrency(salaryRange, currency = 'PHP') {
-    if (!salaryRange) return '';
+const  FormatCurrency = (amount, currency = 'PHP') => {
+    if (amount === null || amount === undefined || amount === '') return 'N/A'
 
-    return salaryRange
-        .split('-')
-        .map(p => {
-            const num = parseFloat(p.replace(/,/g, ''));
-            return num.toLocaleString('en-PH', {
-                style: 'currency',
-                currency,
-                minimumFractionDigits: 2
-            });
-        })
-        .join(' - ');
+    const num = Number(String(amount).replace(/,/g, ''))
+    if (isNaN(num)) return 'N/A'
+
+    return num.toLocaleString('en-PH', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2
+    })
 }
+
 
 const formatToggle = (info) => !!info?.isActive;
 

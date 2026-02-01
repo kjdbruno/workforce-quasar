@@ -158,6 +158,9 @@ const MapAccounts = (data = []) => {
 
 const PopulateData = () => {
     GetAccount(EmployeeStore.data?.id)
+    !accounts.value.length
+        ? [EmptyAccount()]
+        : null
 }
 
 const Errors = reactive({

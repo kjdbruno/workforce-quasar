@@ -64,7 +64,7 @@
                                                 <div class="text-caption text-grey text-uppercase">{{ (data?.position?.salary_type == 'Monthly' ? formatCurrency(data?.position?.monthly_salary) : (data?.position?.salary_type == 'Daily' ? formatCurrency(data?.position?.daily_salary) : data?.position?.salary_type == 'Hourly' ? formatCurrency(data?.position?.hourly_salary) : null)) }}</div>
                                             </q-card-section>
                                             <q-card-section class="q-pa-none">
-                                                <div class="text-caption text-grey">{{ data?.department?.name }}</div>
+                                                <div class="text-caption text-uppercase text-grey">{{ data?.department?.name }}</div>
                                             </q-card-section>
                                             <div class="checkmark-overlay">
                                                 <q-radio v-model="vacancyId" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
@@ -560,219 +560,209 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="q-mb-lg">
-                        <div class="text-h6 text-uppercase text-bold q-mb-md">vacancy information</div>
-                        <div class="row q-col-gutter-xs q-mb-md">
-                            <div class="col-4">
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">position</div>
-                                    <div class="text-body1 text-uppercase">{{ info?.vacancy?.position?.name }}</div>
+                    <q-tabs
+                        v-model="tab"
+                        align="left"
+                        dense
+                        active-color="primary"
+                        indicator-color="white"
+                    >
+                        <q-tab name="vacancy" label="vacancy information" class="radius-xs text-capitalize"/>
+                        <q-tab name="applicant" label="applicant information" class="radius-xs text-capitalize"/>
+                    </q-tabs>
+                    <q-tab-panels
+                        v-model="tab"
+                        transition-prev="fade"
+                        transition-next="fade"
+                    >
+                        <q-tab-panel name="vacancy">
+                            <div class="text-h6 text-uppercase text-bold q-mb-md">vacancy information</div>
+                            <div class="row q-col-gutter-xs q-mb-md">
+                                <div class="col-4">
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">position</div>
+                                        <div class="text-body1 text-uppercase">{{ info?.vacancy?.position?.name }}</div>
+                                    </div>
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">salary</div>
+                                        <div class="text-body1 text-uppercase">{{ formatCurrency(info?.vacancy?.position?.salary_amount) }}</div>
+                                    </div>
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">department</div>
+                                        <div class="text-body1 text-uppercase">{{ info?.vacancy?.department?.name }}</div>
+                                    </div>
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">shift</div>
+                                        <div class="text-body1 text-capitalize">{{ info?.vacancy?.shift?.name }} {{ formatTime(info?.vacancy?.shift?.start_time) }} to {{ formatTime(info?.vacancy?.shift?.end_time) }}</div>
+                                        <div class="text-body1 text-capitalize">{{ FormatDays(info?.vacancy?.shift?.days) }}</div>
+                                    </div>
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">work location</div>
+                                        <div class="text-body1 text-capitalize">{{ info?.vacancy?.location }}</div>
+                                    </div>
                                 </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">salary range</div>
-                                    <div class="text-body1 text-uppercase">{{ info?.vacancy?.salary_range }}</div>
-                                </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">company</div>
-                                    <div class="text-body1">{{ info?.vacancy?.company?.name }}</div>
-                                </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">department</div>
-                                    <div class="text-body1">{{ info?.vacancy?.department?.name }}</div>
-                                </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">schedule</div>
-                                    <div class="text-body1">{{ info?.vacancy?.schedule?.name }},&nbsp;{{ formatTime(info?.vacancy?.schedule?.time_start) }} to {{ formatTime(info?.vacancy?.schedule?.time_end) }}</div>
-                                </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">work location</div>
-                                    <div class="text-body1">{{ info?.vacancy?.location }}</div>
+                                <div class="col-8">
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">job description</div>
+                                        <div class="text-body1">{{ info?.vacancy?.position?.description }}</div>
+                                    </div>
+                                    <div class="q-mb-md">
+                                        <div class="text-caption text-uppercase text-grey">job qualifications</div>
+                                        <div class="text-body1" v-for="(v, index) in info?.vacancy?.position?.qualification" :key="index">{{ (index+1) }}. {{ v || 'N/A' }}</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-8">
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">job description</div>
-                                    <div class="text-body1">{{ info?.vacancy?.position?.description }}</div>
+                            <div class="row q-col-gutter-lg q-mb-md">
+                                <div>
+                                    <div class="text-caption text-uppercase text-grey">date needed</div>
+                                    <div class="text-body1">{{ formatDate(info?.vacancy?.date_needed) }}</div>
                                 </div>
-                                <div class="q-mb-md">
-                                    <div class="text-caption text-uppercase text-grey">job qualifications</div>
-                                    <div class="text-body1" v-for="(v, index) in info?.vacancy?.position?.qualification" :key="index">{{ (index+1) }}. {{ v || 'N/A' }}</div>
+                                <div>
+                                    <div class="text-caption text-uppercase text-grey">need background check</div>
+                                    <div class="text-body1">{{ info?.vacancy?.need_background_check ? 'Yes' : 'No' }}</div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="row q-col-gutter-lg q-mb-md">
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">date needed</div>
-                                <div class="text-body1">{{ formatDate(info?.vacancy?.date_needed) }}</div>
-                            </div>
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">need background check</div>
-                                <div class="text-body1">{{ info?.vacancy?.need_background_check ? 'Yes' : 'No' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">movement</div>
-                                <div class="text-body1">{{ info?.vacancy?.movement }}</div>
-                            </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">justification</div>
-                            <div class="text-body1">{{ info?.vacancy?.justification }}</div>
-                        </div>
-                        <div class="row q-col-gutter-lg q-mb-mb">
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">sex</div>
-                                <div class="text-body1">{{ info?.vacancy?.sex }}</div>
-                            </div>
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">school level</div>
-                                <div class="text-body1">{{ info?.vacancy?.school_level }}</div>
-                            </div>
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">year/s of experience</div>
-                                <div class="text-body1">{{ info?.vacancy?.year_experience }}</div>
-                            </div>
-                            <div>
-                                <div class="text-caption text-uppercase text-grey">age range</div>
-                                <div class="text-body1">{{ info?.vacancy?.age_range }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="q-mb-lg">
-                        <div class="text-h6 text-uppercase text-bold q-mb-md">applicant information</div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">name</div>
-                            <div class="text-body1 text-uppercase">{{ formatName(info) }}</div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">status</div>
-                            <div class="text-body1 text-uppercase">{{ info?.status }}</div>
-                        </div>
-                        <div class="row q-col-gutter-lg q-mb-mb">
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">sex</div>
-                                <div class="text-body1 text-uppercase">{{ info?.sex }}</div>
+                                <div>
+                                    <div class="text-caption text-uppercase text-grey">movement</div>
+                                    <div class="text-body1">{{ info?.vacancy?.movement }}</div>
+                                </div>
                             </div>
                             <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">marital status</div>
-                                <div class="text-body1 text-uppercase">{{ info?.civil_status }}</div>
+                                <div class="text-caption text-uppercase text-grey">justification</div>
+                                <div class="text-body1">{{ info?.vacancy?.justification }}</div>
+                            </div>
+                        </q-tab-panel>
+                        <q-tab-panel name="applicant">
+                            <div class="text-h6 text-uppercase text-bold q-mb-md">applicant information</div>
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase text-grey">name</div>
+                                <div class="text-body1 text-uppercase">{{ formatName(info) }}</div>
                             </div>
                             <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">bithdate</div>
-                                <div class="text-body1 text-uppercase">{{ info?.birthdate }}</div>
+                                <div class="text-caption text-uppercase text-grey">status</div>
+                                <div class="text-body1 text-uppercase">{{ info?.status }}</div>
+                            </div>
+                            <div class="row q-col-gutter-lg q-mb-mb">
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">sex</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.sex }}</div>
+                                </div>
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">marital status</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.civil_status }}</div>
+                                </div>
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">bithdate</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.birthdate }}</div>
+                                </div>
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">birthplace</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.birthplace }}</div>
+                                </div>
                             </div>
                             <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">birthplace</div>
-                                <div class="text-body1 text-uppercase">{{ info?.birthplace }}</div>
+                                <div class="text-caption text-uppercase text-grey">address</div>
+                                <div class="text-body1 text-uppercase">{{ info?.address }}</div>
                             </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">address</div>
-                            <div class="text-body1 text-uppercase">{{ info?.address }}</div>
-                        </div>
-                        <div class="row q-col-gutter-lg q-mb-mb">
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">blood type</div>
-                                <div class="text-body1 text-uppercase">{{ info?.blood_type }}</div>
-                            </div>
-                            <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">email</div>
-                                <div class="text-body1 text-uppercase">{{ info?.email }}</div>
+                            <div class="row q-col-gutter-lg q-mb-mb">
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">email</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.email }}</div>
+                                </div>
+                                <div class="q-mb-md">
+                                    <div class="text-caption text-uppercase text-grey">contact number</div>
+                                    <div class="text-body1 text-uppercase">{{ info?.contact_number }}</div>
+                                </div>
                             </div>
                             <div class="q-mb-md">
-                                <div class="text-caption text-uppercase text-grey">contact number</div>
-                                <div class="text-body1 text-uppercase">{{ info?.contact_number }}</div>
-                            </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey q-mb-sm">educational attainment</div>
-                            <div class="card-grid">
-                                <div
-                                    v-for="(data, index) in info?.educations"
-                                    :key="`data-${data.id}`"
-                                    class="inner-card-anim-wrapper"
-                                    :style="{ animationDelay: `${index * 120}ms` }"
-                                >
-                                    <q-card 
-                                        class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                                <div class="text-caption text-uppercase text-grey q-mb-sm">educational attainment</div>
+                                <div class="card-grid">
+                                    <div
+                                        v-for="(data, index) in info?.educations"
+                                        :key="`data-${data.id}`"
+                                        class="inner-card-anim-wrapper"
+                                        :style="{ animationDelay: `${index * 120}ms` }"
                                     >
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-caption text-uppercase">{{ data?.course?.name }}</div>
-                                            <div class="text-caption text-capitalize text-grey">{{ data?.school?.name }}</div>
-                                        </q-card-section>
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-caption">{{ data?.school_level }}</div>
-                                            <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
-                                        </q-card-section>
-                                    </q-card>
+                                        <q-card 
+                                            class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                                        >
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-caption text-uppercase">{{ data?.course?.name }}</div>
+                                            </q-card-section>
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-caption">{{ data?.school_level }}</div>
+                                                <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
+                                            </q-card-section>
+                                        </q-card>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey q-mb-sm">trainings</div>
-                            <div class="card-grid">
-                                <div
-                                    v-for="(data, index) in info?.trainings"
-                                    :key="`data-${data.id}`"
-                                    class="inner-card-anim-wrapper"
-                                    :style="{ animationDelay: `${index * 120}ms` }"
-                                >
-                                    <q-card 
-                                        class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase text-grey q-mb-sm">trainings</div>
+                                <div class="card-grid">
+                                    <div
+                                        v-for="(data, index) in info?.trainings"
+                                        :key="`data-${data.id}`"
+                                        class="inner-card-anim-wrapper"
+                                        :style="{ animationDelay: `${index * 120}ms` }"
                                     >
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-subtitle1 text-uppercase">{{ data?.title }}</div>
-                                            <div class="text-caption text-uppercase">{{ data?.type }}</div>
-                                        </q-card-section>
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
-                                            <div class="text-caption text-grey">{{ data?.hour }}hr/s</div>
-                                        </q-card-section>
-                                    </q-card>
+                                        <q-card 
+                                            class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                                        >
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-subtitle1 text-uppercase">{{ data?.title }}</div>
+                                                <div class="text-caption text-uppercase">{{ data?.type }}</div>
+                                            </q-card-section>
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
+                                                <div class="text-caption text-grey">{{ data?.hour }}hr/s</div>
+                                            </q-card-section>
+                                        </q-card>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey q-mb-sm">work experiences</div>
-                            <div class="card-grid">
-                                <div
-                                    v-for="(data, index) in info?.experiences"
-                                    :key="`data-${data.id}`"
-                                    class="inner-card-anim-wrapper"
-                                    :style="{ animationDelay: `${index * 120}ms` }"
-                                >
-                                    <q-card 
-                                        class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase text-grey q-mb-sm">work experiences</div>
+                                <div class="card-grid">
+                                    <div
+                                        v-for="(data, index) in info?.experiences"
+                                        :key="`data-${data.id}`"
+                                        class="inner-card-anim-wrapper"
+                                        :style="{ animationDelay: `${index * 120}ms` }"
                                     >
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-subtitle1 text-uppercase">{{ data?.position }}</div>
-                                        </q-card-section>
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
-                                        </q-card-section>
-                                    </q-card>
+                                        <q-card 
+                                            class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                                        >
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-subtitle1 text-uppercase">{{ data?.position }}</div>
+                                            </q-card-section>
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-caption text-grey">{{ data?.start_date }} to {{ data?.end_date }}</div>
+                                            </q-card-section>
+                                        </q-card>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey q-mb-sm">documents uploaded</div>
-                            <div class="card-grid">
-                                <div
-                                    v-for="(data, index) in info?.documents"
-                                    :key="`data-${data.id}`"
-                                    class="inner-card-anim-wrapper"
-                                    :style="{ animationDelay: `${index * 120}ms` }"
-                                >
-                                    <q-card 
-                                        class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase text-grey q-mb-sm">documents uploaded</div>
+                                <div class="card-grid">
+                                    <div
+                                        v-for="(data, index) in info?.documents"
+                                        :key="`data-${data.id}`"
+                                        class="inner-card-anim-wrapper"
+                                        :style="{ animationDelay: `${index * 120}ms` }"
                                     >
-                                        <q-card-section class="text-center full-width">
-                                            <div class="text-subtitle1 text-uppercase" @click="ViewDocument(data)">{{ data?.filename }}</div>
-                                        </q-card-section>
-                                    </q-card>
+                                        <q-card 
+                                            class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm" 
+                                        >
+                                            <q-card-section class="text-center full-width">
+                                                <div class="text-subtitle1 text-uppercase" @click="ViewDocument(data)">{{ data?.filename }}</div>
+                                            </q-card-section>
+                                        </q-card>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </q-tab-panel>
+                    </q-tab-panels>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
@@ -1694,6 +1684,19 @@ const formatDate = (date) => {
     return moment(date).format('MMMM Do, YYYY')
 }
 
+const FormatDays = (days) => {
+    if (!Array.isArray(days) || !days.length) return 'N/A'
+
+    const map = ['', 'Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+
+    return days
+        .map(d => Number(d.day_of_week))
+        .filter(n => n >= 1 && n <= 7)
+        .sort((a, b) => a - b)
+        .map(n => map[n])
+        .join(', ')
+}
+
 const formatName = (profile) => {
     if (!profile) return '';
     const firstname = profile.first_name || '';
@@ -1898,6 +1901,8 @@ const NextStep = () => {
 const PreviousStep = () => {
     if (step.value > 0) step.value--;
 };
+
+const tab = ref('vacancy')
 
 </script>
 

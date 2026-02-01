@@ -50,16 +50,48 @@
                 <q-card @click="() => { GetLeave(data.id); LeaveDialog = true; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ FormatName(data?.employee) }}</div>
-                        <div class="text-caption text-capitalize">{{ data?.status }}</div>
+                        <div class="text-caption text-capitalize text-grey">{{ data?.status }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width q-pa-sm">
-                        <div class="text-caption text-capitalize">{{ data?.leaveType?.name }}</div>
-                        <div class="text-caption">{{ FormatDateRange(data) }}</div>
-                        <div class="text-caption text-grey">{{ FormatDay(data) }}</div>
+                        <div class="text-caption text-uppercase">{{ data?.leaveType?.name }}</div>
+                        <div class="text-caption">{{ FormatLeaveDate(data?.date_from, data?.date_to) }}</div>
+                        <div class="text-caption text-grey">{{ ComputeLeaveDays(data?.date_from, data?.date_to) }} day/s</div>
                     </q-card-section>
                 </q-card>
             </div>
         </div>
+        <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
+            <q-toolbar>
+                <q-toolbar-title class="text-caption text-uppercase">
+                    <div>© 2025 WORKFORCE. All Rights Reserved.</div>
+                </q-toolbar-title>
+                <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                    <template v-slot:before>
+                        <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
+                    </template>
+                    <template v-slot:after>
+                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
+                        </q-btn>
+                    </template>
+                    <template v-slot:prepend>
+                        <q-icon name="search" style="font-size: 1rem;" />
+                    </template>
+                </q-input>
+                <q-inner-loading :showing="loading">
+                    <q-spinner-puff size="md" />
+                </q-inner-loading>
+            </q-toolbar>
+        </q-footer>
         <q-dialog v-model="Dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
@@ -69,7 +101,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-3">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.employeeid.type ? 'text-negative' : 'text-grey'">{{ Errors.employeeid.type ? Errors.employeeid.message : 'employee' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.employeeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employeeid.type ? Errors.employeeid.msg : 'employee' }}</div>
                             <q-select 
                                 outlined 
                                 v-model="employeeid" 
@@ -102,7 +134,7 @@
                             </q-select>
                         </div>
                         <div class="col-3">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.typeid.type ? 'text-negative' : 'text-grey'">{{ Errors.typeid.type ? Errors.typeid.message : 'leave type' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.typeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.typeid.type ? Errors.typeid.msg : 'leave type' }}</div>
                             <q-select 
                                 outlined 
                                 v-model="typeid" 
@@ -137,7 +169,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-6">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.reason.type ? 'text-negative' : 'text-grey'">{{ Errors.reason.type ? Errors.reason.message : 'reason' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.reason.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.reason.type ? Errors.reason.msg : 'reason' }}</div>
                             <q-input 
                                 v-model="reason" 
                                 outlined 
@@ -150,7 +182,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.datestart.type ? 'text-negative' : 'text-grey'">{{ Errors.datestart.type ? Errors.datestart.message : 'date start' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.datestart.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.datestart.type ? Errors.datestart.msg : 'date start' }}</div>
                             <q-input outlined v-model="datestart" label="Enter Date" :error="Errors.datestart.type" no-error-icon>
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" ref="popup">
                                     <q-date v-model="datestart" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide(); } "/>
@@ -158,7 +190,7 @@
                             </q-input>
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.dateend.type ? 'text-negative' : 'text-grey'">{{ Errors.dateend.type ? Errors.dateend.message : 'date end' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.dateend.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.dateend.type ? Errors.dateend.msg : 'date end' }}</div>
                             <q-input outlined v-model="dateend" label="Enter Date" :error="Errors.dateend.type" no-error-icon>
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" ref="popup">
                                     <q-date v-model="dateend" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide(); } "/>
@@ -166,7 +198,7 @@
                             </q-input>
                         </div>
                         <div class="col-1">
-                            <div class="text-caption text-uppercase text-grey q-mb-xs">day/s</div>
+                            <div class="text-caption text-uppercase text-grey">day/s</div>
                             <q-input 
                                 v-model="days" 
                                 outlined 
@@ -210,11 +242,11 @@
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">leave duration</div>
-                        <div class="text-body1 text-uppercase">{{ FormatDateRange(info ?? '') }}</div>
+                        <div class="text-body1 text-uppercase">{{ FormatLeaveDate(info?.date_from, info?.date_to) }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">no of day</div>
-                        <div class="text-body1 text-uppercase">{{ FormatDay(info ?? '') }}</div>
+                        <div class="text-body1 text-uppercase">{{ ComputeLeaveDays(info?.date_from, info?.date_to) }}</div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase text-grey">status</div>
@@ -227,6 +259,7 @@
                                 <img :src="FormatSignature(dt?.setting)" width="150"/>
                             </div>
                             <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
+                            <div class="text-caption text-uppercase text-italic">{{ dt?.setting?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
                         </div>
                     </div>
                 </q-card-section>
@@ -247,8 +280,8 @@
                                 </q-card>
                             </q-menu>
                         </q-btn>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(info?.id)" />
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
+                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(info?.id)" />
+                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
                             <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                                 <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
                                     <q-card-section>
@@ -357,56 +390,38 @@ const Errors = reactive({
     }
 });
 
-const Validations = () => {
+const failToast = () =>
+  Toast.fire({
+    icon: "error",
+    html: `
+      <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+      <div class="text-caption">Something went wrong.</div>
+    `
+  })
 
-    let isError = false;
+const setErr = (key, msg = 'required') => (Errors[key].type = true, Errors[key].msg = msg, true)
+const clearErr = (key) => (Errors[key].type = null, Errors[key].msg = '', false)
 
-    if (!employeeid.value) {
-        Errors.employeeid.type = true;
-        Errors.employeeid.message = ('employee is required!')
-        isError = true
-    } else {
-        Errors.employeeid.type = null
-    }
-    if (!typeid.value) {
-        Errors.typeid.type = true;
-        Errors.typeid.message = ('leave type is required!')
-        isError = true
-    } else {
-        Errors.typeid.type = null
-    }
-    if (!datestart.value) {
-        Errors.datestart.type = true;
-        Errors.datestart.message = ('date start is required!')
-        isError = true
-    } else {
-        Errors.datestart.type = null
-    }
-    if (!dateend.value) {
-        Errors.dateend.type = true;
-        Errors.dateend.message = ('date end is required!')
-        isError = true
-    } else {
-        Errors.dateend.type = null
-    }
-    if (!reason.value) {
-        Errors.reason.type = true;
-        Errors.reason.message = ('reason is required!')
-        isError = true
-    } else {
-        Errors.reason.type = null
-    }
+const req = (key, val) => (!val ? setErr(key, 'required') : clearErr(key))
 
-    if (isError) {
-        Toast.fire({
-            icon: "error",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                <div class="text-caption">Something went wrong.</div>
-            `
-        })
-    }
+const notBefore = (key, end, start, msg = 'invalid') =>
+    (end && start && new Date(end) < new Date(start))
+        ? setErr(key, msg)
+        : clearErr(key)
 
+
+const ValidateLeave = () => {
+
+    let isError = false
+
+    isError ||= req('employeeid', employeeid.value)
+    isError ||= req('typeid', typeid.value)
+    isError ||= req('datestart', datestart.value)
+    isError ||= req('dateend', dateend.value)
+    isError ||= notBefore('dateend', dateend.value, datestart.value)
+    isError ||= req('reason', reason.value)
+
+    if (isError) failToast()
     return !isError
 }
 
@@ -482,44 +497,50 @@ const FormatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-const FormatDateRange = (app) => {
-    const from = new Date(app.date_from);
-    const to = new Date(app.date_to);
+const FormatLeaveDate = (dateFrom, dateTo, locale = 'en-US') => {
+    if (!dateFrom) return ''
 
-    const options = { month: 'short', day: 'numeric' };
-    const year = from.getFullYear();
+    const from = new Date(dateFrom)
+    const to = new Date(dateTo || dateFrom)
 
-    const fromText = from.toLocaleDateString('en-US', options);
-    const toText = to.toLocaleDateString('en-US', options);
+    const sameDay =
+        from.getFullYear() === to.getFullYear() &&
+        from.getMonth() === to.getMonth() &&
+        from.getDate() === to.getDate()
 
-    // Same month
-    if (from.getMonth() === to.getMonth()) {
-        return `${fromText}–${to.getDate()}, ${year}`;
+    const monthName = (d) => d.toLocaleString(locale, { month: 'long' })
+    const dayNum = (d) => d.getDate()
+    const yearNum = (d) => d.getFullYear()
+
+    if (sameDay) {
+        // February 1, 2026
+        return `${monthName(from)} ${dayNum(from)}, ${yearNum(from)}`
     }
 
-    return `${fromText} – ${toText}, ${year}`;
-};
-
-const FormatDay = (app) => {
-    let count = 0;
-
-    const start = new Date(app.date_from);
-    const end = new Date(app.date_to);
-
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const day = d.getDay(); // 0 = Sunday, 6 = Saturday
-
-        if (day !== 0 && day !== 6) {
-            count++;
-        }
+    // Same month & year: February 1-3, 2026
+    if (from.getMonth() === to.getMonth() && from.getFullYear() === to.getFullYear()) {
+        return `${monthName(from)} ${dayNum(from)}-${dayNum(to)}, ${yearNum(from)}`
     }
 
-    // 👇 format label
-    return `${count} ${count === 1 ? 'day' : 'days'}`;
-};
+    // Different month/year: February 28 - March 2, 2026
+    return `${monthName(from)} ${dayNum(from)}, ${yearNum(from)} - ${monthName(to)} ${dayNum(to)}, ${yearNum(to)}`
+}
+
+const ComputeLeaveDays = (dateFrom, dateTo) => {
+    if (!dateFrom) return 0
+
+    const from = new Date(dateFrom)
+    const to = new Date(dateTo || dateFrom)
+
+    // normalize to midnight to avoid timezone issues
+    from.setHours(0, 0, 0, 0)
+    to.setHours(0, 0, 0, 0)
+
+    const diff = Math.round((to - from) / (1000 * 60 * 60 * 24))
+    return diff >= 0 ? diff + 1 : 0 // +1 for inclusive
+}
+
+
 
 const FormatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
@@ -615,7 +636,7 @@ const isEdit = ref(false);
 const submitLoading = ref(false);
 
 const Save = async () => {
-    if (!Validations()) return;
+    if (ValidateLeave && !ValidateLeave()) return;
     submitLoading.value = true;
     try {
         const response = id.value && isEdit
