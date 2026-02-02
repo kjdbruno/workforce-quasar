@@ -2,6 +2,7 @@ import { useAuthStore } from 'src/stores/auth-store';
 import { usePreferenceStore } from 'src/stores/preference-store';
 import { useRecruitmentStore } from 'src/stores/recruitment-store';
 import { useEmployeeStore } from 'src/stores/employee-store';
+import { useDTRStore } from 'src/stores/dtr-store';
 
 const routes = [
   {
@@ -97,9 +98,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     beforeEnter: (to, from, next) => {
       const auth = useAuthStore();
+      const dtr = useDTRStore();
       if (!auth.isAuthenticated) {
         next('/')
       } else {
+        dtr.component = dtr.component ?? 'LogsComponent'
         next()
       }
     },
