@@ -3,7 +3,9 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 export const useDTRStore = defineStore('dtrStore', {
   state: () => ({
     component: null,
-    data: null
+    data: null,
+    month: null,
+    year: null
   }),
 
   getters: {

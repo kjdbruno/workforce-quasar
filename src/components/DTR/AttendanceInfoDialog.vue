@@ -8,7 +8,11 @@
             <q-card-section class="col q-pa-lg scroll">
                 <div class="q-mb-md">
                     <div class="text-caption text-uppercase text-grey">employee</div>
-                    <div class="text-body1 text-uppercase">{{ FormatName(employee?.employee) }}</div>
+                    <div class="text-body1 text-uppercase">{{ FormatName(DTRStore.data?.employee) }}</div>
+                </div>
+                <div class="q-mb-md">
+                    <div class="text-caption text-uppercase text-grey">status</div>
+                    <div class="text-body1 text-uppercase">{{ DTRStore.data?.status }}</div>
                 </div>
                 <div class="q-mb-sm">
                     <span class="text-subtitle1 text-uppercase text-bold q-mr-md">daily time record</span>
@@ -26,51 +30,95 @@
                     </div>
                     <div class="col-1">
                         <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">records</span>
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">time in</span>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">time out</span>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">late</span>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">undertime</span>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        <div class="q-mb-xs">
+                            <span class="text-caption text-uppercase text-grey q-mr-sm">overtime</span>
                         </div>
                     </div>
                 </div>
                 <div class="q-mb-xl">
-                    <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in attendances.results">
+                    <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in logs">
                         <div class="col-1">
-                            <q-input outlined dense :model-value="FormatAttendanceDate(data.date)" />
+                            <q-input outlined dense :model-value="FormatLogDate(data.date)" />
                         </div>
                         <div class="col-1">
-                            <q-input outlined dense :model-value="FormatAttendanceDay(data.date)" />
+                            <q-input outlined dense :model-value="FormatLogDay(data.date)" />
                         </div>
-                        <div class="col-10">
-                            <div class="row items-center q-gutter-xs">
-                                <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;" >
-                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" mask="##:##" fill-mask ref="popup" class="no-shadow custom-border radius-sm">
-                                        <q-time v-model="data.times[index]" mask="HH:mm" >
-                                            <div class="row items-center justify-end">
-                                                <q-btn v-close-popup label="Okay" color="primary" flat />
-                                            </div>
-                                        </q-time>
-                                    </q-popup-proxy>
-                                </q-input>
-                                <!-- <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/> -->
-                                <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" />
-                                <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" />
-                                <q-badge v-if="data.overtimes" rounded color="primary" :label="data.overtimes" />
-                                <q-btn icon="arrow_upward" round unelevated color="primary" size="xs" @click="() => { UpdateDTR(attendances.id, employee.id, data) }"/>
+                        <div class="col-1">
+                            <q-input outlined dense v-model="data.time_in">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" mask="##:##" fill-mask ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-time v-model="data.time_in" mask="HH:mm" >
+                                        <div class="row items-center justify-end">
+                                            <q-btn v-close-popup label="Okay" color="primary" flat />
+                                        </div>
+                                    </q-time>
+                                </q-popup-proxy>
+                            </q-input>
+                        </div>
+                        <div class="col-1">
+                            <q-input outlined dense v-model="data.time_out" >
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" mask="##:##" fill-mask ref="popup" class="no-shadow custom-border radius-sm">
+                                    <q-time v-model="data.time_out" mask="HH:mm" >
+                                        <div class="row items-center justify-end">
+                                            <q-btn v-close-popup label="Okay" color="primary" flat />
+                                        </div>
+                                    </q-time>
+                                </q-popup-proxy>
+                            </q-input>
+                        </div>
+                        <div class="col-1">
+                            <q-input outlined dense :model-value="FormatMinutes(data.late)" :readonly="true"/>
+                        </div>
+                        <div class="col-1">
+                            <q-input outlined dense :model-value="FormatMinutes(data.undertime)" :readonly="true"/>
+                        </div>
+                        <div class="col-1">
+                            <q-input outlined dense :model-value="FormatMinutes(data.overtime)" :readonly="true"/>
+                        </div>
+                        <div class="col-5">
+                            <div class="q-gutter-xs q-mt-xs">
+                                <q-btn rounded size="xs" v-if="data.notes.length" v-for="value in data.notes" outline color="primary" :label="value.type">
+                                    <q-tooltip anchor="center middle" self="center middle" class="text-uppercase">
+                                        <div>{{ value.name }}</div>
+                                    </q-tooltip>
+                                </q-btn>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
-                    <div v-for="(dt, index) in attendances.approvals">
+                    <div v-for="(dt, index) in signatories">
                         <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
                         <div v-if="dt?.status == 'Approved'">
                             <img :src="FormatSignature(dt?.setting)" width="150"/>
                         </div>
                         <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
+                        <div class="text-caption text-uppercase text-italic">{{ dt?.setting?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
                     </div>
                 </div>
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" />
                     <q-btn v-if="canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
                         <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                             <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
@@ -85,17 +133,34 @@
                             </q-card>
                         </q-menu>
                     </q-btn>
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(attendances?.id)" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(attendanceId)" />
                     <!-- <q-btn v-if="info.isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel" @click="Cancel(info.id)"/> -->
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { AttendanceDialog = false; }" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null) }"  outline/>
                 </div>
             </q-card-actions>
-            <q-inner-loading :showing="submitLoading">
+            <q-inner-loading :showing="SubmitLoading">
                 <div class="text-center">
                     <q-spinner-puff size="md"/>
                     <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                 </div>
             </q-inner-loading>
+        </q-card>
+    </q-dialog>
+    <q-dialog v-model="printDialog" full-height full-width class="pdf">
+        <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
+            <q-btn
+                icon="close"
+                class="fixed bg-white text-primary shadow-2"
+                round
+                dense
+                v-close-popup
+                style="top: 15px; right: 15px; z-index: 999;"
+            />
+            <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
+                <div class="iframe-container">
+                <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                </div>
+            </q-card-section>
         </q-card>
     </q-dialog>
 </template>
@@ -105,8 +170,12 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
-import { useEmployeeStore } from 'src/stores/employee-store'
-const EmployeeStore = useEmployeeStore();
+
+import { useDTRStore } from 'src/stores/dtr-store';
+const DTRStore = useDTRStore();
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore();
 
 const props = defineProps({
     modelValue: String,
@@ -125,6 +194,158 @@ const isOpen = computed({
 const SubmitLoading = ref(false);
 
 const PopulateData = () => {
-    
+    LoadAttendance()
 }
+
+const attendanceId = ref('');
+const logs = ref([]);
+const signatories = ref([]);
+
+const LoadAttendance = async () => {
+    SubmitLoading.value = true;
+    try {
+        const response = await api.get(`/attendance/${DTRStore.data?.id}`, {
+            params: { 
+                month: DTRStore.month,
+                year: DTRStore.year
+            }
+        });
+        const { results, approvals, id } = response.data;
+        logs.value = results;
+        attendanceId.value = id;
+        signatories.value = approvals;
+    } catch (error) {
+        console.error("Error fetching all data:", error);
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Error</div>
+                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+            `
+        });
+    } finally {
+        SubmitLoading.value = false;
+    }
+}
+
+const FormatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.first_name || '';
+    const middlename = profile.middle_name
+        ? profile.middle_name.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.last_name || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+const FormatSignature = (sign) => {
+    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
+}
+
+const FormatLogDate = (date) => {
+    if (!date) return ''
+    return moment(date).format('DD')
+}
+
+const FormatLogDay = (date) => {
+    if (!date) return ''
+    return moment(date).format('dddd')
+}
+
+const FormatMinutes = (value) => {
+    const total = Number(value) || 0;
+    if (total <= 0) return '0 min';
+
+    const minutesInDay = 24 * 60;
+
+    const days = Math.floor(total / minutesInDay);
+    const hours = Math.floor((total % minutesInDay) / 60);
+    const minutes = total % 60;
+
+    const parts = [];
+
+    if (days) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+    if (hours) parts.push(`${hours} ${hours === 1 ? 'hr' : 'hrs'}`);
+    if (minutes) parts.push(`${minutes} ${minutes === 1 ? 'min' : 'mins'}`);
+
+    return parts.join(' ');
+};
+
+const canApprove = computed(() => {
+    if (!signatories.value || signatories.value.length === 0) return false;
+
+    // Sort approvals by setting order
+    const sorted = [...signatories.value].sort(
+        (a, b) => a.setting.order - b.setting.order
+    );
+
+    // Find the first pending approval
+    const nextPending = sorted.find(req => req.status === 'Pending');
+    if (!nextPending) return false;
+
+    // Check if the current user is the approver of the next pending approval
+    return nextPending.setting?.approver?.id === AuthStore.user?.id;
+});
+
+const Approve = async (id) => {
+    SubmitLoading.value = true;
+    const userId = Number(AuthStore.user.id);
+    const s = signatories.value;
+    const myRequest = s.find(approval =>
+    Number(
+            approval?.setting?.approver?.employeeAccount?.user_id
+        ) === Number(userId)
+    );
+    const approvalid = myRequest?.id ?? null;
+
+    try {
+        const response = await api.post(`/attendance/${id}/approve`, {
+            approvalid
+        });
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+
+    } finally {
+        SubmitLoading.value = false;
+    }
+}
+
+const printDialog = ref(false);
+const pdf = ref(null);
+
+const Print = async (id) => {
+    SubmitLoading.value = true;
+    try {
+        const res = await api.get(`/attendance/${id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+    } finally {
+        SubmitLoading.value = false;
+    }
+}
+
 </script>

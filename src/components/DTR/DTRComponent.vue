@@ -39,7 +39,7 @@
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="() => {  }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
+                <q-card @click="() => { openDialog('AttendanceInfoDialog'); DTRStore.data = data; DTRStore.month = month; DTRStore.year = year }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ FormatName(data?.employee) }}</div>
                         <div class="text-caption text-capitalized">{{ data?.status }}</div>
@@ -106,9 +106,7 @@
 </template>
 
 <script setup>
-import { 
-    usePreferenceStore 
-} from 'src/stores/preference-store';
+import { useDTRStore } from 'src/stores/dtr-store';
 
 import AttendanceDialog from './AttendanceDialog.vue';
 import AttendanceInfoDialog from './AttendanceInfoDialog.vue';
@@ -134,7 +132,7 @@ import {
 
 const AuthStore = useAuthStore();
 
-const PreferenceStore = usePreferenceStore();
+const DTRStore = useDTRStore();
 
 const dialog = ref(false);
 const isEdit = ref(false);
