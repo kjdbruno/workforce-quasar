@@ -246,18 +246,6 @@ const roles = ref([
         label: "Administrator"
     },
     {
-        value: "Supervisor",
-        label: "Supervisor"
-    },
-    {
-        value: "HR",
-        label: "Human Resource"
-    },
-    {
-        value: "Finance",
-        label: "Finance"
-    },
-    {
         value: "Employee",
         label: "Employee"
     },
