@@ -47,15 +47,13 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
-import { useEmployeeStore } from 'src/stores/employee-store'
-const EmployeeStore = useEmployeeStore();
 
 const props = defineProps({
     modelValue: String,
     dialogName: String
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isOpen = computed({
     get: () => props.modelValue === props.dialogName,
@@ -122,6 +120,7 @@ const Save = async () => {
                 dateEnd: dateEnd.value,
             });
         emit('update:modelValue', null);
+        emit('saved');
         Toast.fire({
             icon: "success",
             html: `
@@ -165,4 +164,6 @@ const applyBackendErrors = (backendErrors) => {
         }
     })
 }
+
+const popup = ref(null);
 </script>

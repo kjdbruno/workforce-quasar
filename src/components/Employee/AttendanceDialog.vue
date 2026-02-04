@@ -26,24 +26,55 @@
                     </div>
                 </div>
                 <div class="q-mt-md">
-                    <div class="card-grid">
-                        <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="!SubmitLoading && attendances.length === 0">
-                            <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                                <q-card-section class="text-center">
-                                    <div class="text-caption text-uppercase text-grey">no data found</div>
-                                </q-card-section>
-                            </q-card>
+                    <div class="row q-col-gutter-xs">
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">date</span>
+                            </div>
                         </div>
-                        <div v-for="(app, index) in attendances" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                            <q-card @click="() => { Print(app.id) }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                                <q-card-section class="text-center full-width">
-                                    <div class="text-subtitle2 text-uppercase">{{ FormatDateRange(app) }}</div>
-                                    <div class="text-caption text-uppercase text-grey">{{ FormatDay(app) }}</div>
-                                </q-card-section>
-                                <q-card-section class="full-width">
-                                    <div class="text-caption text-grey">{{ app.status }}</div>
-                                </q-card-section>
-                            </q-card>
+                        <div class="col-1">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">day</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">attendance</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="q-mb-xs">
+                                <span class="text-caption text-uppercase text-grey q-mr-sm">logs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="q-mb-xl">
+                        <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in attendances">
+                            <div class="col-1">
+                                <q-input outlined dense :model-value="FormatLogDate(data.date)" />
+                            </div>
+                            <div class="col-1">
+                                <q-input outlined dense :model-value="FormatLogDay(data.date)" />
+                            </div>
+                            <div class="col-4">
+                                <div class="row items-center q-gutter-xs">
+                                    <q-input outlined dense :model-value="FormatLogTime(data.time_in)" :readonly="true" style="width: 100px;"/>
+                                    <q-input outlined dense :model-value="FormatLogTime(data.time_out)" :readonly="true" style="width: 100px;"/>
+                                    <q-input outlined dense :model-value="FormatMinutes(data.late)" :readonly="true" style="width: 100px;"/>
+                                    <q-input outlined dense :model-value="FormatMinutes(data.undertime)" :readonly="true" style="width: 100px;"/>
+                                    <q-input outlined dense :model-value="FormatMinutes(data.overtime)" :readonly="true" style="width: 100px;"/>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row items-center q-gutter-xs">
+                                    <q-input v-for="(time, index) in data.logs" outlined dense :model-value="FormatLogTime(data.logs[index])" :readonly="true" style="width: 100px;"/>
+                                    <q-badge v-if="data.notes.length" v-for="value in data.notes" rounded color="primary" :label="value.type" class="text-uppercase cursor-pointer">
+                                        <q-tooltip anchor="top middle" self="center middle" class="text-uppercase">
+                                            <div>{{ value.name }}</div>
+                                        </q-tooltip>
+                                    </q-badge>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -51,6 +82,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
+                    <q-btn :disable="!attendance_id" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="() => { Print() }"/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -115,7 +147,8 @@ const months = Array.from({ length: 12 }, (_, i) => {
     return { label: monthName, value: monthValue };
 });
 
-const attendances = ref([])
+const attendances = ref([]);
+const attendance_id = ref('');
 
 const GetAttendance = async (id) => {
     SubmitLoading.value = true;
@@ -127,8 +160,9 @@ const GetAttendance = async (id) => {
                 month: month.value
             }
         });
-        attendances.value = (response.data.record)
-        
+        const app = response.data;
+        attendances.value = app.logs;
+        attendance_id.value = app.attendance_id;
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -147,52 +181,48 @@ const PopulateData = () => {
     GetAttendance(EmployeeStore.data?.id)
 }
 
-const FormatDateRange = (app) => {
-    const from = new Date(app.date_start);
-    const to = new Date(app.date_end);
+const FormatLogDate = (date) => {
+    if (!date) return ''
+    return moment(date).format('DD')
+}
 
-    const options = { month: 'short', day: 'numeric' };
-    const year = from.getFullYear();
+const FormatLogDay = (date) => {
+    if (!date) return ''
+    return moment(date).format('dddd')
+}
 
-    const fromText = from.toLocaleDateString('en-US', options);
-    const toText = to.toLocaleDateString('en-US', options);
-
-    // Same month
-    if (from.getMonth() === to.getMonth()) {
-        return `${fromText}–${to.getDate()}, ${year}`;
-    }
-
-    return `${fromText} – ${toText}, ${year}`;
+const FormatLogTime = (time) => {
+    if (!time) return '';
+    return moment(time, ['HH:mm', 'HH:mm:ss'], true).format('hh:mm A');
 };
 
-const FormatDay = (app) => {
-    let count = 0;
 
-    const start = new Date(app.date_start);
-    const end = new Date(app.date_end);
+const FormatMinutes = (value) => {
+    const total = Number(value) || 0;
+    if (total <= 0) return '0 min';
 
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
+    const minutesInDay = 24 * 60;
 
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const day = d.getDay(); // 0 = Sunday, 6 = Saturday
+    const days = Math.floor(total / minutesInDay);
+    const hours = Math.floor((total % minutesInDay) / 60);
+    const minutes = total % 60;
 
-        if (day !== 0 && day !== 6) {
-        count++;
-        }
-    }
+    const parts = [];
 
-    // 👇 format label
-    return `${count} ${count === 1 ? 'day' : 'days'}`;
+    if (days) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+    if (hours) parts.push(`${hours} ${hours === 1 ? 'hr' : 'hrs'}`);
+    if (minutes) parts.push(`${minutes} ${minutes === 1 ? 'min' : 'mins'}`);
+
+    return parts.join(' ');
 };
 
 const printDialog = ref(false);
 const pdf = ref(null);
 
-const Print = async (id) => {
+const Print = async () => {
     SubmitLoading.value = true;
     try {
-        const res = await api.get(`/attendance/${id}/pdf`, {
+        const res = await api.get(`/attendance/${attendance_id.value}/pdf`, {
             responseType: 'arraybuffer',
         })
         const blob = new Blob([res.data], { type: 'application/pdf' });
@@ -201,8 +231,9 @@ const Print = async (id) => {
         printDialog.value = true;
         SubmitLoading.value = false;
     } catch (error) {
-        SubmitLoading.value = false;
         console.error("Error generating PDF:", error);
+    } finally {
+        SubmitLoading.value = false;
     }
 }
 

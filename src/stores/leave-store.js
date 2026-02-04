@@ -3,7 +3,8 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 export const useLeaveStore = defineStore('leaveStore', {
   state: () => ({
     component: null,
-    data: null
+    data: null,
+    isEdit: false
   }),
 
   getters: {

@@ -93,13 +93,13 @@
                         <div class="col-1">
                             <q-input outlined dense :model-value="FormatMinutes(data.overtime)" :readonly="true"/>
                         </div>
-                        <div class="col-5">
-                            <div class="q-gutter-xs q-mt-xs">
-                                <q-btn rounded size="xs" v-if="data.notes.length" v-for="value in data.notes" outline color="primary" :label="value.type">
-                                    <q-tooltip anchor="center middle" self="center middle" class="text-uppercase">
+                        <div class="col">
+                            <div class="q-gutter-xs q-mt-sm">
+                                <q-badge v-if="data.notes.length" v-for="value in data.notes" rounded color="primary" :label="value.type" class="text-uppercase cursor-pointer">
+                                    <q-tooltip anchor="top middle" self="center middle" class="text-uppercase">
                                         <div>{{ value.name }}</div>
                                     </q-tooltip>
-                                </q-btn>
+                                </q-badge>
                             </div>
                         </div>
                     </div>
@@ -115,10 +115,22 @@
                     </div>
                 </div>
             </q-card-section>
-            
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" />
+                    <q-btn v-if="DTRStore.data?.status != 'Approved'" unelevated size="md" color="primary" class="btn text-capitalize" label="save">
+                        <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                            <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
+                                <q-card-section>
+                                    <div class="text-h6 text-center text-uppercase">
+                                        proceed to save
+                                    </div>
+                                </q-card-section>
+                                <q-card-actions>
+                                    <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="() => { Update(); }"/>
+                                </q-card-actions>
+                            </q-card>
+                        </q-menu>
+                    </q-btn>
                     <q-btn v-if="canApprove" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
                         <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                             <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
@@ -128,13 +140,12 @@
                                     </div>
                                 </q-card-section>
                                 <q-card-actions>
-                                    <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Approve(attendances?.id)"/>
+                                    <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Approve(attendanceId)"/>
                                 </q-card-actions>
                             </q-card>
                         </q-menu>
                     </q-btn>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(attendanceId)" />
-                    <!-- <q-btn v-if="info.isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel" @click="Cancel(info.id)"/> -->
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null) }"  outline/>
                 </div>
             </q-card-actions>
@@ -182,7 +193,7 @@ const props = defineProps({
     dialogName: String
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const isOpen = computed({
     get: () => props.modelValue === props.dialogName,
@@ -294,7 +305,7 @@ const Approve = async (id) => {
     const s = signatories.value;
     const myRequest = s.find(approval =>
     Number(
-            approval?.setting?.approver?.employeeAccount?.user_id
+            approval?.setting?.approver_id
         ) === Number(userId)
     );
     const approvalid = myRequest?.id ?? null;
@@ -303,6 +314,40 @@ const Approve = async (id) => {
         const response = await api.post(`/attendance/${id}/approve`, {
             approvalid
         });
+        emit('saved');
+        emit('update:modelValue', null)
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+
+    } finally {
+        SubmitLoading.value = false;
+    }
+}
+
+const Update = async () => {
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`/attendance/${attendanceId.value}/update`, {
+            logs: logs.value
+        });
+        LoadAttendance()
         Toast.fire({
             icon: "success",
             html: `

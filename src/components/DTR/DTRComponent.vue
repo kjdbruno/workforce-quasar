@@ -100,8 +100,8 @@
                 </q-inner-loading>
             </q-toolbar>
         </q-footer>
-        <attendance-dialog v-model="activeDialog" dialog-name="AttendanceDialog"/>
-        <AttendanceInfoDialog v-model="activeDialog" dialog-name="AttendanceInfoDialog"/>
+        <attendance-dialog v-model="activeDialog" dialog-name="AttendanceDialog" @saved="LoadAll"/>
+        <AttendanceInfoDialog v-model="activeDialog" dialog-name="AttendanceInfoDialog" @saved="LoadAll"/>
     </div>
 </template>
 
@@ -124,69 +124,11 @@ import { api } from 'src/boot/axios';
 
 import { Toast } from 'src/boot/sweetalert'; 
 
-import moment from 'moment';
-
-import { 
-    useAuthStore 
-} from 'src/stores/auth-store';
-
-const AuthStore = useAuthStore();
-
 const DTRStore = useDTRStore();
-
-const dialog = ref(false);
-const isEdit = ref(false);
-const submitLoading = ref(false);
 
 const today = new Date();
 const month = ref(String(today.getMonth() + 1).padStart(2, '0'));
 const year = ref(String(today.getFullYear()));
-
-const id = ref('');
-const dateStart = ref(new Date().toISOString().split('T')[0]);
-const dateEnd = ref(new Date().toISOString().split('T')[0]);
-
-const isActive = ref(false);
-
-const Errors = reactive({
-    dateStart: { 
-        type: null, message: ''
-    },
-    dateEnd: { 
-        type: null, message: ''
-    }
-});
-
-const Validations = () => {
-
-    let isError = false;
-    if (!dateStart.value) {
-        Errors.dateStart.type = true;
-        Errors.dateStart.message = ('date start is required!')
-        isError = true
-    } else {
-        Errors.dateStart.type = null
-    }
-    if (!dateEnd.value) {
-        Errors.dateEnd.type = true;
-        Errors.dateEnd.message = ('date end is required!')
-        isError = true
-    } else {
-        Errors.dateEnd.type = null
-    }
-
-    if (isError) {
-        Toast.fire({
-            icon: "error",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                <div class="text-caption">Something went wrong.</div>
-            `
-        })
-    }
-
-    return !isError
-}
 
 const rows = ref([]);
 
