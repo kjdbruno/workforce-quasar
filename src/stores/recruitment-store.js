@@ -2,7 +2,9 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 export const useRecruitmentStore = defineStore('recruitmentStore', {
   state: () => ({
-    component: null
+    component: null,
+    data: null,
+    isEdit: false
   }),
 
   getters: {
