@@ -5,7 +5,7 @@
                 <div class="text-h6 text-uppercase">digital id</div>
             </q-card-section>
             <q-separator inset />
-            <q-card-section class="col q-pa-lg scroll">
+            <q-card-section class="col q-pa-none scroll">
                 <div class="iframe-container">
                     <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
                 </div>

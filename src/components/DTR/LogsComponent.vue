@@ -1,6 +1,6 @@
 <template>
     <div class="dtr-wrapper">
-        <div class="card-grid">
+        <div class="card-main-grid">
             <div v-if="rows.length === 0" class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
                 <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label">
                     <q-card-section class="text-center full-width q-pa-sm">

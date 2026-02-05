@@ -13,15 +13,15 @@
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.employeeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employeeid.type ? Errors.employeeid.msg : 'employee' }}</div>
                                 <div class="card-grid">
-                                    <div class="card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!displayedEmployees.length">
+                                    <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
+                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" v-if="!displayedEmployees.length">
                                             <q-card-section class="text-center">
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
-                                    <div v-for="(data, index) in displayedEmployees" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedEmployees.length">
-                                        <q-card @click="() => { employeeid = data.id }" class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" :class="{ 'card--active': employeeid === data.id }">
+                                    <div v-for="(data, index) in displayedEmployees" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedEmployees.length">
+                                        <q-card @click="() => { employeeid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': employeeid === data.id }">
                                             <q-card-section class="text-center">
                                                 <div class="text-caption text-dark text-uppercase">{{ FormatName(data) }}</div>
                                             </q-card-section>
@@ -38,15 +38,15 @@
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.typeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.typeid.type ? Errors.typeid.msg : 'leave type' }}</div>
                                 <div class="card-grid">
-                                    <div class="card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!leavetypes.length">
+                                    <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
+                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" v-if="!leavetypes.length">
                                             <q-card-section class="text-center">
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
-                                    <div v-for="(data, index) in leavetypes" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="leavetypes.length">
-                                        <q-card @click="() => { typeid = data.id }" class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" :class="{ 'card--active': typeid === data.id }">
+                                    <div v-for="(data, index) in leavetypes" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="leavetypes.length">
+                                        <q-card @click="() => { typeid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': typeid === data.id }">
                                             <q-card-section class="text-center">
                                                 <div class="text-caption text-dark text-uppercase">{{ data.name }}</div>
                                             </q-card-section>

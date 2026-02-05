@@ -23,7 +23,7 @@
                 </div>
             </q-card-section>
         </q-card>
-        <div class="card-grid">
+        <div class="card-main-grid">
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('LeaveDialog'); LeaveStore.isEdit = false; }" >
                     <q-card-section class="text-center">

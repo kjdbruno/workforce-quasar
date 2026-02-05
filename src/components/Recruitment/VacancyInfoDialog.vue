@@ -63,12 +63,13 @@
                 </div>
                 <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
                     <div v-for="(dt, index) in info?.approvals">
-                        <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
+                        <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : (dt?.setting?.description) }}</div>
                         <div v-if="dt?.status == 'Approved'">
-                            <img :src="FormatSignature(dt?.setting)" width="150"/>
+                            <img :src="FormatSignature(dt?.setting?.approver?.employeeAccount?.employee?.signature)" width="150"/>
                         </div>
                         <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
-                        <div class="text-caption text-uppercase text-italic">{{ dt?.setting?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
+                        <div class="text-body1 text-uppercase text-italic">{{ dt?.setting?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
+                        <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
                     </div>
                 </div>
             </q-card-section>
@@ -208,7 +209,7 @@ const Approve = async (id) => {
             icon: "success",
             html: `
                 <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.msg}<div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
             `
         });
         emit('saved');
@@ -288,6 +289,11 @@ const formatDate = (date) => {
 const formatTime = (time) => {
     if (!time) return ''
     return moment(time, 'HH:mm').format('hh:mm A')
+}
+
+const FormatSigned = (date) => {
+    if (!date) return ''
+    return moment(date).format('MMMM Do, YYYY hh:mm A')
 }
 
 const FormatDays = (days) => {

@@ -807,6 +807,7 @@ const PopulateData = () => {
     LoadApplicants();
     ResetForm();
     ResetAllErrors();
+    step.value = 0;
 }
 
 const Populate = (app) => {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card-grid">
+        <div class="card-main-grid">
             <div class="card-anim-wrapper">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
                     <q-card-section class="text-center">
@@ -27,13 +27,17 @@
                 <q-card @click="ShowDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ data.type }}</div>
-                        <div class="text-caption text-grey">{{ FormatOrdinal(data.order) }}</div>
                     </q-card-section>
-                    <q-card-section class="text-center full-width">
-                        <div class="text-caption text-grey text-uppercase">{{ data.owner?.name }}</div>
-                        <div class="text-subtitle2 text-uppercase text-italic">{{ data.approver?.name }}</div>
+                    <q-card-section class="text-center">
+                        <div class="text-caption text-uppercase">{{ data.owner?.name }}</div>
+                        <div class="text-caption text-grey text-capitalize">owner</div>
+                    </q-card-section>
+                    <q-card-section class="text-center">
+                        <div class="text-caption text-uppercase">{{ data.approver?.name }}</div>
+                        <div class="text-caption text-grey text-capitalize">approver</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
+                    <div class="text-caption text-grey absolute-top-right q-ma-sm">{{ FormatOrdinal(data.order) }}</div>
                 </q-card>
             </div>
         </div>
@@ -60,12 +64,6 @@
                         <div class="q-mb-md">
                             <div class="text-caption text-uppercase text-grey">description</div>
                             <div class="text-body1 text-uppercase">{{ info?.description }}</div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">signature</div>
-                            <div>
-                                <img :src="FormatSignature(info)" width="150"/>
-                            </div>
                         </div>
                         <div class="q-mb-md">
                             <div class="text-caption text-uppercase text-grey">order</div>
@@ -122,9 +120,6 @@
                             <div class="col-2">
                                 <div class="text-caption text-uppercase" :class="Errors.signatories.description.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.description.msg ? Errors.signatories.description.msg : 'description' }}</div>
                             </div>
-                            <div class="col-2">
-                                <div class="text-caption text-uppercase" :class="Errors.signatories.signature.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.signature.msg ? Errors.signatories.signature.msg : 'signature' }}</div>
-                            </div>
                             <div class="col-1">
                                 <div class="text-caption text-uppercase" :class="Errors.signatories.order.msg ? 'text-negative' : 'text-grey'">{{ Errors.signatories.order.msg ? Errors.signatories.order.msg : 'order' }}</div>
                             </div>
@@ -171,15 +166,6 @@
                                     :error="Errors.signatories.description.type[index]"
                                     :no-error-icon="true"
                                     input-class="text-capitalize"
-                                />
-                            </div>
-                            <div class="col-2">
-                                <q-file 
-                                    v-model="value.signature" 
-                                    label="Upload Signature"
-                                    outlined 
-                                    :error="Errors.signatories.signature.type[index]"
-                                    :no-error-icon="true"
                                 />
                             </div>
                             <div class="col-1">
@@ -287,7 +273,7 @@ const submitLoading = ref(false);
 const id = ref('');
 const type = ref('');
 const ownerid = ref('');
-const signatories = ref([{ id: "", approverid: "", description: "", signature: "", order: "" }])
+const signatories = ref([{ id: "", approverid: "", description: "", order: "" }])
 const isActive = ref(false);
 
 const Errors = reactive({
@@ -304,9 +290,6 @@ const Errors = reactive({
         description: {
             type: [], msg: ''
         },
-        signature: {
-            type: [], msg: ''
-        },
         order: {
             type: [], msg: ''
         }
@@ -316,7 +299,6 @@ const Errors = reactive({
 const initErrors = () => {
     Errors.signatories.approverid.type = signatories.value.map(() => null);
     Errors.signatories.description.type = signatories.value.map(() => null);
-    Errors.signatories.signature.type = signatories.value.map(() => null);
     Errors.signatories.order.type = signatories.value.map(() => null);
 }
 
@@ -326,7 +308,6 @@ const Validations = () => {
 
     Errors.signatories.approverid = { type: null, msg: '' }
     Errors.signatories.description = { type: null, msg: '' }
-    Errors.signatories.signature = { type: null, msg: '' }
     Errors.signatories.order = { type: null, msg: '' }
 
     if (!type.value) {
@@ -355,11 +336,6 @@ const Validations = () => {
         if (!e.description) {
             Errors.signatories.description.type[index] = true;
             Errors.signatories.description.msg = 'required';
-            isError = true;
-        }
-        if (!e.signature) {
-            Errors.signatories.signature.type[index] = true;
-            Errors.signatories.signature.msg = 'required';
             isError = true;
         }
         if (!e.order) {
@@ -469,7 +445,7 @@ const ResetForm = () => {
     id.value = '';
     type.value = '';
     ownerid.value = '';
-    signatories.value = [{ id: "", approverid: "", description: "", signature: "", order: "" }]
+    signatories.value = [{ id: "", approverid: "", description: "", order: "" }]
     isActive.value = false;
 }
 
@@ -477,25 +453,10 @@ const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
-        const Data = new FormData();
-        Data.append('ownerid', ownerid.value);
-        Data.append('type', type.value);
-        Data.append("signatories", JSON.stringify(
-            signatories.value.map(s => ({
-                approverid: s.approverid,
-                description: s.description,
-                order: s.order
-            }))
-        ));
-        signatories.value.forEach((s) => {
-            const file = Array.isArray(s.signature) ? s.signature[0] : s.signature;
-            if (file instanceof File) Data.append("files", file);
-            else Data.append("files", "");
-        });
-        const response = await api.post(`/signatory`, Data, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
+        const response = await api.post(`/signatory`, {
+            type: type.value,
+            ownerid: ownerid.value,
+            signatories: signatories.value
         });
         dialog.value = false;
         LoadAll();
@@ -626,17 +587,12 @@ function FormatOrdinal(n) {
     }
 }
 
-const FormatSignature = (sign) => {
-    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
-}
-
 const AddSignatory = () => {
     const e = signatories.value;
     e.unshift({
         id: "",
         approverid: "",
         description: "",
-        signature: "",
         order: ""
     });
 }
