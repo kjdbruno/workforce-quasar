@@ -97,11 +97,19 @@ body {
 }
 
 /* Custom grid container */
-.card-grid {
+.card-main-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start; /* or center if you prefer */
     gap: 10px; /* space between cards */
+    /* padding: 10px; */
+}
+
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* or center if you prefer */
+    // gap: 10px; /* space between cards */
     /* padding: 10px; */
 }
 

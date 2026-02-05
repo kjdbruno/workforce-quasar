@@ -20,8 +20,8 @@
                                                 </q-card-section>
                                             </q-card>
                                         </div>
-                                        <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
-                                            <q-card @click="() => { position = data }" class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" :class="{ 'card--active': position === data }">
+                                        <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
+                                            <q-card @click="() => { position = data }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': position === data }">
                                                 <q-card-section class="text-center">
                                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
                                                 </q-card-section>

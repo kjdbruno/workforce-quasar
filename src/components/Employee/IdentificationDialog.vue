@@ -6,7 +6,9 @@
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                
+                <div class="iframe-container">
+                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                </div>
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
@@ -49,6 +51,24 @@ const isOpen = computed({
 const SubmitLoading = ref(false);
 
 const PopulateData = () => {
-    
+    Print()
+}
+
+const pdf = ref(null);
+
+const Print = async () => {
+    SubmitLoading.value = true;
+    try {
+        const res = await api.get(`/employee/${EmployeeStore.data?.id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+    } finally {
+        SubmitLoading.value = false;
+    }
 }
 </script>

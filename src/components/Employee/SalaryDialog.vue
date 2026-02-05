@@ -7,28 +7,17 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="q-mb-md">
-                    <div style="width: 300px;" class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">please search to display more</div>
-                        <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
-                            <template v-slot:prepend>
-                                <q-icon name="search" style="font-size: 1rem;" />
-                            </template>
-                            <template v-slot:after>
-                                <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
-                            </template>
-                        </q-input>
-                    </div>
                     <div class="text-caption text-uppercase text-grey" >position</div>
                     <div class="card-grid">
-                        <div class="card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                            <q-card class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
+                        <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
+                            <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">no record found</div>
                                 </q-card-section>
                             </q-card>
                         </div>
-                        <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
-                            <q-card @click="() => { positionid = data.id }" class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" :class="{ 'card--active': positionid === data.id }">
+                        <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
+                            <q-card @click="() => { positionid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" :class="{ 'card--active': positionid === data.id }">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
                                     <div class="text-caption text-grey text-uppercase">{{ formatCurrency(data?.amount) }}</div>
@@ -156,9 +145,17 @@
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
-                <div class="q-gutter-sm">
+                <div class="row q-gutter-sm">
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
+                        <template v-slot:prepend>
+                            <q-icon name="search" style="font-size: 1rem;" />
+                        </template>
+                        <template v-slot:after>
+                            <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
+                        </template>
+                    </q-input>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">

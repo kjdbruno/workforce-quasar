@@ -37,8 +37,8 @@
             </div>
             <div class="col-9">
                 <div class="card-grid">
-                    <div v-for="(data, index) in tabs" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }">
-                        <q-card @click="openDialog(data.dialog)" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" >
+                    <div v-for="(data, index) in tabs" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }">
+                        <q-card @click="openDialog(data.dialog)" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" >
                             <q-card-section class="text-center">
                                 <div class="text-body2 text-grey text-uppercase">{{ data.label }}</div>
                             </q-card-section>
@@ -66,6 +66,7 @@
         <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog"/>
         <salary-dialog v-model="activeDialog" dialog-name="SalaryDialog"/>
         <account-dialog v-model="activeDialog" dialog-name="AccountDialog"/>
+        <signature-dialog v-model="activeDialog" dialog-name="SignatureDialog"/>
     </div>
     <!-- <div class="card-grid">
         <div class="card-anim-wrapper">
@@ -139,6 +140,7 @@ import PayslipDialog from './PayslipDialog.vue';
 import OvertimeDialog from './OvertimeDialog.vue';
 import SalaryDialog from './SalaryDialog.vue';
 import AccountDialog from './AccountDialog.vue';
+import SignatureDialog from './SignatureDialog.vue';
 const EmployeeStore = useEmployeeStore();
 
 const tabs = [
@@ -148,6 +150,7 @@ const tabs = [
     { label: 'service recrod', dialog: 'ServiceDialog'},
     { label: 'photo', dialog: 'PhotoDialog'},
     { label: 'account', dialog: 'AccountDialog'},
+    { label: 'signature', dialog: 'SignatureDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
     { label: 'education', dialog: 'EducationDialog'},
     { label: 'trainings', dialog: 'TrainingDialog'},
