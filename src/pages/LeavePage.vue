@@ -24,7 +24,7 @@
             </q-card-section>
         </q-card>
         <div class="card-main-grid">
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('LeaveDialog'); LeaveStore.isEdit = false; }" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
@@ -102,6 +102,9 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, computed, reactive, wat
 import { api } from 'src/boot/axios';
 import { Toast } from 'src/boot/sweetalert'; 
 import moment from 'moment';
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore()
 
 import { useLeaveStore } from 'src/stores/leave-store';
 const LeaveStore = useLeaveStore();

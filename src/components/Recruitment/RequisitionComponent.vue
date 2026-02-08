@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="card-main-grid">
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('VacancyDialog'); }" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
@@ -32,7 +32,6 @@
                         <div class="text-caption text-uppercase">{{ FormatCurrency(data?.position?.salary_amount) }} {{ data?.position?.salary_type }}</div>
                         <div class="text-caption text-grey">{{ data?.status }}</div>
                     </q-card-section>
-                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status === 'Requested' ? 'bg-blue' : (data.status === 'Approved' ? 'bg-positive' : (data.status === 'Rejected' ? 'bg-negative' : (data.status === 'Filled' ? 'bg-primary' : null)))"/>
                 </q-card>
             </div>
         </div>
@@ -207,6 +206,7 @@ const OpenDialog = (dialogName) => {
 onMounted(() => {
     LoadAll();
 })
+
 </script>
 
 <style lang="css" scoped>

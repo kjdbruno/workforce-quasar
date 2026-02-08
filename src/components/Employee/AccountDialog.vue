@@ -10,7 +10,7 @@
                     <div>
                         <span class="text-uppercase text-body1 text-bold">account {{ index+1 }}</span>
                         <q-btn 
-                            v-if="accounts.length > 1" 
+                            v-if="accounts.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
                             icon="delete" 
                             flat 
@@ -61,9 +61,9 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddAccount" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddAccount" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
@@ -80,6 +80,10 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore()
+
 import { useEmployeeStore } from 'src/stores/employee-store'
 const EmployeeStore = useEmployeeStore();
 
@@ -244,6 +248,18 @@ const roles = ref([
     {
         value: "Admin",
         label: "Administrator"
+    },
+    {
+        value: "Management",
+        label: "Management"
+    },
+    {
+        value: "HR",
+        label: "HR"
+    },
+    {
+        value: "Finance",
+        label: "Finance"
     },
     {
         value: "Employee",

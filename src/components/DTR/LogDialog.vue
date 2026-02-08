@@ -68,7 +68,7 @@
                                         </q-time>
                                     </q-popup-proxy>
                                 </q-input> -->
-                                <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;"/>
+                                <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;" :readonly="true"/>
                                 <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" class="text-uppercase"/>
                                 <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" class="text-uppercase"/>
                                 <q-badge v-if="data.overtimes" rounded color="primary" :label="data.overtimes" class="text-uppercase"/>

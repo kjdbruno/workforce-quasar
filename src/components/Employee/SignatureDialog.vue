@@ -10,7 +10,7 @@
                     <img v-if="signature" :src="FormatSignature(signature)" width="200"/>
                     <div v-else class="text-body1 text-capitalize text-grey">no signature found</div>
                 </div>
-                <div class="row">
+                <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                     <div>
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'signature' }}</div>
                         <q-file 
@@ -27,7 +27,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -45,6 +45,10 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore();
+
 import { useEmployeeStore } from 'src/stores/employee-store'
 const EmployeeStore = useEmployeeStore();
 

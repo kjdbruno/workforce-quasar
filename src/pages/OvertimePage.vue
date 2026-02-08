@@ -23,9 +23,9 @@
                 </div>
             </q-card-section>
         </q-card>
-        <div class="card-grid">
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { Dialog = true; LoadPersonnels(); isEdit = false; }" >
+        <div class="card-main-grid">
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
+                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('OvertimeDialog'); OvertimeStore.isEdit = false; }" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
@@ -47,7 +47,7 @@
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                <q-card @click="() => { GetOvertime(data.id); OvertimeDialog = true}" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
+                <q-card @click="() => { OpenDialog('OvertimeInfoDialog'); OvertimeStore.data = data; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
                     <q-card-section class="text-center full-width">
                         <div class="text-subtitle2 text-uppercase">{{ FormatDate(data?.date) }}</div>
                         <div class="text-caption text-capitalize">{{ FormatTimeRange(data) }}</div>
@@ -58,128 +58,9 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="Dialog" full-height position="right" persistent square class="dialog">
-            <q-card class="dialog-card column full-height">
-                <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify overtime application' : 'create new overtime application' }}</div>
-                </q-card-section>
-                <q-separator inset />
-                <q-card-section class="col q-pa-lg scroll">
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.msg : 'date' }}</div>
-                            <q-input outlined v-model="date" label="Enter Date" :error="Errors.date.type" :no-error-icon="true">
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                    <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
-                                </q-popup-proxy>
-                            </q-input>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeStart.type ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.type ? Errors.timeStart.msg : 'start time' }}</div>
-                            <q-input outlined v-model="timeStart" label="Enter Time" :error="Errors.timeStart.type" :no-error-icon="true" mask="##:##" fill-mask>
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                    <q-time v-model="timeStart" mask="HH:mm" >
-                                        <div class="row items-center justify-end">
-                                            <q-btn v-close-popup label="Okay" color="primary" flat />
-                                        </div>
-                                    </q-time>
-                                </q-popup-proxy>
-                            </q-input>
-                        </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.type ? Errors.timeEnd.msg : 'time end' }}</div>
-                            <q-input outlined v-model="timeEnd" label="Enter Time" :error="Errors.timeEnd.type" :no-error-icon="true" mask="##:##" fill-mask>
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                    <q-time v-model="timeEnd" mask="HH:mm" >
-                                        <div class="row items-center justify-end">
-                                            <q-btn v-close-popup label="Okay" color="primary" flat />
-                                        </div>
-                                    </q-time>
-                                </q-popup-proxy>
-                            </q-input>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-xl">
-                        <div class="col-6">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'description' }}</div>
-                            <q-input 
-                                v-model="description" 
-                                outlined 
-                                type="textarea" 
-                                :error="Errors.description.type"
-                                :no-error-icon="true"
-                                label="Enter Content"
-                            />
-                        </div>
-                    </div>
-                    <div v-for="(value, index) in employees" :key="index" class="q-mb-md">
-                        <div>
-                            <span class="text-uppercase text-body1 text-bold">employee {{ index+1 }}</span>
-                            <q-btn 
-                                v-if="employees.length > 1" 
-                                round 
-                                icon="delete" 
-                                flat 
-                                unelevated 
-                                color="grey" 
-                                @click="RemoveEmployee(index)" 
-                                size="sm"
-                                class="q-ml-sm"
-                            />
-                        </div>
-                        <div class="row q-col-gutter-xs q-mb-md" >
-                            <div class="col-3">
-                                <q-select 
-                                    outlined 
-                                    v-model="value.employeeid" 
-                                    emit-value 
-                                    map-options 
-                                    use-input 
-                                    input-debounce="300" 
-                                    :options="filteredPersonnels" 
-                                    @filter="filterPersonnelFn" 
-                                    :error="Errors.employees.employeeid.type[index]"
-                                    dropdown-icon="keyboard_arrow_down"
-                                    :no-error-icon="true"
-                                    label="Choose Employee"
-                                    class="text-capitalize"
-                                >
-                                    <template v-slot:no-option>
-                                        <q-item>
-                                            <q-item-section class="text-italic text-grey">
-                                                No options
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
-                                    <template v-slot:option="scope">
-                                        <q-item v-bind="scope.itemProps">
-                                            <q-item-section>
-                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
-                                </q-select>
-                            </div>
-                        </div>
-                    </div>
-                </q-card-section>
-                <q-card-actions class="q-pa-lg bg">
-                    <div class="q-gutter-sm">
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddEmployee" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { Dialog = false; }" outline/>
-                    </div>
-                </q-card-actions>
-                <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
-                </q-inner-loading>
-            </q-card>
-        </q-dialog>
+        <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog" @saved="() => { LoadAll(); }"/>
+        <overtime-info-dialog v-model="activeDialog" dialog-name="OvertimeInfoDialog" @saved="() => { LoadAll(); }"/>
+        
         <q-dialog v-model="OvertimeDialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
@@ -286,11 +167,14 @@ import { api } from 'src/boot/axios';
 import { Toast } from 'src/boot/sweetalert'; 
 import moment from 'moment';
 
-import { useLeaveStore } from 'src/stores/leave-store';
-const LeaveStore = useLeaveStore();
+import { useOvertimeStore } from 'src/stores/overtime-store';
+const OvertimeStore = useOvertimeStore();
 
 import { useAuthStore } from 'src/stores/auth-store';
 const AuthStore = useAuthStore();
+
+import OvertimeDialog from 'src/components/Overtime/OvertimeDialog.vue';
+import OvertimeInfoDialog from 'src/components/Overtime/OvertimeInfoDialog.vue';
 
 const today = new Date();
 const month = ref(String(today.getMonth() + 1).padStart(2, '0'));
@@ -544,7 +428,7 @@ const MapApplicants = (data = []) => {
 }
 
 const info = ref([])
-const OvertimeDialog = ref(false);
+// const OvertimeDialog = ref(false);
 
 const GetOvertime = async (id) => {
     submitLoading.value = true;
@@ -738,6 +622,11 @@ const popup = ref(null);
 onMounted(() => {
     LoadAll()
 })
+
+const activeDialog = ref(null)
+const OpenDialog = (dialogName) => {
+    activeDialog.value = dialogName
+}
 
 </script>
 

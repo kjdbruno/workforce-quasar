@@ -23,7 +23,7 @@
                         </q-card>
                     </div>
                     <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                        <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id" :class="{ 'card--disabled': !app.is_active }">
+                        <q-card class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id" :class="{ 'card--active': salaryId === app.id, 'card--disabled': !app.is_active || !CanManageSalary  }">
                             <q-card-section class="text-center full-width">
                                 <div class="text-subtitle2 text-uppercase">{{ formatCurrency(app?.amount) }}</div>
                                 <div class="text-caption text-uppercase">{{ app?.salarytype }}</div>
@@ -43,7 +43,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn v-if="salaryId != ''" unelevated size="md" color="primary" class="btn text-capitalize" label="remove" @click="Save()" />
+                    <q-btn v-if="salaryId != '' && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="remove" @click="Save()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(EmployeeStore.data?.id)" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
@@ -79,6 +79,10 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore()
+
 import { useEmployeeStore } from 'src/stores/employee-store'
 const EmployeeStore = useEmployeeStore();
 
@@ -242,13 +246,13 @@ const Save = async () => {
     }
 };
 
+const CanManageSalary = computed(() =>
+    AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])
+)
+
 </script>
 
 <style scoped lang="css">
-.card
-{
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
-}
 .card--disabled {
     opacity: 0.8;
     pointer-events: none;

@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-1">
                             <q-btn 
-                                v-if="documents.length > 1" 
+                                v-if="documents.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                                 round 
                                 icon="delete" 
                                 flat 
@@ -57,8 +57,8 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddDocument" outline/>
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddDocument" outline/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -76,6 +76,10 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore()
+
 import { useEmployeeStore } from 'src/stores/employee-store'
 const EmployeeStore = useEmployeeStore();
 

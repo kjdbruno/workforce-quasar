@@ -16,6 +16,11 @@ export const useAuthStore = defineStore('auth', {
         notificationList: [],
         hasNotifications: null,
     }),
+    getters: {
+        hasRole: (state) => (roles = []) => roles.includes(state.user?.role),
+        // optional helpers
+        isHR: (state) => state.user?.role === 'HR',
+    },
     actions: {
         async login(username, password) {
             try {

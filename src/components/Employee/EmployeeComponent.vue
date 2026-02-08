@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="wrapper">
         <div class="card-main-grid">
-            <div class="card-anim-wrapper">
+            <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('EmployeeDialog') }" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
@@ -79,6 +79,9 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore();
 
 import { useEmployeeStore } from 'src/stores/employee-store';
 import EmployeeDialog from './EmployeeDialog.vue';

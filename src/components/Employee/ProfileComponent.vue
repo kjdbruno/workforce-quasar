@@ -67,6 +67,7 @@
         <salary-dialog v-model="activeDialog" dialog-name="SalaryDialog"/>
         <account-dialog v-model="activeDialog" dialog-name="AccountDialog"/>
         <signature-dialog v-model="activeDialog" dialog-name="SignatureDialog"/>
+        <shift-dialog v-model="activeDialog" dialog-name="ShiftDialog"/>
     </div>
     <!-- <div class="card-grid">
         <div class="card-anim-wrapper">
@@ -141,6 +142,7 @@ import OvertimeDialog from './OvertimeDialog.vue';
 import SalaryDialog from './SalaryDialog.vue';
 import AccountDialog from './AccountDialog.vue';
 import SignatureDialog from './SignatureDialog.vue';
+import ShiftDialog from './ShiftDialog.vue';
 const EmployeeStore = useEmployeeStore();
 
 const tabs = [
@@ -152,6 +154,7 @@ const tabs = [
     { label: 'signature', dialog: 'SignatureDialog'},
     { label: 'face recognition', dialog: 'BiometricDialog'},
     { label: 'account', dialog: 'AccountDialog'},
+    { label: 'shift', dialog: 'ShiftDialog'},
     { label: 'id', dialog: 'IdentificationDialog'},
     { label: 'dtr', dialog: 'AttendanceDialog'},
     { label: 'leaves', dialog: 'LeaveDialog'},

@@ -185,7 +185,7 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="row q-col-gutter-sm">
-                    <div v-if="info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn'">
+                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR']))">
                         <q-select
                             outlined
                             v-model="applicationstatus"
@@ -197,7 +197,7 @@
                             dense
                         />
                     </div>
-                    <div v-if="info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn'">
+                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR']))">
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="update" >
                             <q-menu transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                                 <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
@@ -251,6 +251,9 @@ import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, comput
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore();
 
 import { useApplicationStore } from 'src/stores/application-store';
 const ApplicationStore = useApplicationStore();

@@ -13,7 +13,6 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="SaveProfile()" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>

@@ -1,8 +1,6 @@
 <template>
     <div>
-        <div class="q-mt-md">
-            <component :is="components[EmployeeStore.component]" :key="EmployeeStore.component" />
-        </div>
+        <component :is="components[EmployeeStore.component]" :key="EmployeeStore.component" />
     </div>
 </template>
 

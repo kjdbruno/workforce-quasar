@@ -57,7 +57,7 @@
             <q-scroll-area v-if="!miniState" class="fit q-pl-lg q-pr-lg" :horizontal-thumb-style="{ opacity: 0 }">
                 <q-list padding>
 
-                    <q-item clickable v-ripple class="q-pa-md q-pb-sm radius-xl" v-for="item in menuItems" :key="item.label" @click="router.push(item.to)">
+                    <q-item clickable v-ripple class="q-pa-md q-pb-sm radius-xl" v-for="item in filteredMenuItems" :key="item.label" @click="router.push(item.to)">
                         <q-item-section avatar>
                             <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
                         </q-item-section>
@@ -72,7 +72,7 @@
             <q-scroll-area v-if="miniState" class="fit" :horizontal-thumb-style="{ opacity: 0 }">
                 
                 <div class="text-center">
-                    <div v-for="item in menuItems" :key="item.label" class="q-pa-sm q-pb-sm">
+                    <div v-for="item in filteredMenuItems" :key="item.label" class="q-pa-sm q-pb-sm">
                         <q-btn flat round @click="router.push(item.to)">
                             <q-avatar size="sm">
                                 <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
@@ -201,17 +201,17 @@ function drawerClick(e) {
 }
 
 const menuItems = [
-    { iconPrimary: homePrimary, iconSecondary: homeSecondary, label: 'home', to: '/home' },
-    { iconPrimary: recruitmentPrimary, iconSecondary: recruitmentSecondary, label: 'recruitment', to: '/recruitment'},
-    { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee' },
-    { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave' },
-    { iconPrimary: dtrPrimary, iconSecondary: dtrSecondary, label: 'dtr', to: '/dtr' },
-    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'overtime', to: '/overtime' },
-    { iconPrimary: performancePrimary, iconSecondary: performanceSecondary, label: 'performance', to: '/performance' },
-    { iconPrimary: disciplinaryPrimary, iconSecondary: disciplinarySecondary, label: 'disciplinary', to: '/disciplinary' },
-    { iconPrimary: exitPrimary, iconSecondary: exitSecondary, label: 'separation', to: '/separation' },
-    { iconPrimary: payrollPrimary, iconSecondary: payrollSecondary, label: 'payroll', to: '/payroll' },
-    { iconPrimary: preferencePrimary, iconSecondary: preferenceSecondary, label: 'preferences', to: '/preferences' }
+    { iconPrimary: homePrimary, iconSecondary: homeSecondary, label: 'home', to: '/home', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
+    { iconPrimary: recruitmentPrimary, iconSecondary: recruitmentSecondary, label: 'recruitment', to: '/recruitment', roles: ['SuperAdmin', 'Management', 'Admin', 'HR'] },
+    { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
+    { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
+    { iconPrimary: dtrPrimary, iconSecondary: dtrSecondary, label: 'dtr', to: '/dtr', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'overtime', to: '/overtime', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { iconPrimary: performancePrimary, iconSecondary: performanceSecondary, label: 'performance', to: '/performance', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { iconPrimary: disciplinaryPrimary, iconSecondary: disciplinarySecondary, label: 'disciplinary', to: '/disciplinary', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { iconPrimary: exitPrimary, iconSecondary: exitSecondary, label: 'separation', to: '/separation', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { iconPrimary: payrollPrimary, iconSecondary: payrollSecondary, label: 'payroll', to: '/payroll', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
+    { iconPrimary: preferencePrimary, iconSecondary: preferenceSecondary, label: 'preferences', to: '/preferences', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] }
 ]
 
 const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase();
@@ -219,5 +219,13 @@ const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase();
 const formatPhoto = (avatar) => {
     return `${process.env.VUE_APP_BACKEND_URL}${avatar}`
 }
+
+const userRole = computed(() => String(authStore.user?.role || '').trim())
+
+const filteredMenuItems = computed(() => {
+  const role = userRole.value
+  if (!role) return []
+  return menuItems.filter(i => !i.roles || i.roles.includes(role))
+})
 
 </script>

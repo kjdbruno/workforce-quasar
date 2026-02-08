@@ -24,7 +24,7 @@
             </q-card-section>
         </q-card>
         <div class="card-main-grid">
-            <div class="card-anim-wrapper">
+            <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { openDialog('AttendanceDialog') }" >
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
@@ -51,23 +51,6 @@
                 </q-card>
             </div>
         </div>
-        <q-dialog v-model="printDialog" full-height full-width class="pdf">
-            <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
-                <q-btn
-                    icon="close"
-                    class="fixed bg-white text-primary shadow-2"
-                    round
-                    dense
-                    v-close-popup
-                    style="top: 15px; right: 15px; z-index: 999;"
-                />
-                <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
-                    <div class="iframe-container">
-                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
-                    </div>
-                </q-card-section>
-            </q-card>
-        </q-dialog>
         <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
             <q-toolbar>
                 <q-toolbar-title class="text-caption text-uppercase">
@@ -123,6 +106,9 @@ import {
 import { api } from 'src/boot/axios';
 
 import { Toast } from 'src/boot/sweetalert'; 
+
+import { useAuthStore } from 'src/stores/auth-store';
+const AuthStore = useAuthStore()
 
 const DTRStore = useDTRStore();
 
