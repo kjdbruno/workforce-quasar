@@ -2,99 +2,39 @@
     <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="PopulateData()">
         <q-card class="dialog-card column full-height">
             <q-card-section class="q-pa-lg">
-                <div class="text-h6 text-uppercase">education information</div>
+                <div class="text-h6 text-uppercase">shift information</div>
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                <div v-for="(value, index) in educations" :key="index" class="q-mb-md">
+                <div v-for="(value, index) in schedules" :key="index" class="q-mb-md">
                     <div>
-                        <span class="text-uppercase text-body1 text-bold">education {{ index+1 }}</span>
+                        <span class="text-uppercase text-body1 text-bold">shift {{ index+1 }}</span>
                         <q-btn 
-                            v-if="educations.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
+                            v-if="schedules.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
                             icon="delete" 
                             flat 
                             unelevated 
                             color="grey" 
-                            @click="RemoveEducation(index)" 
+                            @click="RemoveSchedule(index)" 
                             size="sm"
                             class="q-ml-sm"
                         />
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.educations.schoollevel.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.schoollevel.msg ? Errors.educations.schoollevel.msg : 'school level' }}</div>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.schedules.shiftId.msg ? 'text-negative' : 'text-grey'">{{ Errors.schedules.shiftId.msg ? Errors.schedules.shiftId.msg : 'shift' }}</div>
                             <q-select
                                 outlined
-                                v-model="value.schoollevel"
-                                label="Choose School Level"
-                                input-debounce="300"
-                                :options="schoollevels"
-                                :error="Errors.educations.schoollevel.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:no-option>
-                                    <q-item>
-                                        <q-item-section class="text-italic text-grey">
-                                        No options
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                                <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
-                                        <q-item-section>
-                                            <q-item-label>{{ $CapitalizeWords(scope.opt) }}</q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                            </q-select>
-                        </div>
-                        <div class="col-4">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.educations.schoolId.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.schoolId.msg ? Errors.educations.schoolId.msg : 'school' }}</div>
-                            <q-select
-                                outlined
-                                v-model="value.schoolId"
-                                label="Choose School"
+                                v-model="value.shiftId"
+                                label="Choose Shift"
                                 emit-value
                                 map-options
                                 use-input
                                 input-debounce="300"
-                                :options="filteredSchools"
-                                @filter="filterSchoolFn"
-                                :error="Errors.educations.schoolId.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
-                                :no-error-icon="true"
-                            >
-                                <template v-slot:no-option>
-                                    <q-item>
-                                        <q-item-section class="text-italic text-grey">
-                                        No options
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                                <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
-                                        <q-item-section>
-                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                            </q-select>
-                        </div>
-                        <div class="col-4">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.educations.courseId.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.courseId.msg ? Errors.educations.courseId.msg : 'degree' }}</div>
-                            <q-select
-                                outlined
-                                v-model="value.courseId"
-                                label="Choose Degree"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredCourses"
-                                @filter="filterCoursesFn"
-                                :error="Errors.educations.courseId.type[index]"
+                                :options="filteredShifts"
+                                @filter="filterShiftFn"
+                                :error="Errors.schedules.shiftId.type[index]"
                                 dropdown-icon="keyboard_arrow_down"
                                 :no-error-icon="true"
                             >
@@ -117,18 +57,18 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.educations.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.startDate.msg ? Errors.educations.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="value.startDate" label="Enter Date">
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => eduStartPopups[index] = el">
-                                    <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideEduStartPopup(index)"/>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.schedules.effectiveFrom.msg ? 'text-negative' : 'text-grey'">{{ Errors.schedules.effectiveFrom.msg ? Errors.schedules.effectiveFrom.msg : 'start date (YYYY-MM-DD)' }}</div>
+                            <q-input outlined v-model="value.effectiveFrom" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => efStartPopups[index] = el">
+                                    <q-date v-model="value.effectiveFrom" mask="YYYY-MM-DD" @update:model-value="() => hideEfStartPopup(index)"/>
                                 </q-popup-proxy>
                             </q-input>
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.educations.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.educations.endDate.msg ? Errors.educations.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="value.endDate" label="Enter Date">
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => eduEndPopups[index] = el">
-                                    <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideEduEndPopup(index)"/>
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.schedules.effectiveTo.msg ? 'text-negative' : 'text-grey'">{{ Errors.schedules.effectiveTo.msg ? Errors.schedules.effectiveTo.msg : 'end date (YYYY-MM-DD)' }}</div>
+                            <q-input outlined v-model="value.effectiveTo" label="Enter Date">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => etEndPopups[index] = el">
+                                    <q-date v-model="value.effectiveTo" mask="YYYY-MM-DD" @update:model-value="() => hideEtEndPopup(index)"/>
                                 </q-popup-proxy>
                             </q-input>
                         </div>
@@ -138,8 +78,8 @@
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
-                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
-                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="AddEducation" outline/>
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
+                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { AddSchedule() }" outline/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -180,37 +120,35 @@ const isOpen = computed({
 
 const SubmitLoading = ref(false);
 
-const educations = ref([
+const schedules = ref([
     {
         id: '',
-        schoollevel: "",
-        schoolId: "",
-        courseId: "",
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0]
+        shiftId: "",
+        effectiveFrom: "",
+        effectiveTo: "",
+        notes: ''
     }
 ]);
 
-const EmptyEducation = () => ({
+const EmptySchedule = () => ({
     id: '',
-    schoollevel: "",
-    schoolId: "",
-    courseId: "",
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
+    shiftId: "",
+    effectiveFrom: "",
+    effectiveTo: "",
+    notes: ''
 })
 
-const GetEducation = async (id) => {
+const GetSchedule = async (id) => {
     SubmitLoading.value = true;
     try {
-        const response = await api.get(`/employee/education`, {
+        const response = await api.get(`/employee/schedule`, {
             params: { 
                 id: id
             }
         });
         !response.data.record.length
-            ? [EmptyEducation()]
-            : MapEducations(response.data.record)
+            ? [EmptySchedule()]
+            : MapSchedules(response.data.record)
         
     } catch (error) {
         console.error("Error fetching all data:", error);
@@ -226,95 +164,69 @@ const GetEducation = async (id) => {
     }
 }
 
-const MapEducations = (data = []) => {
-    educations.value = data.map(item => ({
+const MapSchedules = (data = []) => {
+    schedules.value = data.map(item => ({
         id: item.id ?? '',
-        schoollevel: item.school_level ?? '',
-        schoolId: Number(item.school_id) ?? '',
-        courseId: Number(item.course_id) ?? '',
-        startDate: item.start_date ?? '',
-        endDate: item.end_date ?? ''
+        shiftId: Number(item.shift_id) ?? '',
+        effectiveFrom: item.effective_from ?? '',
+        effectiveTo: item.effective_to ?? '',
+        notes: item.notes ?? ''
     }))
 }
 
 const PopulateData = () => {
-    LoadCourses();
-    LoadSchools();
-    GetEducation(EmployeeStore.data?.id)
+    LoadShifts()
+    GetSchedule(EmployeeStore.data?.id)
 }
 
 const Errors = reactive({
-    educations: {
-        schoollevel: {
+    schedules: {
+        shiftId: {
             type: [], msg: ''
         },
-        schoolId: {
+        effectiveFrom: {
             type: [], msg: ''
         },
-        courseId: {
-            type: [], msg: ''
-        },
-        startDate: {
-            type: [], msg: ''
-        },
-        endDate: {
+        effectiveTo: {
             type: [], msg: ''
         }
     }
 });
 
 const initErrors = () => {
-    Errors.educations.schoollevel.type = educations.value.map(() => null);
-    Errors.educations.schoolId.type = educations.value.map(() => null);
-    Errors.educations.courseId.type = educations.value.map(() => null);
-    Errors.educations.startDate.type = educations.value.map(() => null);
-    Errors.educations.endDate.type = educations.value.map(() => null);
+    Errors.schedules.shiftId.type = schedules.value.map(() => null);
+    Errors.schedules.effectiveFrom.type = schedules.value.map(() => null);
+    Errors.schedules.effectiveTo.type = schedules.value.map(() => null);
 }
 
 const Validations = () => {
 
     let isError = false;
     
-    Errors.educations.schoollevel = { type: null, msg: '' }
-    Errors.educations.schoolId = { type: null, msg: '' }
-    Errors.educations.courseId = { type: null, msg: '' }
-    Errors.educations.startDate = { type: null, msg: '' }
-    Errors.educations.endDate = { type: null, msg: '' }
+    Errors.schedules.shiftId = { type: null, msg: '' }
+    Errors.schedules.effectiveFrom = { type: null, msg: '' }
+    Errors.schedules.effectiveTo = { type: null, msg: '' }
 
     initErrors()
     
-    educations.value.forEach((e, index) => {
-        if (!e.schoollevel) {
-            Errors.educations.schoollevel.type[index] = true;
-            Errors.educations.schoollevel.msg = 'school level is required';
+    schedules.value.forEach((e, index) => {
+        if (!e.shiftId) {
+            Errors.schedules.shiftId.type[index] = true;
+            Errors.schedules.shiftId.msg = 'required';
             isError = true;
         }
-        if (!e.schoolId) {
-            Errors.educations.schoolId.type[index] = true;
-            Errors.educations.schoolId.msg = 'school is required';
+        if (!e.effectiveFrom) {
+            Errors.schedules.effectiveFrom.type[index] = true;
+            Errors.schedules.effectiveFrom.msg = 'required';
+            isError = true;
+        } else if (isNaN(new Date(e.effectiveFrom).getTime())) {
+            Errors.schedules.effectiveFrom.type[index] = true;
+            Errors.schedules.effectiveFrom.msg = 'invalid';
             isError = true;
         }
-        if (!e.courseId) {
-            Errors.educations.courseId.type[index] = true;
-            Errors.educations.courseId.msg = 'degree is required';
-            isError = true;
-        }
-        if (!e.startDate) {
-            Errors.educations.startDate.type[index] = true;
-            Errors.educations.startDate.msg = 'start date is required';
-            isError = true;
-        } else if (isNaN(new Date(e.startDate).getTime())) {
-            Errors.educations.startDate.type[index] = true;
-            Errors.educations.startDate.msg = 'start date must be a valid date';
-            isError = true;
-        }
-        if (!e.endDate) {
-            Errors.educations.endDate.type[index] = true;
-            Errors.educations.endDate.msg = 'end date is required';
-            isError = true;
-        } else if (isNaN(new Date(e.endDate).getTime())) {
-            Errors.educations.endDate.type[index] = true;
-            Errors.educations.endDate.msg = 'end date must be a valid date';
+        if (e.effectiveTo && isNaN(new Date(e.effectiveTo).getTime())) {
+            Errors.educations.effectiveTo.type[index] = true;
+            Errors.educations.effectiveTo.msg = 'invalid';
             isError = true;
         }
     });
@@ -332,11 +244,8 @@ const Validations = () => {
     return !isError
 }
 
-const schoollevels = ref(["High School", "Vocational", "College", "Graduate Studies"]);
-const schools = ref([]);
-const courses = ref([]);
-const filteredSchools = ref([]);
-const filteredCourses = ref([]);
+const shifts = ref([]);
+const filteredShifts = ref([]);
 
 const createFilterFn = (sourceRef, targetRef) => {
     return (val, update) => {
@@ -351,77 +260,46 @@ const createFilterFn = (sourceRef, targetRef) => {
     };
 };
 
-const normalizeOptions = (data = []) => data.map(d => {
-    const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '')
-    // Default
-    return {
-        label: baseLabel,
-        value: Number(d.value ?? d.id)
-    }
-})
+const filterShiftFn = createFilterFn(shifts, filteredShifts);
 
-const filterSchoolFn = createFilterFn(schools, filteredSchools);
-const filterCoursesFn = createFilterFn(courses, filteredCourses);
-
-const LoadSchools = async () => {
+const LoadShifts = async () => {
     try {
-        const { data } = await api.get(`/employee/option/school`);
-        schools.value = normalizeOptions(data)
-        filteredSchools.value = [...schools.value]
+        const { data } = await api.get(`/employee/option/shift`);
+        shifts.value = (data || []).map(d => {
+            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
+            return {
+                label: baseLabel,
+                value: Number(d.value ?? d.id)
+            };
+        });
+        filteredShifts.value = [...shifts.value];
     } catch (error) {
         console.error("Error fetching options:", error);
     }
 };
 
-const LoadCourses = async () => {
-    try {
-        const { data } = await api.get(`/employee/option/course`);
-        courses.value = normalizeOptions(data)
-        filteredCourses.value = [...courses.value]
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
 
-const FormatToYMD = (val) => {
-    if (!val) return ''
-
-    // keep digits only
-    const digits = val.replace(/\D/g, '').slice(0, 8)
-
-    let formatted = digits
-
-    if (digits.length > 4 && digits.length <= 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4)}`
-    } else if (digits.length > 6) {
-        formatted = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`
-    }
-
-    return formatted
-}
-
-const AddEducation = () => {
-    const e = educations.value;
+const AddSchedule = () => {
+    const e = schedules.value;
     e.push({
-        id: "",
-        schoollevel: "",
-        schoolId: "",
-        courseId: "",
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0]
+        id: '',
+        shiftId: "",
+        effectiveFrom: "",
+        effectiveTo: "",
+        notes: ''
     });
 }
 
-const RemoveEducation = (index) => {
-    educations.value.splice(index, 1);
+const RemoveSchedule = (index) => {
+    schedules.value.splice(index, 1);
 }
 
 const Save = async () => {
     if (!Validations()) return;
     SubmitLoading.value = true;
     try {
-        const response = await api.post(`/employee/${EmployeeStore.data?.id}/education`, {
-            educations: educations.value
+        const response = await api.post(`/employee/${EmployeeStore.data?.id}/schedule`, {
+            schedules: schedules.value
         });
         emit('update:modelValue', null);
         Toast.fire({
@@ -463,16 +341,16 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
-const eduStartPopups = ref([]);
-const eduEndPopups = ref([]);
-function hideEduStartPopup(index) {
+const efStartPopups = ref([]);
+const etEndPopups = ref([]);
+function hideEfStartPopup(index) {
   nextTick(() => {
-    if (eduStartPopups.value[index]) eduStartPopups.value[index].hide();
+    if (efStartPopups.value[index]) efStartPopups.value[index].hide();
   });
 }
-function hideEduEndPopup(index) {
+function hideEtEndPopup(index) {
   nextTick(() => {
-    if (eduEndPopups.value[index]) eduEndPopups.value[index].hide();
+    if (etEndPopups.value[index]) etEndPopups.value[index].hide();
   });
 }
 </script>
