@@ -59,7 +59,8 @@
 
                     <q-item clickable v-ripple class="q-pa-md q-pb-sm radius-xl" v-for="item in filteredMenuItems" :key="item.label" @click="router.push(item.to)">
                         <q-item-section avatar>
-                            <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
+                            <!-- <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20"> -->
+                            <q-icon :name="item.icon" />
                         </q-item-section>
                         <q-item-section class="text-uppercase text-caption" :class="isActive(item.label) ? 'text-primary' : 'text-secondary'">
                             {{ item.label }}
@@ -74,9 +75,10 @@
                 <div class="text-center">
                     <div v-for="item in filteredMenuItems" :key="item.label" class="q-pa-sm q-pb-sm">
                         <q-btn flat round @click="router.push(item.to)">
-                            <q-avatar size="sm">
+                            <!-- <q-avatar size="sm">
                                 <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
-                            </q-avatar>
+                            </q-avatar> -->
+                            <q-icon :name="item.icon" />
                         </q-btn>
                     </div>
                 </div>
@@ -201,7 +203,7 @@ function drawerClick(e) {
 }
 
 const menuItems = [
-    { iconPrimary: homePrimary, iconSecondary: homeSecondary, label: 'home', to: '/home', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
+    { iconPrimary: homePrimary, iconSecondary: homeSecondary, icon: 'fa-solid fa-house', label: 'home', to: '/home', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
     { iconPrimary: recruitmentPrimary, iconSecondary: recruitmentSecondary, label: 'recruitment', to: '/recruitment', roles: ['SuperAdmin', 'Management', 'Admin', 'HR'] },
     { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
     { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },

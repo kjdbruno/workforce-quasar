@@ -41,10 +41,6 @@
                                     </div>
                                 </div>
                             </q-card-section>
-                            <q-card-section class="q-pa-xl">
-                                
-                                
-                            </q-card-section>
                         </div>
                         <div class="col-3">
                             <img
@@ -62,6 +58,7 @@
                     </q-card-section>
                 </q-card>
             </div>
+            <q-icon name="fa-solid fa-user" />
         </div>
     </div>
 </template>
