@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="home-page">
         <div class="row q-col-gutter-md">
             <div class="col-9">
-                <q-card class="card card-profile no-shadow radius-sm">
+                <q-card class="card welcome-card no-shadow radius-sm">
                     <div class="row q-col-gutter-sm">
                         <div class="col-9">
                             <q-card-section class="q-pa-xl">
@@ -49,6 +49,9 @@
                                 />
                         </div>
                     </div>
+                    <q-inner-loading :showing="WelcomeLoading" dark>
+                        <q-spinner-puff />
+                    </q-inner-loading>
                 </q-card>
             </div>
             <div class="col-3">
@@ -58,7 +61,6 @@
                     </q-card-section>
                 </q-card>
             </div>
-            <q-icon name="fa-solid fa-user" />
         </div>
     </div>
 </template>
@@ -68,6 +70,9 @@ import { ref, reactive, onMounted, onBeforeMount } from 'vue';
 
 import  { useAuthStore } from 'src/stores/auth-store';
 const AuthStore = useAuthStore();
+
+const WelcomeLoading = ref(false);
+const date = ref(new Date());
 
 const greeting = ref('');
 const formattedDate = ref('');
@@ -104,6 +109,7 @@ const setDateInfo = () => {
 }
 
 const fetchWeather = async (lat, lon) => {
+    WelcomeLoading.value = true;
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
     try {
         const response = await fetch(url)
@@ -112,6 +118,8 @@ const fetchWeather = async (lat, lon) => {
         mapWeatherCode(data.current_weather.weathercode)
     } catch (error) {
         console.error('Weather fetch failed:', error)
+    } finally {
+        WelcomeLoading.value = false;
     }
 }
 
@@ -159,43 +167,3 @@ onMounted(() => {
     setInterval(setGreeting, 60000)
 })
 </script>
-
-<style scoped>
-.card-profile {
-    overflow: hidden;
-    background: linear-gradient(
-        135deg,
-        #ff4d2d 0%,
-        #ff7a18 45%,
-        #ff9f1c 100%
-    );
-    height: 300px;
-}
-
-.welcome-card{
-    overflow: hidden;
-    background: linear-gradient(
-        135deg,
-        #ff4d2d 0%,
-        #ff7a18 45%,
-        #ff9f1c 100%
-    );
-}
-
-/* avatar container on right */
-.welcome-avatar{
-    width: 150px;
-    height: 100px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:flex-end;
-    position: relative;
-    z-index: 1;
-}
- img{
-    height: 300px;
-    width: 100%;
-    object-fit: contain;
-    transform: translateY(6px);
-}
-</style>

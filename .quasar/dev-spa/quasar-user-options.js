@@ -11,7 +11,7 @@
  * Boot files are your "main.js"
  **/
 
-import iconSet from 'quasar/icon-set/fontawesome-v6.js'
+import iconSet from 'quasar/icon-set/bootstrap-icons.js'
 
 
 

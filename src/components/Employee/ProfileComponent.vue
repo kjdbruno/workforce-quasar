@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="profile-component">
         <div class="row q-col-gutter-md">
             <div class="col-3">
                 <q-card key="data-add" class="card card-profile no-shadow radius-sm q-mb-sm q-pb-lg">
@@ -238,62 +238,3 @@ onBeforeMount(() => {
 })
 
 </script>
-
-<style lang="css" scoped>
-     /* CARD */
-    .card-profile {
-        overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            #ff9f1c 0%,
-            #ff7a18 45%,
-            #ff4d2d 100%
-        );
-    }
-
-    /* COVER PHOTO */
-    .cover-photo {
-        height: 175px;
-        width: 100%;
-        position: relative;
-    }
-
-    .cover-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    }
-
-    /* Optional dark overlay for readability */
-    .cover-photo::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.55)
-    );
-    }
-
-    /* PROFILE IMAGE SECTION */
-    .profile-section {
-    margin-top: -80px; /* pulls image over cover */
-    }
-
-    /* PROFILE IMAGE */
-    .profile-img {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 5px solid #ffffff;
-        background: #ffffff;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-    }
-    .card-menu
-    {
-        width: 175px;
-        height: 200px;
-    }
-</style>

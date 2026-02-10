@@ -455,3 +455,91 @@ body {
 .swal-toast .swal2-timer-progress-bar {
   background: rgba(255, 255, 255, 0.6) !important;
 }
+
+/**home page */
+.home-page .welcome-card{
+    overflow: hidden;
+    background: linear-gradient(
+  135deg,
+  #c94a4a 0%,
+  #a91f1f 65%,
+  #900201 100%
+);
+
+
+}
+
+/* avatar container on right */
+.home-page .welcome-avatar{
+    width: 150px;
+    height: 100px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:flex-end;
+    position: relative;
+    z-index: 1;
+}
+.home-page img{
+    height: 300px;
+    width: 100%;
+    object-fit: contain;
+    transform: translateY(6px);
+}
+
+/**profile page */
+    /* CARD */
+    .profile-component .card-profile {
+        overflow: hidden;
+        background: linear-gradient(
+  135deg,
+  #c94a4a 0%,
+  #a91f1f 65%,
+  #900201 100%
+);
+    }
+
+    /* COVER PHOTO */
+    .profile-component .cover-photo {
+        height: 175px;
+        width: 100%;
+        position: relative;
+    }
+
+    .profile-component .cover-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    /* Optional dark overlay for readability */
+    .profile-component .cover-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.55)
+    );
+    }
+
+    /* PROFILE IMAGE SECTION */
+    .profile-component .profile-section {
+    margin-top: -80px; /* pulls image over cover */
+    }
+
+    /* PROFILE IMAGE */
+    .profile-component .profile-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+    .profile-component .card-menu
+    {
+        width: 175px;
+        height: 200px;
+    }

@@ -3,7 +3,7 @@
         <q-card class="justify-center items-center no-shadow q-pa-xl radius-md border" style="width: 600px;">
             <q-card-section>
                 <div class="text-center">
-                    <div v-html="indexStore.brand"/>
+                    <img src="~assets/logo.png" alt="Login Image" style="width: 100%; height: auto;" />
                 </div>
             </q-card-section>
             <q-card-section>
@@ -21,7 +21,7 @@
                 </div>
             </q-card-section>
             <q-card-section>
-                <q-btn unelevated color="primary" label="login" size="lg" class="full-width" :loading="loading" @click="login">
+                <q-btn unelevated color="primary" label="sign in" size="lg" class="full-width" :loading="loading" @click="login">
                     <template v-slot:loading>
                         <q-spinner-puff size=".5em"/>
                     </template>
@@ -39,6 +39,9 @@
                     </q-list>
                 </q-banner>
             </q-card-section>
+            <q-card-actions align="center">
+
+            </q-card-actions>
         </q-card>
     </q-page>
 </template>

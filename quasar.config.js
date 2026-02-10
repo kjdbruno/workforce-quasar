@@ -25,6 +25,7 @@ export default defineConfig((/* ctx */) => {
       // 'ionicons-v4',
       // 'mdi-v7',
       'fontawesome-v6',
+      'bootstrap-icons',
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
@@ -90,7 +91,7 @@ export default defineConfig((/* ctx */) => {
 
       // Quasar plugins
       plugins: ['Dialog'],
-      iconSet: 'fontawesome-v6'
+      iconSet: 'bootstrap-icons'
     },
 
     // animations: 'all', // --- includes all animations

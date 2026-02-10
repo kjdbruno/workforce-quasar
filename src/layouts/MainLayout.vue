@@ -12,23 +12,17 @@
 
                 <div class="q-gutter-sm">
                     <q-btn flat round dense class="text-white">
-                        <q-avatar size="md" text-color="grey-8">
-                            <img :src="messageSecondary" />
-                            <q-badge color="red" floating>2</q-badge>
-                        </q-avatar>
+                        <q-icon name="bi-chat-square" color="secondary" />
+                        <q-badge color="red" floating>2</q-badge>
                     </q-btn>
 
                     <q-btn flat round dense class="text-white">
-                        <q-avatar size="md" text-color="grey-8">
-                            <img :src="notificationSecondary" />
-                            <q-badge color="red" floating>2</q-badge>
-                        </q-avatar>
+                        <q-icon name="bi-bell" color="secondary" />
+                        <q-badge color="red" floating>2</q-badge>
                     </q-btn>
 
                     <q-btn flat round dense class="text-white" @click="meDialog = !meDialog">
-                        <q-avatar size="md">
-                            <img :src="account" />
-                        </q-avatar>
+                        <q-icon name="bi-person" color="secondary" />
                         <q-badge color="positive" rounded floating />
                     </q-btn>
                 </div>
@@ -42,14 +36,11 @@
                 <div class="q-pt-lg q-pb-lg">
                     <div v-if="miniState">
                         <q-avatar>
-                            <img :src="logo">
+                            <img src="~assets/ccmi-logo.png">
                         </q-avatar>
                     </div>
-                    <div v-if="!miniState">
-                        <q-avatar>
-                            <img :src="logo">
-                        </q-avatar>
-                        <span class="text-primary">workforce</span>
+                    <div v-if="!miniState" class="q-pl-xl q-pr-xl">
+                        <img src="~assets/logo.png" width="100%" height="auto">
                     </div>
                 </div>
             </div>
@@ -60,7 +51,7 @@
                     <q-item clickable v-ripple class="q-pa-md q-pb-sm radius-xl" v-for="item in filteredMenuItems" :key="item.label" @click="router.push(item.to)">
                         <q-item-section avatar>
                             <!-- <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20"> -->
-                            <q-icon :name="item.icon" />
+                            <q-icon :name="item.icon" :color="isActive(item.label) ? 'primary' : 'secondary'" />
                         </q-item-section>
                         <q-item-section class="text-uppercase text-caption" :class="isActive(item.label) ? 'text-primary' : 'text-secondary'">
                             {{ item.label }}
@@ -78,7 +69,7 @@
                             <!-- <q-avatar size="sm">
                                 <img :src="isActive(item.label) ? item.iconPrimary : item.iconSecondary" width="20">
                             </q-avatar> -->
-                            <q-icon :name="item.icon" />
+                            <q-icon :name="item.icon" :color="isActive(item.label) ? 'primary' : 'secondary'" />
                         </q-btn>
                     </div>
                 </div>
@@ -203,17 +194,17 @@ function drawerClick(e) {
 }
 
 const menuItems = [
-    { iconPrimary: homePrimary, iconSecondary: homeSecondary, icon: 'fa-solid fa-house', label: 'home', to: '/home', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
-    { iconPrimary: recruitmentPrimary, iconSecondary: recruitmentSecondary, label: 'recruitment', to: '/recruitment', roles: ['SuperAdmin', 'Management', 'Admin', 'HR'] },
-    { iconPrimary: employeePrimary, iconSecondary: employeeSecondary, label: 'employee', to: '/employee', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
-    { iconPrimary: leavePrimary, iconSecondary: leaveSecondary, label: 'leave', to: '/leave', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
-    { iconPrimary: dtrPrimary, iconSecondary: dtrSecondary, label: 'dtr', to: '/dtr', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
-    { iconPrimary: trainingPrimary, iconSecondary: trainingSecondary, label: 'overtime', to: '/overtime', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
-    { iconPrimary: performancePrimary, iconSecondary: performanceSecondary, label: 'performance', to: '/performance', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
-    { iconPrimary: disciplinaryPrimary, iconSecondary: disciplinarySecondary, label: 'disciplinary', to: '/disciplinary', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
-    { iconPrimary: exitPrimary, iconSecondary: exitSecondary, label: 'separation', to: '/separation', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
-    { iconPrimary: payrollPrimary, iconSecondary: payrollSecondary, label: 'payroll', to: '/payroll', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
-    { iconPrimary: preferencePrimary, iconSecondary: preferenceSecondary, label: 'preferences', to: '/preferences', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] }
+    { icon: 'bi-house', label: 'home', to: '/home', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
+    { icon: 'bi-search', label: 'recruitment', to: '/recruitment', roles: ['SuperAdmin', 'Management', 'Admin', 'HR'] },
+    { icon: 'bi-person', label: 'employee', to: '/employee', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
+    { icon: 'bi-heart', label: 'leave', to: '/leave', roles: ['SuperAdmin', 'Admin', 'Management', 'HR']  },
+    { icon: 'bi-alarm', label: 'dtr', to: '/dtr', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { icon: 'bi-hourglass', label: 'overtime', to: '/overtime', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { icon: 'bi-speedometer2', label: 'performance', to: '/performance', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { icon: 'bi-shield', label: 'disciplinary', to: '/disciplinary', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { icon: 'bi-escape', label: 'separation', to: '/separation', roles: ['SuperAdmin', 'Admin', 'Management', 'HR'] },
+    { icon: 'bi-wallet', label: 'payroll', to: '/payroll', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] },
+    { icon: 'bi-gear', label: 'preferences', to: '/preferences', roles: ['SuperAdmin', 'Admin', 'Management', 'HR', 'Finance'] }
 ]
 
 const isActive = (label) => route.name?.toLowerCase() === label.toLowerCase();
