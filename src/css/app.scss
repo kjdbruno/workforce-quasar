@@ -54,6 +54,11 @@ body {
   max-width: 100%;
 }
 
+.q-dialog__inner .card {
+  width: 30vw;
+  max-width: 100%;
+}
+
 //input
 .q-field--outlined .q-field__control:after,
 .q-field--outlined.q-field--highlighted .q-field__control:after
@@ -212,7 +217,7 @@ body {
     rgba(250, 103, 36, 0.15) 0px 6px 18px 0px,
     rgba(250, 103, 36, 0.25) 0px 0px 8px 1px;
   transform: scale(1.05);
-  background-color: #FDF3E9;
+  background-color: #fcf2f2;
 }
 
 /* ✅ Checkmark overlay */

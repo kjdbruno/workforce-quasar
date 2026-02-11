@@ -35,7 +35,7 @@
                                 :options="filteredShifts"
                                 @filter="filterShiftFn"
                                 :error="Errors.schedules.shiftId.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>

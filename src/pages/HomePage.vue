@@ -57,7 +57,7 @@
             <div class="col-3">
                 <q-card class="no-shadow radius-sm">
                     <q-card-section class="q-pa-none">
-                        <q-date v-model="date" class="full-width no-shadow radius-sm"/>
+                        <q-date v-model="date" mask="YYYY-MM-DD" class="full-width no-shadow radius-sm"/>
                     </q-card-section>
                 </q-card>
             </div>
@@ -72,7 +72,7 @@ import  { useAuthStore } from 'src/stores/auth-store';
 const AuthStore = useAuthStore();
 
 const WelcomeLoading = ref(false);
-const date = ref(new Date());
+const date = ref(new Date().toISOString().split('T')[0]);
 
 const greeting = ref('');
 const formattedDate = ref('');

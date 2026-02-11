@@ -112,15 +112,35 @@
                 
         </q-page-container>
 
-        <q-dialog v-model="meDialog" full-height position="right" square class="profile-dialog">
-            <q-card class="dialog-card column full-height">
-                <q-card-section class="q-pa-lg">
-                    <q-avatar>
-                        <img :src="authStore.user?.profile?.photos.photo">
-                    </q-avatar>
+        <q-dialog v-model="meDialog" full-height position="right" square class="dialog profile-dialog">
+            <q-card key="data-add" class="card card-profile no-shadow radius-sm q-mb-sm q-pb-lg">
+                <div class="cover-photo">
+                    <img :src="randomCover" alt="Cover"/>
+                </div>
+                <q-card-section class="text-center profile-section">
+                    <img :src="formatPhoto(authStore.user?.avatar)" alt="Profile" class="profile-img" />
                 </q-card-section>
-                <q-separator inset />
-                <q-btn label="logout" color="primary" @click="authStore.logout"/>
+                <q-card-section class="text-center q-pt-sm">
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.employee_no }}</div>
+                    <div class="text-h5 text-uppercase text-bold text-white">{{ formatName(authStore.employees[0].employee) }}</div>
+                    <div class="text-body1 text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.position?.name }}</div>
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.employment_status }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">email address</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees[0].employee?.email }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">contact number</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees[0].employee?.contact_number }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">adderss</div>
+                    <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees[0].employee?.address }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout() }"/>
+                </q-card-section>
             </q-card>
         </q-dialog>
         
@@ -128,43 +148,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useIndexStore } from 'src/stores/index-store';
+import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth-store';
 // import moment from 'moment';
-import logo from 'src/assets/workforce-logo.png';
-import homePrimary from 'src/assets/icons/home_primary.png';
-import homeSecondary from 'src/assets/icons/home_secondary.png';
-import recruitmentPrimary from 'src/assets/icons/recruitment_primary.png';
-import recruitmentSecondary from 'src/assets/icons/recruitment_secondary.png';
-import employeePrimary from 'src/assets/icons/employee_primary.png';
-import employeeSecondary from 'src/assets/icons/employee_secondary.png';
-import leavePrimary from 'src/assets/icons/leave_primary.png';
-import leaveSecondary from 'src/assets/icons/leave_secondary.png';
-import dtrPrimary from 'src/assets/icons/dtr_primary.png';
-import dtrSecondary from 'src/assets/icons/dtr_secondary.png';
-import performancePrimary from 'src/assets/icons/performance_primary.png';
-import performanceSecondary from 'src/assets/icons/performance_secondary.png';
-import trainingPrimary from 'src/assets/icons/training_primary.png';
-import trainingSecondary from 'src/assets/icons/training_secondary.png';
-import disciplinaryPrimary from 'src/assets/icons/disciplinary_primary.png';
-import disciplinarySecondary from 'src/assets/icons/disciplinary_secondary.png';
-import exitPrimary from 'src/assets/icons/exit_primary.png';
-import exitSecondary from 'src/assets/icons/exit_secondary.png';
-import payrollPrimary from 'src/assets/icons/payroll_primary.png';
-import payrollSecondary from 'src/assets/icons/payroll_secondary.png';
-import preferencePrimary from 'src/assets/icons/preference_primary.png';
-import preferenceSecondary from 'src/assets/icons/preference_secondary.png';
-import notificationPrimary from 'src/assets/icons/notification_primary.png';
-import notificationSecondary from 'src/assets/icons/notification_secondary.png';
-import messagePrimary from 'src/assets/icons/message_primary.png';
-import messageSecondary from 'src/assets/icons/message_secondary.png';
-import logoutPrimary from 'src/assets/icons/logout_primary.png';
-import logoutSecondary from 'src/assets/icons/logout_secondary.png';
-import account from 'src/assets/icons/account.png';
 
-const indexStore = useIndexStore();
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -174,11 +162,11 @@ const miniState = ref(true)
 
 const formatName = (profile) => {
     if (!profile) return '';
-    const firstname = profile.firstname || '';
-    const middlename = profile.middlename
-        ? profile.middlename.charAt(0).toUpperCase() + '.'
+    const firstname = profile.first_name || '';
+    const middlename = profile.middle_name
+        ? profile.middle_name.charAt(0).toUpperCase() + '.'
         : '';
-    const lastname = profile.lastname || '';
+    const lastname = profile.last_name || '';
     const suffix = profile.suffix ? ` ${profile.suffix}` : '';
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
@@ -221,4 +209,83 @@ const filteredMenuItems = computed(() => {
   return menuItems.filter(i => !i.roles || i.roles.includes(role))
 })
 
+onMounted(() => {
+    console.log()
+})
+
+const TOTAL_COVERS = 25;
+
+const randomCover = ref('');
+
+onBeforeMount(() => {
+    const randomNumber = Math.floor(Math.random() * TOTAL_COVERS) + 1;
+
+    randomCover.value = new URL(
+        `../assets/cover/${randomNumber}.jpg`,
+        import.meta.url
+    ).href;
+})
+
 </script>
+
+<style lang="css" scoped>
+    .profile-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+    .card-profile {
+        overflow: hidden;
+        background: linear-gradient(
+  135deg,
+  #c94a4a 0%,
+  #a91f1f 65%,
+  #900201 100%
+);
+    }
+
+    /* COVER PHOTO */
+    .cover-photo {
+        height: 175px;
+        width: 100%;
+        position: relative;
+    }
+
+    .cover-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    /* Optional dark overlay for readability */
+    .cover-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.55)
+    );
+    }
+
+    /* PROFILE IMAGE SECTION */
+    .profile-section {
+    margin-top: -80px; /* pulls image over cover */
+    }
+
+    /* PROFILE IMAGE */
+    .profile-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+</style>

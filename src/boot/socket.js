@@ -57,6 +57,11 @@ export default boot(({ app, router }) => {
             console.log(`users logs loaded:`, users);
         });
 
+        socket.on('EmitEmployee', (employees) => {
+            authStore.employees = employees;
+            console.log(`employees loaded:`, employees);
+        });
+
         // Handle notifications
         socket.on('EmitNotifications', (notificationCount, notifications) => {
             authStore.notificationCount = notificationCount;

@@ -12,7 +12,7 @@
                         <q-btn 
                             v-if="dependents.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
-                            icon="delete" 
+                            icon="bi-trash3" 
                             flat 
                             unelevated 
                             color="grey" 
@@ -31,7 +31,7 @@
                                 input-debounce="300"
                                 :options="relationships"
                                 :error="Errors.dependents.relationship.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>
@@ -137,7 +137,7 @@
                         </div>
                     </div>
                     <div>
-                        <q-checkbox left-label v-model="value.isEmergency" @update:model-value="() => ToggleEmergency(index)" label="emergency contact person" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
+                        <q-checkbox left-label v-model="value.isEmergency" @update:model-value="() => ToggleEmergency(index)" label="emergency contact person" checked-icon="bi-check2-circle" unchecked-icon="bi-circle" class="text-capitalize" />
                     </div>
                 </div>
             </q-card-section>

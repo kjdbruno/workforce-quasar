@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
         user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
         //
         onlineUsers: [],
+        employees: [],
         notificationCount: 0,
         notificationList: [],
         hasNotifications: null,

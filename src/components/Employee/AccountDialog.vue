@@ -12,7 +12,7 @@
                         <q-btn 
                             v-if="accounts.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
-                            icon="delete" 
+                            icon="bi-trash3" 
                             flat 
                             unelevated 
                             color="grey" 
@@ -23,7 +23,7 @@
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.role.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.role.msg ? Errors.accounts.role.msg : 'role' }}</div>
-                        <q-radio  v-for="(v, index) in roles" v-model="value.role" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="v.value" :label="v.label" class="text-uppercase" :disable="isDisabled(v.value)"/>
+                        <q-radio  v-for="(v, index) in roles" v-model="value.role" checked-icon="bi-check2-circle" unchecked-icon="bi-circle" :val="v.value" :label="v.label" class="text-uppercase" :disable="isDisabled(v.value)"/>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
@@ -47,14 +47,14 @@
                                 :type="showPassword ? 'text' : 'password'"
                             >
                                 <template v-slot:append>
-                                    <q-icon :name="showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" @click="showPassword = !showPassword" style="font-size: 1rem;" />
+                                    <q-icon :name="showPassword ? 'bi-eye' : 'bi-eye-slash'" class="cursor-pointer" @click="showPassword = !showPassword" style="font-size: 1rem;" />
                                 </template>
                             </q-input>
                         </div>
                     </div>
                     <div class="q-mb-md">
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.status.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.status.msg ? Errors.accounts.status.msg : 'status' }}</div>
-                        <q-radio  v-for="(v, index) in statuses" v-model="value.status" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="v" :label="v" class="text-uppercase" :disable="isDisabled(v)"/>
+                        <q-radio  v-for="(v, index) in statuses" v-model="value.status" checked-icon="bi-check2-circle" unchecked-icon="bi-circle" :val="v" :label="v" class="text-uppercase" :disable="isDisabled(v)"/>
                     </div>
                 </div>
             </q-card-section>
@@ -162,9 +162,19 @@ const MapAccounts = (data = []) => {
 
 const PopulateData = () => {
     GetAccount(EmployeeStore.data?.id)
+    accounts.value = [
+        {
+            id: '',
+            employeeid: "",
+            username: "",
+            password: "",
+            role: "",
+            status: ""
+        }
+    ]
     !accounts.value.length
         ? [EmptyAccount()]
-        : null
+        : null;
 }
 
 const Errors = reactive({

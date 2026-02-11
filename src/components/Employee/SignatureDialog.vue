@@ -1,16 +1,27 @@
 <template>
-    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="() => { PopulateData(); ResetForm(); }">
+    <q-dialog v-model="isOpen" full-height position="right" persistent square class="dialog" @before-show="() => { PopulateData(); ResetForm(); }" @show="onShow" @hide="onHide">
         <q-card class="dialog-card column full-height">
             <q-card-section class="q-pa-lg">
                 <div class="text-h6 text-uppercase">signature information</div>
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                <div class="q-mb-lg">
-                    <img v-if="signature" :src="FormatSignature(signature)" width="200"/>
-                    <div v-else class="text-body1 text-capitalize text-grey">no signature found</div>
+                <div class="row q-col-gutter-md">
+                    <div class="col-3">
+                        <div class="q-mb-lg">
+                            <div v-if="signature"class="text-body1 text-capitalize text-grey">current signature</div>
+                            <img v-if="signature" :src="FormatSignature(signature)" width="200"/>
+                            <div v-else class="text-body1 text-capitalize text-grey">no signature found</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'please sign here to continue' }}</div>
+                        <div ref="containerRef" class="signature-container">
+                            <canvas ref="canvasRef" class="signature-canvas"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
+                <!-- <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                     <div>
                         <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'signature' }}</div>
                         <q-file 
@@ -22,13 +33,15 @@
                             class="col-2"
                         />
                     </div>
-                </div>
+                </div> -->
+                
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
                     <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { clear(); }" outline/>
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
@@ -41,7 +54,7 @@
     </q-dialog>
 </template>
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, onBeforeMount, watch, reactive, computed, nextTick } from 'vue';
 import { api } from 'src/boot/axios';
 import moment from 'moment';
 import { Toast } from 'src/boot/sweetalert'; 
@@ -112,21 +125,10 @@ const Errors = reactive({
 const Validations = () => {
 
     let isError = false;
-
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/png'];
     
-    if (!file.value) {
+    if (!pad || pad.isEmpty()) {
         Errors.file.type = true;
-        Errors.file.msg = 'file is required';
-        isError = true;
-    } else if (!allowedTypes.includes(file.value.type)) {
-        Errors.file.type = true;
-        Errors.file.msg = 'file must be a image file';
-        isError = true;
-    } else if (file.value.size > maxSize) {
-        Errors.file.type = true;
-        Errors.file.msg = 'file size must not exceed to 5MB';
+        Errors.file.msg = 'required';
         isError = true;
     }
 
@@ -145,10 +147,12 @@ const Validations = () => {
 
 const Save = async () => {
     if (!Validations()) return;
+    const dataUrl = pad.toDataURL('image/png')
+    const file = base64ToPngFile(dataUrl)
     SubmitLoading.value = true;
     try {
         const Data = new FormData();
-        Data.append('file', file.value);
+        Data.append('file', file);
         const response = await api.post(`/employee/${EmployeeStore.data?.id}/signature`, Data, {
             headers: {
                 "Content-Type": "multipart/form-data"
@@ -198,4 +202,85 @@ const applyBackendErrors = (backendErrors) => {
 const FormatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
+
+import SignaturePad from 'signature_pad'
+
+const containerRef = ref(null)
+const canvasRef = ref(null)
+let pad = null
+
+const onShow = async () => {
+    await nextTick() // wait until canvas is mounted
+    initSignaturePad()
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+}
+
+const onHide = () => {
+    window.removeEventListener('resize', resizeCanvas)
+    pad?.off?.()
+    pad = null
+}
+
+const initSignaturePad = () => {
+    const canvas = canvasRef.value
+    if (!canvas) return
+
+    pad = new SignaturePad(canvas, {
+        backgroundColor: 'rgba(255,255,255,0)',
+        penColor: '#000'
+    })
+}
+
+const resizeCanvas = () => {
+    const canvas = canvasRef.value
+    const container = containerRef.value
+    if (!canvas || !container) return
+
+    const ratio = Math.max(window.devicePixelRatio || 1, 1)
+    const { width, height } = container.getBoundingClientRect()
+
+    canvas.width = Math.floor(width * ratio)
+    canvas.height = Math.floor(height * ratio)
+    canvas.style.width = `${width}px`
+    canvas.style.height = `${height}px`
+
+    const ctx = canvas.getContext('2d')
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+
+    pad?.clear()
+}
+
+const clear = () => {
+    pad?.clear()
+}
+
+
+const base64ToPngFile = (base64, filename = 'signature.png') => {
+    const arr = base64.split(',')
+    const mime = arr[0].match(/:(.*?);/)[1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new File([u8arr], filename, { type: mime })
+}
+
 </script>
+
+<style scoped>
+.signature-container {
+  border: 1px solid #ccc;
+  height: 100%;
+  width: 100%;
+}
+.signature-canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+</style>

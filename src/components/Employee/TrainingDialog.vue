@@ -12,7 +12,7 @@
                         <q-btn 
                             v-if="trainings.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
-                            icon="delete" 
+                            icon="bi-trash3" 
                             flat 
                             unelevated 
                             color="grey" 
@@ -31,7 +31,7 @@
                                 input-debounce="300"
                                 :options="trainingtypes"
                                 :error="Errors.trainings.trainingtype.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>
@@ -65,7 +65,7 @@
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.startDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.startDate.msg ? Errors.trainings.startDate.msg : 'start date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="value.startDate" label="Enter Date">
+                            <q-input outlined v-model="value.startDate" label="Enter Date" :error="Errors.trainings.startDate.type[index]" :no-error-icon="true">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => trainingStartPopups[index] = el">
                                     <q-date v-model="value.startDate" mask="YYYY-MM-DD" @update:model-value="() => hideTrainingStartPopup(index)"/>
                                 </q-popup-proxy>
@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.trainings.endDate.msg ? 'text-negative' : 'text-grey'">{{ Errors.trainings.endDate.msg ? Errors.trainings.endDate.msg : 'end date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="value.endDate" label="Enter Date">
+                            <q-input outlined v-model="value.endDate" label="Enter Date" :error="Errors.trainings.endDate.type[index]" :no-error-icon="true">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="no-shadow custom-border radius-sm" :ref="el => trainingEndPopups[index] = el">
                                     <q-date v-model="value.endDate" mask="YYYY-MM-DD" @update:model-value="() => hideTrainingEndPopup(index)"/>
                                 </q-popup-proxy>

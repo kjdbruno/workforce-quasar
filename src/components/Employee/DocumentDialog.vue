@@ -26,7 +26,7 @@
                             <q-btn 
                                 v-if="documents.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                                 round 
-                                icon="delete" 
+                                icon="bi-trash3" 
                                 flat 
                                 unelevated 
                                 color="grey" 

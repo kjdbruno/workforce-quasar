@@ -12,7 +12,7 @@
                         <q-btn 
                             v-if="educations.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
-                            icon="delete" 
+                            icon="bi-trash3" 
                             flat 
                             unelevated 
                             color="grey" 
@@ -31,7 +31,7 @@
                                 input-debounce="300"
                                 :options="schoollevels"
                                 :error="Errors.educations.schoollevel.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>
@@ -63,7 +63,7 @@
                                 :options="filteredSchools"
                                 @filter="filterSchoolFn"
                                 :error="Errors.educations.schoolId.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>
@@ -95,7 +95,7 @@
                                 :options="filteredCourses"
                                 @filter="filterCoursesFn"
                                 :error="Errors.educations.courseId.type[index]"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                             >
                                 <template v-slot:no-option>

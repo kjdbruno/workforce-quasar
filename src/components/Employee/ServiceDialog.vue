@@ -34,7 +34,7 @@
                             </q-card-section>
                             <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="app.is_active ? 'bg-positive' : 'bg-negative'"></div>
                             <div class="absolute-top-right" v-if="app.is_active">
-                                <q-radio v-model="salaryId" :val="app.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                <q-radio v-model="salaryId" :val="app.id" checked-icon="bi-check2-circle" unchecked-icon="bi-cicle" size="xs" />
                             </div>
                         </q-card>
                     </div>

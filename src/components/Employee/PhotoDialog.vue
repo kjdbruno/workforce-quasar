@@ -11,7 +11,7 @@
                 </div>
                 <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                     <div>
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'credit' }}</div>
+                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'upload photo' }}</div>
                         <q-file 
                             v-model="file" 
                             label="Upload Photo"
