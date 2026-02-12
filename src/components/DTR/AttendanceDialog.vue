@@ -7,21 +7,9 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="row q-col-gutter-xs q-mb-md">
-                    <div class="col-2">
-                        <div class="text-caption text-uppercase" :class="Errors.dateStart.type ? 'text-negative' : 'text-grey'">{{ Errors.dateStart.type ? Errors.dateStart.message : 'date start (YYYY-MM-DD)' }}</div>
-                        <q-input outlined v-model="dateStart" label="Enter Date">
-                            <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                <q-date v-model="dateStart" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
-                            </q-popup-proxy>
-                        </q-input>
-                    </div>
-                    <div class="col-2">
-                        <div class="text-caption text-uppercase" :class="Errors.dateEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.dateEnd.type ? Errors.dateEnd.message : 'date end (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="dateEnd" label="Enter Date">
-                            <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                <q-date v-model="dateEnd" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
-                            </q-popup-proxy>
-                        </q-input>
+                    <div class="col-3">
+                        <div class="text-caption text-uppercase" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.message : 'date range' }}</div>
+                        <q-date v-model="date" range class="no-shadow custom-border full-width" />
                     </div>
                 </div>
             </q-card-section>
@@ -68,14 +56,10 @@ const PopulateData = () => {
     
 }
 
-const dateStart = ref(new Date().toISOString().split('T')[0]);
-const dateEnd = ref(new Date().toISOString().split('T')[0]);
+const date = ref();
 
 const Errors = reactive({
-    dateStart: { 
-        type: null, message: ''
-    },
-    dateEnd: { 
+    date: { 
         type: null, message: ''
     }
 });
@@ -83,19 +67,12 @@ const Errors = reactive({
 const Validations = () => {
 
     let isError = false;
-    if (!dateStart.value) {
-        Errors.dateStart.type = true;
-        Errors.dateStart.message = ('date start is required!')
+    if (!date.value) {
+        Errors.date.type = true;
+        Errors.date.message = ('required')
         isError = true
     } else {
-        Errors.dateStart.type = null
-    }
-    if (!dateEnd.value) {
-        Errors.dateEnd.type = true;
-        Errors.dateEnd.message = ('date end is required!')
-        isError = true
-    } else {
-        Errors.dateEnd.type = null
+        Errors.date.type = null
     }
 
     if (isError) {
@@ -114,10 +91,12 @@ const Validations = () => {
 const Save = async () => {
     if (!Validations()) return;
     SubmitLoading.value = true;
+    const dateStart = moment(date.value.from).format('YYYY-MM-DD');
+    const dateEnd = moment(date.value.to).format('YYYY-MM-DD');
     try {
         const response = await api.post('/attendance', {
-                dateStart: dateStart.value,
-                dateEnd: dateEnd.value,
+                dateStart: dateStart,
+                dateEnd: dateEnd,
             });
         emit('update:modelValue', null);
         emit('saved');
