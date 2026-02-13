@@ -176,6 +176,7 @@
                                     :error="Errors.signatories.order.type[index]"
                                     :no-error-icon="true"
                                     input-class="text-capitalize"
+                                    :readonly="true"
                                 />
                             </div>
                             <div class="col-1">
@@ -273,7 +274,7 @@ const submitLoading = ref(false);
 const id = ref('');
 const type = ref('');
 const ownerid = ref('');
-const signatories = ref([{ id: "", approverid: "", description: "", order: "" }])
+const signatories = ref([{ id: "", approverid: "", description: "", order: "1" }])
 const isActive = ref(false);
 
 const Errors = reactive({
@@ -296,19 +297,19 @@ const Errors = reactive({
     },
 });
 
-const initErrors = () => {
-    Errors.signatories.approverid.type = signatories.value.map(() => null);
-    Errors.signatories.description.type = signatories.value.map(() => null);
-    Errors.signatories.order.type = signatories.value.map(() => null);
-}
+// const initErrors = () => {
+//     Errors.signatories.approverid.type = signatories.value.map(() => null);
+//     Errors.signatories.description.type = signatories.value.map(() => null);
+//     Errors.signatories.order.type = signatories.value.map(() => null);
+// }
 
 const Validations = () => {
     
     let isError = false;
 
-    Errors.signatories.approverid = { type: null, msg: '' }
-    Errors.signatories.description = { type: null, msg: '' }
-    Errors.signatories.order = { type: null, msg: '' }
+    // Errors.signatories.approverid = { type: null, msg: '' }
+    // Errors.signatories.description = { type: null, msg: '' }
+    // Errors.signatories.order = { type: null, msg: '' }
 
     if (!type.value) {
         Errors.type.type = true
@@ -325,25 +326,25 @@ const Validations = () => {
         Errors.ownerid.type = null
     }
     
-    initErrors()
+    // initErrors()
     
-    signatories.value.forEach((e, index) => {
-        if (!e.approverid) {
-            Errors.signatories.approverid.type[index] = true;
-            Errors.signatories.approverid.msg = 'required';
-            isError = true;
-        }
-        if (!e.description) {
-            Errors.signatories.description.type[index] = true;
-            Errors.signatories.description.msg = 'required';
-            isError = true;
-        }
-        if (!e.order) {
-            Errors.signatories.order.type[index] = true;
-            Errors.signatories.order.msg = 'required';
-            isError = true;
-        }
-    });
+    // signatories.value.forEach((e, index) => {
+    //     if (!e.approverid) {
+    //         Errors.signatories.approverid.type[index] = true;
+    //         Errors.signatories.approverid.msg = 'required';
+    //         isError = true;
+    //     }
+    //     if (!e.description) {
+    //         Errors.signatories.description.type[index] = true;
+    //         Errors.signatories.description.msg = 'required';
+    //         isError = true;
+    //     }
+    //     if (!e.order) {
+    //         Errors.signatories.order.type[index] = true;
+    //         Errors.signatories.order.msg = 'required';
+    //         isError = true;
+    //     }
+    // });
     
     if (isError) {
         Toast.fire({
@@ -445,7 +446,7 @@ const ResetForm = () => {
     id.value = '';
     type.value = '';
     ownerid.value = '';
-    signatories.value = [{ id: "", approverid: "", description: "", order: "" }]
+    signatories.value = [{ id: "", approverid: "", description: "", order: 1+1 }]
     isActive.value = false;
 }
 
@@ -565,11 +566,19 @@ const normalizeOptions = (data = []) => data.map(d => {
 const filterOwnerFn = createFilterFn(owners, filteredOwners);
 const filterApproverFn = createFilterFn(approvers, filteredApprovers);
 
-const LoadUsers = async () => {
+const LoadEmployees = async () => {
     try {
-        const { data } = await api.get(`/signatory/option/user`);
+        const { data } = await api.get(`/signatory/option/employee`);
         owners.value = normalizeOptions(data)
         filteredOwners.value = [...owners.value]
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
+
+const LoadManagers = async () => {
+    try {
+        const { data } = await api.get(`/signatory/option/management`);
         approvers.value = normalizeOptions(data)
         filteredApprovers.value = [...approvers.value]
     } catch (error) {
@@ -589,11 +598,14 @@ function FormatOrdinal(n) {
 
 const AddSignatory = () => {
     const e = signatories.value;
-    e.unshift({
+    const maxOrder = e.length
+        ? Math.max(...e.map(s => Number(s.order) || 0))
+        : 0;
+    e.push({
         id: "",
         approverid: "",
         description: "",
-        order: ""
+        order: maxOrder + 1
     });
 }
 
@@ -607,7 +619,8 @@ onMounted(() => {
 })
 
 onBeforeMount(() => {
-    LoadUsers()
+    LoadEmployees()
+    LoadManagers()
 })
 
 </script>

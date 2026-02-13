@@ -247,6 +247,7 @@
                                     <q-input 
                                         v-model="tin" 
                                         label="Enter TIN"
+                                        mask="###-###-###-###"
                                         outlined 
                                         :error="Errors.tin.type"
                                         :no-error-icon="true"
@@ -258,6 +259,7 @@
                                     <q-input 
                                         v-model="sssNo" 
                                         label="Enter SSS No."
+                                        mask="##-#######-#"
                                         outlined 
                                         :error="Errors.sssNo.type"
                                         :no-error-icon="true"
@@ -268,7 +270,8 @@
                                     <div class="text-caption text-uppercase" :class="Errors.philhealthNo.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.philhealthNo.type ? Errors.philhealthNo.msg : 'Philhealth No.' }}</div>
                                     <q-input 
                                         v-model="philhealthNo"
-                                        label="Enter Philhealth No." 
+                                        label="Enter Philhealth No."
+                                        mask="##-#######-#" 
                                         outlined 
                                         :error="Errors.philhealthNo.type"
                                         :no-error-icon="true"
@@ -280,6 +283,7 @@
                                     <q-input 
                                         v-model="pagibigNo" 
                                         label="Enter Pagibig No."
+                                        mask="####-####-####"
                                         outlined 
                                         :error="Errors.pagibigNo.type"
                                         :no-error-icon="true"

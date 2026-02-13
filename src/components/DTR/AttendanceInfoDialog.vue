@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="q-mb-xl">
-                    <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in logs">
+                    <div class="row q-col-gutter-xs q-mb-xs" v-for="(data, index) in dtr">
                         <div class="col-1">
                             <q-input outlined dense :model-value="FormatLogDate(data.date)" />
                         </div>
@@ -105,14 +105,34 @@
                     </div>
                 </div>
                 <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
-                    <div v-for="(dt, index) in info?.approvals">
-                        <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : (dt?.setting?.description) }}</div>
-                        <div v-if="dt?.status == 'Approved'">
-                            <img :src="FormatSignature(dt?.setting?.approver?.employeeAccount?.employee?.signature)" width="150"/>
+                    <div v-for="(dt, index) in signatories">
+                        <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : (dt?.description) }}</div>
+                        <div v-if="dt?.status == 'Pending'">
+                            <div class="text-h6 text-uppercase">{{ dt?.original_approver_name }}</div>
+                            <div class="text-body1 text-uppercase text-italic">{{ dt?.original_approver_position }}</div>
                         </div>
-                        <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
-                        <div class="text-body1 text-uppercase text-italic">{{ dt?.setting?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
-                        <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
+                        <div v-if="dt?.status == 'Approved'">
+                            <div v-if="dt?.is_overide">
+                                <div class="text-grey q-mb-lg">
+                                    <div class="text-h6 text-uppercase">{{ dt?.original_approver_name }}</div>
+                                    <div class="text-body1 text-uppercase text-italic">{{ dt?.original_approver_position }}</div>
+                                </div>
+                                <div class="text-caption text-uppercase text-italic text-bold q-mb-lg">overiden by</div>
+                                <img :src="FormatSignature(dt?.override_signature)" width="150"/>
+                                <div class="text-h6 text-uppercase">{{ dt?.override_name }}</div>
+                                <div class="text-body1 text-uppercase text-italic">{{ dt?.override_position }}</div>
+                                <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
+                            </div>
+                            <div v-if="!dt?.is_overide">
+                                <img :src="FormatSignature(dt?.original_signature)" width="150"/>
+                                <div class="text-h6 text-uppercase">{{ dt?.original_approver_name }}</div>
+                                <div class="text-body1 text-uppercase text-italic">{{ dt?.original_approver_position }}</div>
+                                <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
+                            </div>
+                        </div>
+                        <div v-if="dt?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management'])" class="q-mt-md">
+                            <q-checkbox v-model="overide_signatories" :val="dt?.id" label="Overide" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="sm" class="tex-caption"/>
+                        </div>
                     </div>
                 </div>
             </q-card-section>
@@ -142,6 +162,20 @@
                                 </q-card-section>
                                 <q-card-actions>
                                     <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Approve(attendanceId)"/>
+                                </q-card-actions>
+                            </q-card>
+                        </q-menu>
+                    </q-btn>
+                    <q-btn v-if="DTRStore.data?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management'])" :disable="!HasOverrideSignatories" unelevated size="md" color="primary" class="btn text-capitalize" label="overide" >
+                        <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                            <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
+                                <q-card-section>
+                                    <div class="text-h6 text-center text-uppercase">
+                                        proceed to overide signature
+                                    </div>
+                                </q-card-section>
+                                <q-card-actions>
+                                    <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Overide(DTRStore.data?.id)"/>
                                 </q-card-actions>
                             </q-card>
                         </q-menu>
@@ -210,7 +244,7 @@ const PopulateData = () => {
 }
 
 const attendanceId = ref('');
-const logs = ref([]);
+const dtr = ref([]);
 const signatories = ref([]);
 
 const LoadAttendance = async () => {
@@ -222,10 +256,11 @@ const LoadAttendance = async () => {
                 year: DTRStore.year
             }
         });
-        const { results, approvals, id } = response.data;
-        logs.value = results;
+        const { logs, approvals, id } = response.data;
+        dtr.value = logs;
         attendanceId.value = id;
         signatories.value = approvals;
+        console.log('approvals', signatories.value)
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -290,20 +325,20 @@ const FormatMinutes = (value) => {
 };
 
 const canApprove = computed(() => {
-    if (!signatories.value || signatories.value.length === 0) return false;
+    const list = signatories.value || [];
+    if (!list.length) return false;
 
-    // Sort approvals by setting order
-    const sorted = [...signatories.value].sort(
-        (a, b) => a.setting.order - b.setting.order
-    );
+    // Sort by order
+    const sorted = [...list].sort((a, b) => Number(a.order) - Number(b.order));
 
-    // Find the first pending approval
-    const nextPending = sorted.find(req => req.status === 'Pending');
+    // First pending
+    const nextPending = sorted.find(a => a.status === 'Pending');
     if (!nextPending) return false;
 
-    // Check if the current user is the approver of the next pending approval
-    return nextPending.setting?.approver?.id === AuthStore.user?.id;
+    // Current user can approve only if they are the approver_id of the next pending
+    return Number(nextPending.approver_id) === Number(AuthStore.user?.id);
 });
+
 
 const Approve = async (id) => {
     SubmitLoading.value = true;
@@ -311,7 +346,7 @@ const Approve = async (id) => {
     const s = signatories.value;
     const myRequest = s.find(approval =>
     Number(
-            approval?.setting?.approver_id
+            approval?.approver_id
         ) === Number(userId)
     );
     const approvalid = myRequest?.id ?? null;
@@ -394,6 +429,44 @@ const Print = async (id) => {
         printDialog.value = true;
     } catch (error) {
         console.error("Error generating PDF:", error);
+    } finally {
+        SubmitLoading.value = false;
+    }
+}
+
+const overide_signatories = ref([]);
+
+const HasOverrideSignatories = computed(() =>
+    Array.isArray(overide_signatories.value) &&
+    overide_signatories.value.some(v => String(v).trim() !== '')
+)
+
+const Overide = async (id) => {
+    SubmitLoading.value = true;
+    try {
+        const response = await api.post(`attendance/${id}/overide`, {
+            signatories: overide_signatories.value
+        })
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+        emit('saved');
+        emit('update:modelValue', null);
+    } catch (error) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
     } finally {
         SubmitLoading.value = false;
     }
