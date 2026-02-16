@@ -94,6 +94,39 @@
                                     dropdown-icon="keyboard_arrow_down"
                                     :no-error-icon="true"
                                     class="text-capitalize"
+                                    v-if="type !== 'Vacancy'"
+                                >
+                                    <template v-slot:no-option>
+                                        <q-item>
+                                            <q-item-section class="text-italic text-grey">
+                                            No options
+                                            </q-item-section>
+                                        </q-item>
+                                    </template>
+                                    <template v-slot:option="scope">
+                                        <q-item v-bind="scope.itemProps">
+                                            <q-item-section>
+                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                                <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
+                                            </q-item-section>
+                                        </q-item>
+                                    </template>
+                                </q-select>
+                                <q-select
+                                    outlined
+                                    v-model="ownerid"
+                                    label="Choose Owner"
+                                    emit-value
+                                    map-options
+                                    use-input
+                                    input-debounce="300"
+                                    :options="filteredApprovers"
+                                    @filter="filterApproverFn"
+                                    :error="Errors.ownerid.type"
+                                    dropdown-icon="keyboard_arrow_down"
+                                    :no-error-icon="true"
+                                    class="text-capitalize"
+                                    v-if="type === 'Vacancy'"
                                 >
                                     <template v-slot:no-option>
                                         <q-item>

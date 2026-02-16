@@ -29,7 +29,7 @@
                 <div class="row q-col-gutter-lg q-mb-md">
                     <div>
                         <div class="text-caption text-uppercase text-grey">department</div>
-                        <div class="text-body1 text-capitalize">{{ info?.department?.name }}</div>
+                        <div class="text-body1 text-capitalize">{{ info?.position?.department?.name }}</div>
                     </div>
                     <div>
                         <div class="text-caption text-uppercase text-grey">shift</div>
@@ -110,7 +110,7 @@
                             </q-card>
                         </q-menu>
                     </q-btn>
-                    <q-btn v-if="RecruitmentStore.data?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management'])" :disable="!HasOverrideSignatories" unelevated size="md" color="primary" class="btn text-capitalize" label="overide" >
+                    <q-btn v-if="RecruitmentStore.data?.status == 'Requested' && AuthStore.hasRole(['SuperAdmin', 'Management'])" :disable="!HasOverrideSignatories" unelevated size="md" color="primary" class="btn text-capitalize" label="overide" >
                         <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                             <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
                                 <q-card-section>
@@ -236,7 +236,8 @@ const Approve = async (id) => {
     );
     const approvalid = myRequest?.id ?? null;
     try {
-        const response = await api.post(`recruitment/${id}/approve`, {
+        const response = await api.post(`socket/vacancy/approve`, {
+            id,
             approvalid: approvalid
         })
         Toast.fire({
@@ -249,44 +250,6 @@ const Approve = async (id) => {
         emit('saved');
         emit('update:modelValue', null);
     } catch (error) {
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-    } finally {
-        SubmitLoading.value = false;
-    }
-}
-
-const UpdateList = (data) => {
-    const index = rows.value.findIndex(item => item.id === data.id)
-    if (index !== -1) {
-        rows.value[index] = data
-    }
-}
-
-const Toggle = async () => {
-    SubmitLoading.value = true;
-    try {
-        const response = isActive.value
-            ? await api.post(`/recruitment/${id.value}/disable`)
-            : await api.post(`/recruitment/${id.value}/enable`)
-        DetailDialog.value = false;
-        UpdateList(response.data.vacancy);
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.msg}<div>
-            `
-        });
-    } catch (e) {
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
             Toast.fire({
@@ -347,17 +310,6 @@ const FormatSignature = (sign) => {
     return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
 
-const FormatName = (profile) => {
-    if (!profile) return '';
-    const firstname = profile.first_name || '';
-    const middlename = profile.middle_name
-        ? profile.middle_name.charAt(0).toUpperCase() + '.'
-        : '';
-    const lastname = profile.last_name || '';
-    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
-    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
-}
-
 const applyBackendErrors = (backendErrors) => {
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
@@ -404,7 +356,8 @@ const HasOverrideSignatories = computed(() =>
 const Overide = async (id) => {
     SubmitLoading.value = true;
     try {
-        const response = await api.post(`recruitment/${id}/overide`, {
+        const response = await api.post(`/socket/vacancy/overide`, {
+            id,
             signatories: overide_signatories.value
         })
         Toast.fire({

@@ -182,10 +182,9 @@
                     </div>
                 </div>
             </q-card-section>
-            
             <q-card-actions class="q-pa-lg bg">
                 <div class="row q-col-gutter-sm">
-                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR']))">
+                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])) && ApplicationStore.data?.vacancy?.status === 'Approved'">
                         <q-select
                             outlined
                             v-model="applicationstatus"
@@ -197,7 +196,7 @@
                             dense
                         />
                     </div>
-                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR']))">
+                    <div v-if="(info?.status !== 'Hired' && info?.status !== 'Rejected' && info?.status !== 'Withdrawn') && (AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])) && ApplicationStore.data?.vacancy?.status === 'Approved'">
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="update" >
                             <q-menu transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                                 <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
@@ -302,7 +301,8 @@ const PopulateData = () => {
 const Update = async () => {
     SubmitLoading.value = true;
     try {
-        const response = await api.post(`/application/${ApplicationStore.data?.id}/update`, {
+        const response = await api.post(`/socket/application/update`, {
+            id: ApplicationStore.data?.id,
             status: applicationstatus.value
         });
         emit('saved');

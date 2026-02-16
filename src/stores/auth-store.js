@@ -3,7 +3,6 @@ import { api } from 'src/boot/axios';
 import { LocalStorage } from 'quasar';
 import { useRouter } from 'vue-router';
 import { Router } from 'src/router/index';
-// import { socket } from 'src/boot/socket'; // Not needed to import directly here for subscription
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -13,8 +12,8 @@ export const useAuthStore = defineStore('auth', {
         //
         onlineUsers: [],
         employees: [],
-        notificationCount: 0,
-        notificationList: [],
+        notifications: [],
+        count: 0,
         hasNotifications: null,
     }),
     getters: {
@@ -93,8 +92,8 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async readNotification() {
-            this.notificationCount = 0;
-            // this.socket.emit('readNotification', { id });
+            this.count = 0;
+            this.socket.emit('ReadNotification', { id: this.user.id });
         },
     },
     persist: true,

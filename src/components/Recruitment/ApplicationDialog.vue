@@ -38,7 +38,7 @@
                         <div v-if="step === 1">
                             <div class="text-overline text-uppercase text-bold q-mb-md">personal information</div>
                             <div class="row q-col-gutter-xs q-mb-md">
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.firstname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.firstname.type ? Errors.firstname.msg : 'firstname' }}</div>
                                     <q-input 
                                         v-model="firstname" 
@@ -49,7 +49,7 @@
                                         input-class="text-capitalize"
                                     />
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.middlename.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.middlename.type ? Errors.middlename.msg : 'middlename' }}</div>
                                     <q-input 
                                         v-model="middlename" 
@@ -60,7 +60,7 @@
                                         input-class="text-capitalize"
                                     />
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.lastname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.lastname.type ? Errors.lastname.msg : 'lastname' }}</div>
                                     <q-input 
                                         v-model="lastname" 
@@ -152,6 +152,7 @@
                                         outlined 
                                         :error="Errors.contactNo.type"
                                         :no-error-icon="true"
+                                        mask="###########"
                                     />
                                 </div>
                             </div>
@@ -1070,7 +1071,7 @@ const Save = async () => {
                 Data.append(`documents[${index}][file]`, doc.file);
             }
         });
-        const response = await api.post('/application', Data, {
+        const response = await api.post('/socket/application/create', Data, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }

@@ -439,6 +439,11 @@ body {
   color: #ffffff !important;
 }
 
+.swal-toast.swal2-icon-info {
+  background-color: $blue !important; /* green */
+  color: #ffffff !important;
+}
+
 /* ERROR */
 .swal-toast.swal2-icon-error {
   background-color: $negative !important; /* red */

@@ -13,6 +13,11 @@ const socket = io(process.env.VUE_APP_BACKEND_URL, {
 export default boot(({ app, router }) => {
     app.config.globalProperties.$socket = socket; // Make socket available globally
 
+    app.config.globalProperties.$readNotifications = () => {
+        if (!socket || !socket.connected) return
+        socket.emit('ReadNotification') // no id; server uses socket auth user
+    }
+
     const authStore = useAuthStore();
 
     // Event listener for successful socket authentication
@@ -49,6 +54,8 @@ export default boot(({ app, router }) => {
             socket.emit('authenticate', { token: authStore.token });
             //Register event listeners once reloaded
             socket.emit('register', { token: authStore.token });
+            // Join the user room
+            socket.emit('join', authStore.user.id);
         }
 
         // Handle all users logs
@@ -63,24 +70,18 @@ export default boot(({ app, router }) => {
         });
 
         // Handle notifications
-        socket.on('EmitNotifications', (notificationCount, notifications) => {
-            authStore.notificationCount = notificationCount;
-            authStore.notificationList = notifications;
-            console.log(`notifications loaded:`, notifications);
-            if (notificationCount > 0) {
-                Toast.fire({
-                    icon: "info",
-                    html: `
-                        <div class="text-h6 text-bold text-uppercase">New Notifications!</div>
-                        <div class="text-caption;">You have ${notificationCount} new notifications.<div>
-                    `
-                });
-                authStore.hasNotifications = true;
-            } else {
-                authStore.hasNotifications = false;
-            }
-            
-        });
+        socket.on('EmitNotifications', (data) => {
+
+            const count = data.count
+            const notifications = data.notifications
+
+            // example: store in Pinia
+            authStore.count = count
+            authStore.notifications = notifications
+            authStore.hasNotifications = true
+
+        })
+
 
     });
 
@@ -116,10 +117,10 @@ export default boot(({ app, router }) => {
         
         // Handle notification read state
         // If notification count is 0 and hasNotifications is true, emit readNotification
-        if (state.notificationCount == 0 && state.hasNotifications) {
-            const id = state.user.id;
-            socket.emit('readNotification', { id });
-        }
+        // if (state.count == 0 && state.hasNotifications) {
+        //     const id = state.user.id;
+        //     socket.emit('ReadNotification', { id });
+        // }
     });
 
     // Initial connection attempt if user is already authenticated on app load

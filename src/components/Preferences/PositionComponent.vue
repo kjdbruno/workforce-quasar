@@ -30,6 +30,7 @@
                         <div class="text-caption text-uppercase">{{ formatSalary(data) }}</div>
                     </q-card-section>
                     <q-card-section class="text-center full-width">
+                        <div class="text-caption text-capitalize">{{ data.department?.name }}</div>
                         <div class="text-caption text-grey text-uppercase">{{ data?.status }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm"  style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'" ></div>
@@ -44,7 +45,7 @@
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
                             <q-input 
                                 v-model="name" 
@@ -54,6 +55,39 @@
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
                             />
+                        </div>
+                        <div class="col-2">
+                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.departmentId.type ? 'text-negative' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'departmentI' }}</div>
+                            <q-select
+                                outlined
+                                v-model="departmentId"
+                                label="Choose Department"
+                                emit-value
+                                map-options
+                                use-input
+                                input-debounce="300"
+                                :options="filteredDepartments"
+                                @filter="filterDepartmentFn"
+                                :error="Errors.departmentId.type"
+                                dropdown-icon="keyboard_arrow_down"
+                                :no-error-icon="true"
+                                class="text-capitalize"
+                            >
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-italic text-grey">
+                                        No options
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                        <q-item-section>
+                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </template>
+                            </q-select>
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
@@ -212,6 +246,7 @@ const submitLoading = ref(false);
 
 const id = ref('');
 const name = ref('');
+const departmentId = ref('');
 const monthly = ref('');
 const daily = ref('');
 const hourly = ref('');
@@ -222,6 +257,7 @@ const isActive = ref(false);
 
 const Errors = reactive({
     name: { type: null, msg: '' },
+    departmentId: { type: null, msg: '' },
     monthly: { type: null, msg: '' },
     daily: { type: null, msg: '' },
     hourly: { type: null, msg: '' },
@@ -241,6 +277,7 @@ const Validations = () => {
     Errors.qualifications.name = { type: null, msg: '' }
     
     if (!name.value) { Errors.name.type = true; Errors.name.msg = 'required'; isError = true } else { Errors.name.type = null; }
+    if (!departmentId.value) { Errors.departmentId.type = true; Errors.departmentId.msg = 'required'; isError = true } else { Errors.departmentId.type = null; }
     if (!monthly.value) { Errors.monthly.type = true; Errors.monthly.msg = 'required'; isError = true } else { Errors.monthly.type = null; }
     if (!daily.value) { Errors.daily.type = true; Errors.daily.msg = 'required'; isError = true; } else { Errors.daily.type = null; }
     if (!hourly.value) { Errors.hourly.type = true; Errors.hourly.msg = 'required'; isError = true; } else { Errors.hourly.type = null; }
@@ -351,6 +388,7 @@ const ModifyDialog = async (data) => {
     isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
+    departmentId.value = Number(data.department_id);
     monthly.value = data.monthly_salary;
     daily.value = data.daily_salary;
     hourly.value = data.hourly_salary;
@@ -362,6 +400,7 @@ const ModifyDialog = async (data) => {
 
 const ResetForm = () => {
     id.value = '';
+    departmentId.value = '';
     name.value = '';
     monthly.value = '';
     daily.value = '';
@@ -370,6 +409,7 @@ const ResetForm = () => {
     description.value = '';
     qualifications.value = [""];
     Errors.name.type = null;
+    Errors.departmentId.type = null;
     Errors.monthly.type = null;
     Errors.daily.type = null;
     Errors.hourly.type = null;
@@ -384,6 +424,7 @@ const Save = async () => {
         const response = id.value && isEdit
             ? await api.post(`/position/${id.value}/update`, {
                 name: name.value,
+                departmentId: departmentId.value,
                 monthly: monthly.value,
                 daily: daily.value,
                 hourly: hourly.value,
@@ -393,6 +434,7 @@ const Save = async () => {
             })
             : await api.post('/position', {
                 name: name.value,
+                departmentId: departmentId.value,
                 monthly: monthly.value,
                 daily: daily.value,
                 hourly: hourly.value,
@@ -429,17 +471,20 @@ const applyBackendErrors = (backendErrors) => {
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
+
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
-        Errors[key].messages = []
+        Errors[key].msg = null
     })
+
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
+            Errors[err.path].msg = err.msg // just string
         }
     })
 }
+
 
 const UpdateList = (data) => {
     const index = rows.value.findIndex(item => item.id === data.id)
@@ -526,7 +571,39 @@ const remove = (index) => {
 
 onMounted(() => {
     LoadAll();
+    LoadDepartments()
 })
+
+const departments = ref([]);
+const filteredDepartments = ref([]);
+const createFilterFn = (sourceRef, targetRef) => {
+    return (val, update) => {
+        if (val === '') {
+        update(() => { targetRef.value = sourceRef.value; });
+            return;
+        }
+        update(() => {
+            const needle = val.toLowerCase();
+            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
+        });
+    };
+};
+const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
+const LoadDepartments = async () => {
+    try {
+        const { data } = await api.get(`/position/option/department`);
+        departments.value = (data || []).map(d => {
+            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
+            return {
+                label: baseLabel,
+                value: Number(d.value ?? d.id)
+            };
+        });
+        filteredDepartments.value = [...departments.value];
+    } catch (error) {
+        console.error("Error fetching options:", error);
+    }
+};
 
 </script>
 

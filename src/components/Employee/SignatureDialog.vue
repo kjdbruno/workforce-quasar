@@ -228,7 +228,8 @@ const initSignaturePad = () => {
 
     pad = new SignaturePad(canvas, {
         backgroundColor: 'rgba(255,255,255,0)',
-        penColor: '#000'
+        penColor: '#000',
+        maxWidth: 4, 
     })
 }
 

@@ -76,39 +76,6 @@
                                     </q-input>
                                 </div>
                                 <div class="col-2">
-                                    <div class="text-caption text-uppercase" :class="Errors.departmentId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'department' }}</div>
-                                    <q-select
-                                        outlined
-                                        v-model="departmentId"
-                                        label="Choose Department"
-                                        emit-value
-                                        map-options
-                                        use-input
-                                        input-debounce="300"
-                                        :options="filteredDepartments"
-                                        @filter="filterDepartmentFn"
-                                        :error="Errors.departmentId.type"
-                                        dropdown-icon="keyboard_arrow_down"
-                                        :no-error-icon="true"
-                                        class="text-capitalize"
-                                    >
-                                        <template v-slot:no-option>
-                                            <q-item>
-                                                <q-item-section class="text-italic text-grey">
-                                                No options
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                        <template v-slot:option="scope">
-                                            <q-item v-bind="scope.itemProps">
-                                                <q-item-section>
-                                                    <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                    </q-select>
-                                </div>
-                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.shiftId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.shiftId.type ? Errors.shiftId.msg : 'Shift' }}</div>
                                     <q-select
                                         outlined
@@ -142,7 +109,9 @@
                                         </template>
                                     </q-select>
                                 </div>
-                                <div class="col-6">
+                            </div>
+                            <div class="row q-col-gutter-xs q-mb-md">
+                                <div class="col-4">
                                     <div class="text-caption text-uppercase" :class="Errors.location.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.location.type ? Errors.location.msg : 'location' }}</div>
                                     <q-input 
                                         v-model="location" 
@@ -166,7 +135,7 @@
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs">
-                                <div class="col-6">
+                                <div class="col-4">
                                     <div class="text-caption text-uppercase" :class="Errors.justification.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.justification.type ? Errors.justification.msg : 'justification' }}</div>
                                     <q-input 
                                         v-model="justification" 
@@ -236,7 +205,6 @@ const isOpen = computed({
 const PopulateData = () => {
     ResetForm();
     LoadPositions();
-    LoadDepartments();
     LoadShifts();
     step.value = 0;
 }
@@ -244,7 +212,6 @@ const PopulateData = () => {
 const SubmitLoading = ref(false);
 
 const position = ref('');
-const departmentId = ref('');
 const shiftId = ref('');
 const date = ref(new Date().toISOString().split('T')[0]);
 const location = ref('');
@@ -255,7 +222,6 @@ const needBackgroundCheck = ref(false);
 
 const Errors = reactive({
     position: { type: null, msg: '' },
-    departmentId: { type: null, msg: '' },
     shiftId: { type: null, msg: '' },
     employmentStatus: { type: null, msg: '' },
     date: { type: null, msg: '' },
@@ -310,7 +276,6 @@ const ValidateInfo = () => {
     } else if (date.value) {
         clearErr('date')
     }
-    isError ||= req('departmentId', departmentId.value)
     isError ||= req('shiftId', shiftId.value)
     isError ||= req('location', location.value)
     isError ||= req('movement', movement.value)
@@ -324,7 +289,6 @@ const qualifications = ref([]);
 
 const ResetForm = () => {
     position.value = '';
-    departmentId.value = '';
     shiftId.value = '';
     date.value = new Date().toISOString().split('T')[0];
     location.value = '';
@@ -346,9 +310,8 @@ const Save = async () => {
     if (ValidateInfo && !ValidateInfo()) return;
     SubmitLoading.value = true;
     try {
-        const response = await api.post('/recruitment', {
+        const response = await api.post('/socket/vacancy/create', {
             positionId: position.value.id,
-            departmentId: departmentId.value,
             shiftId: shiftId.value,
             date: date.value,
             location: location.value,
@@ -367,13 +330,14 @@ const Save = async () => {
             `
         });
     } catch (e) {
+        console.error(e.response?.data?.error);
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
             Toast.fire({
                 icon: "error",
                 html: `
                     <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
+                    <div class="text-caption">${e.response?.data?.error}</div>
                 `
             })
         }
@@ -400,10 +364,8 @@ const applyBackendErrors = (backendErrors) => {
 
 const employmentstatuses = ref(['Regular', 'Probationary', 'Contractual', 'Temporary', 'Intern']);
 const positions = ref([]);
-const departments = ref([]);
 const shifts = ref([]);
 
-const filteredDepartments = ref([]);
 const filteredShifts = ref([]);
 
 const createFilterFn = (sourceRef, targetRef) => {
@@ -419,24 +381,7 @@ const createFilterFn = (sourceRef, targetRef) => {
     };
 };
 
-const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
 const filterShiftFn = createFilterFn(shifts, filteredShifts);
-
-const LoadDepartments = async () => {
-    try {
-        const { data } = await api.get(`/recruitment/option/department`);
-        departments.value = (data || []).map(d => {
-            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
-            return {
-                label: baseLabel,
-                value: Number(d.value ?? d.id)
-            };
-        });
-        filteredDepartments.value = [...departments.value];
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
 
 const LoadShifts = async () => {
     try {

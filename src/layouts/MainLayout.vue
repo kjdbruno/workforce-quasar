@@ -11,17 +11,43 @@
                 </q-toolbar-title>
 
                 <div class="q-gutter-sm">
-                    <q-btn flat round dense class="text-white">
+                    <!-- <q-btn flat round dense class="text-white">
                         <q-icon name="bi-chat-square" color="secondary" />
                         <q-badge color="red" floating>2</q-badge>
-                    </q-btn>
+                    </q-btn> -->
 
                     <q-btn flat round dense class="text-white">
                         <q-icon name="bi-bell" color="secondary" />
-                        <q-badge color="red" floating>2</q-badge>
+                        <q-badge color="red" floating>{{ authStore.count }}</q-badge>
+                        <q-menu :offset="[5, 5]" class="radius-md" @hide="() => { ReadNotification()}" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                            <q-card class="no-shadow" style="width: 350px;" >
+                                <div v-if="authStore.count === 0" class="q-pa-md text-center">
+                                    <div class="text-caption text-uppercase text-secondary">No new notifications</div>  
+                                </div>
+                                <div v-else>
+                                    <q-card-section>
+                                        <div class="text-uppercase text-h6 text-center" > my notifications </div>
+                                    </q-card-section>
+                                    <q-separator />
+                                    <q-card-section class="q-pa-none" >
+                                        <q-list>
+                                            <q-item v-for="(dt, index) in authStore.notifications" :key="index" class="q-mb-sm">
+                                                <q-item-section>
+                                                    <q-item-label>{{ dt.content }}</q-item-label>
+                                                    <q-item-label caption lines="1">{{ formatDate(dt.createdAt) }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </q-list>
+                                    </q-card-section>
+                                </div>
+                            </q-card>
+                        </q-menu>
                     </q-btn>
 
-                    <q-btn flat round dense class="text-white" @click="meDialog = !meDialog">
+                    <q-btn v-if="authStore.user.role === 'SuperAdmin'" flat round dense @click="() => { authStore.logout() }">
+                        <q-icon name="bi-box-arrow-right" color="secondary" />
+                    </q-btn>
+                    <q-btn v-else flat round dense class="text-white" @click="meDialog = !meDialog">
                         <q-icon name="bi-person" color="secondary" />
                         <q-badge color="positive" rounded floating />
                     </q-btn>
@@ -151,7 +177,8 @@
 import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth-store';
-// import moment from 'moment';
+import moment from 'moment';
+import { socket } from 'src/boot/socket'
 
 const router = useRouter();
 const route = useRoute();
@@ -225,6 +252,14 @@ onBeforeMount(() => {
         import.meta.url
     ).href;
 })
+
+const formatDate = (timestamp) => {
+    return moment(timestamp).fromNow();
+};
+
+const ReadNotification = () => {
+    if (socket?.connected) socket.emit('ReadNotification')
+}
 
 </script>
 
