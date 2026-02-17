@@ -13,20 +13,20 @@
                                 <div class="col-8">
                                     <div class="text-caption text-uppercase q-mb-sm" :class="Errors.position.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.position.type ? Errors.position.msg : 'position' }}</div>
                                     <div class="card-grid">
-                                        <div class="card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                            <q-card class="card card-menu custom-border card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
+                                        <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
+                                            <q-card class="card card-menu custom-border card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
                                                 <q-card-section class="text-center">
                                                     <div class="text-caption text-dark text-uppercase">no record found</div>
                                                 </q-card-section>
                                             </q-card>
                                         </div>
                                         <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
-                                            <q-card @click="() => { position = data }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': position === data }">
+                                            <q-card @click="() => { position = data }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': position === data }">
                                                 <q-card-section class="text-center">
                                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
                                                 </q-card-section>
                                                 <div class="absolute-left">
-                                                    <q-radio v-model="position" :val="data" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                                    <q-radio v-model="position" :val="data" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" />
                                                 </div>
                                             </q-card>
                                         </div>
@@ -47,7 +47,7 @@
                                             <div class="text-caption">
                                                 <template v-if="Array.isArray(position?.qualification) && position?.qualification.length">
                                                     <div v-for="(dt, index) in position?.qualification" :key="index">
-                                                    {{ index + 1 }}. {{ dt }}
+                                                        {{ index + 1 }}. {{ dt }}
                                                     </div>
                                                 </template>
                                                 <div v-else>
@@ -63,7 +63,7 @@
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase" :class="Errors.employmentStatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employmentStatus.type ? Errors.employmentStatus.msg : 'employment status' }}</div>
                                 <div class="q-gutter-sm">
-                                    <q-radio v-for="value in employmentstatuses" v-model="employmentStatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                                    <q-radio v-for="value in employmentstatuses" v-model="employmentStatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
@@ -88,7 +88,7 @@
                                         :options="filteredShifts"
                                         @filter="filterShiftFn"
                                         :error="Errors.shiftId.type"
-                                        dropdown-icon="keyboard_arrow_down"
+                                        hide-dropdown-icon
                                         :no-error-icon="true"
                                         class="text-capitalize"
                                     >
@@ -125,13 +125,13 @@
                             </div>
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase text-grey">background check</div>
-                                <q-checkbox right-label v-model="needBackgroundCheck" label="need background check?" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-uppercase"/>
+                                <q-checkbox right-label v-model="needBackgroundCheck" label="need background check?" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-uppercase"/>
                             </div>
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase" :class="Errors.movement.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.movement.type ? Errors.movement.msg : 'movement' }}</div>
                                 <div class="q-gutter-sm">
-                                    <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Addition" label="addition to department"  class="text-uppercase" />
-                                    <q-radio v-model="movement" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" val="Replacement" label="replacement"  class="text-uppercase" />
+                                    <q-radio v-model="movement" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" val="Addition" label="addition to department"  class="text-uppercase" />
+                                    <q-radio v-model="movement" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" val="Replacement" label="replacement"  class="text-uppercase" />
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs">

@@ -7,7 +7,7 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="row q-col-gutter-xs q-mb-md">
-                    <div class="col-3">
+                    <div class="col-2">
                         <div class="text-caption text-uppercase" :class="Errors.firstname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.firstname.type ? Errors.firstname.msg : 'firstname' }}</div>
                         <q-input 
                             v-model="firstname" 
@@ -18,7 +18,7 @@
                             input-class="text-capitalize"
                         />
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <div class="text-caption text-uppercase" :class="Errors.middlename.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.middlename.type ? Errors.middlename.msg : 'middlename' }}</div>
                         <q-input 
                             v-model="middlename" 
@@ -29,7 +29,7 @@
                             input-class="text-capitalize"
                         />
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <div class="text-caption text-uppercase" :class="Errors.lastname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.lastname.type ? Errors.lastname.msg : 'lastname' }}</div>
                         <q-input 
                             v-model="lastname"
@@ -56,13 +56,13 @@
                     <div class="col-2">
                         <div class="text-caption text-uppercase" :class="Errors.sex.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.sex.type ? Errors.sex.msg : 'sex' }}</div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in sexes" v-model="sex" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            <q-radio v-for="value in sexes" v-model="sex" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                         </div>
                     </div>
                     <div class="col">
                         <div class="text-caption text-uppercase" :class="Errors.civilstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.civilstatus.type ? Errors.civilstatus.msg : 'civil status' }}</div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                         </div>
                     </div>
                 </div>

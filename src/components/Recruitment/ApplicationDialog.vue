@@ -13,23 +13,23 @@
                             <div class="text-caption text-uppercase q-mb-sm" :class="Errors.vacancyId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.vacancyId.type ? Errors.vacancyId.msg : 'position' }}</div>
                             <div class="card-grid">
                                 <div key="data-none" class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="displayedVacancies.length === 0">
-                                    <q-card class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label">
+                                    <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label">
                                         <q-card-section class="text-center full-width q-pa-none">
                                             <div class="text-caption text-uppercase text-grey">no data found</div>
                                         </q-card-section>
                                     </q-card>
                                 </div>
                                 <div v-for="(data, index) in displayedVacancies" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                                    <q-card class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" tag="label" :class="{ 'card--active': vacancyId === data.id }" @click="vacancyId = data.id" >
-                                        <q-card-section class="text-center full-width q-pa-none">
+                                    <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label" :class="{ 'card--active': vacancyId === data.id }" @click="vacancyId = data.id" >
+                                        <q-card-section class="text-center">
                                             <div class="text-caption text-uppercase">{{ data?.position?.name }}</div>
                                             <div class="text-caption text-grey text-uppercase">{{ (data?.position?.salary_type == 'Monthly' ? formatCurrency(data?.position?.monthly_salary) : (data?.position?.salary_type == 'Daily' ? formatCurrency(data?.position?.daily_salary) : data?.position?.salary_type == 'Hourly' ? formatCurrency(data?.position?.hourly_salary) : null)) }}</div>
                                         </q-card-section>
-                                        <q-card-section class="q-pa-none">
+                                        <q-card-section>
                                             <div class="text-caption text-capitalize text-grey">{{ data?.department?.name }}</div>
                                         </q-card-section>
                                         <div class="checkmark-overlay">
-                                            <q-radio v-model="vacancyId" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                            <q-radio v-model="vacancyId" :val="data.id" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" />
                                         </div>
                                     </q-card>
                                 </div>
@@ -87,13 +87,13 @@
                                 <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.sex.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.sex.type ? Errors.sex.msg : 'sex' }}</div>
                                     <div class="q-gutter-sm">
-                                        <q-radio v-for="value in sexes" v-model="sex" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                                        <q-radio v-for="value in sexes" v-model="sex" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                                     </div>
                                 </div>
                                 <div class="col-10">
                                     <div class="text-caption text-uppercase" :class="Errors.civilstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.civilstatus.type ? Errors.civilstatus.msg : 'civil status' }}</div>
                                     <div class="q-gutter-sm">
-                                        <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                                        <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                                     </div>
                                 </div>
                             </div>
@@ -186,7 +186,7 @@
                                             input-debounce="300"
                                             :options="schoollevels"
                                             :error="Errors.educations.schoollevel.type[index]"
-                                            dropdown-icon="keyboard_arrow_down"
+                                            hide-dropdown-icon
                                             :no-error-icon="true"
                                         >
                                             <template v-slot:no-option>
@@ -217,7 +217,7 @@
                                             :options="filteredSchools"
                                             @filter="filterSchoolFn"
                                             :error="Errors.educations.schoolId.type[index]"
-                                            dropdown-icon="keyboard_arrow_down"
+                                            hide-dropdown-icon
                                             :no-error-icon="true"
                                         >
                                             <template v-slot:no-option>
@@ -248,7 +248,7 @@
                                             :options="filteredCourses"
                                             @filter="filterCoursesFn"
                                             :error="Errors.educations.courseId.type[index]"
-                                            dropdown-icon="keyboard_arrow_down"
+                                            hide-dropdown-icon
                                             :no-error-icon="true"
                                         >
                                             <template v-slot:no-option>
@@ -285,7 +285,7 @@
                                         <q-btn 
                                             v-if="educations.length > 1" 
                                             round 
-                                            icon="delete" 
+                                            icon="bi-trash3" 
                                             flat 
                                             unelevated 
                                             color="grey" 
@@ -326,7 +326,7 @@
                                             input-debounce="300"
                                             :options="trainingtypes"
                                             :error="Errors.trainings.trainingtype.type[index]"
-                                            dropdown-icon="keyboard_arrow_down"
+                                            hide-dropdown-icon
                                             :no-error-icon="true"
                                         >
                                             <template v-slot:no-option>
@@ -382,7 +382,7 @@
                                         <q-btn 
                                             v-if="trainings.length > 1" 
                                             round 
-                                            icon="delete" 
+                                            icon="bi-trash3" 
                                             flat 
                                             unelevated 
                                             color="grey" 
@@ -449,7 +449,7 @@
                                         <q-btn 
                                             v-if="experiences.length > 1" 
                                             round 
-                                            icon="delete" 
+                                            icon="bi-trash3" 
                                             flat 
                                             unelevated 
                                             color="grey" 
@@ -483,7 +483,7 @@
                                         <q-btn 
                                             v-if="documents.length > 1" 
                                             round 
-                                            icon="delete" 
+                                            icon="bi-trash3" 
                                             flat 
                                             unelevated 
                                             color="grey" 
@@ -569,7 +569,7 @@ const birthdate = ref(new Date().toISOString().split('T')[0]);
 const birthplace = ref('');
 const address = ref('');
 const email = ref('');
-const contactNo = ref('09');
+const contactNo = ref('');
 const educations = ref([
     {
         schoollevel: "",
@@ -1009,7 +1009,7 @@ const ResetForm = () => {
     birthplace.value = '';
     address.value = '';
     email.value = '';
-    contactNo.value = '09';
+    contactNo.value = '';
     educations.value = ([
         {
             schoollevel: "",

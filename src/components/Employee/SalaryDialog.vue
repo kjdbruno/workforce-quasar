@@ -10,20 +10,20 @@
                     <div class="text-caption text-uppercase text-grey" >position</div>
                     <div class="card-grid">
                         <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                            <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
+                            <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">no record found</div>
                                 </q-card-section>
                             </q-card>
                         </div>
                         <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
-                            <q-card @click="() => { positionid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" :class="{ 'card--active': positionid === data.id }">
+                            <q-card @click="() => { position = data; salarytype = data.salary_type; amount = data.amount }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': position === data }">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
                                     <div class="text-caption text-grey text-uppercase">{{ formatCurrency(data?.amount) }}</div>
                                 </q-card-section>
                                 <div class="absolute-left">
-                                    <q-radio v-model="positionid" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                    <q-radio v-model="position" :val="data" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs"/>
                                 </div>
                             </q-card>
                         </div>
@@ -32,7 +32,7 @@
                 <div class="q-mb-md">
                     <div class="text-caption text-uppercase" :class="Errors.salarytype.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
                     <div class="q-gutter-sm">
-                        <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                        <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value"/>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
@@ -64,7 +64,7 @@
                             input-debounce="300"
                             :options="salarygroups"
                             :error="Errors.salarygroup.type"
-                            dropdown-icon="keyboard_arrow_down"
+                            hide-dropdown-icon
                             :no-error-icon="true"
                             class="text-capitalize"
                         >
@@ -84,7 +84,7 @@
                             </template>
                         </q-select>
                     </div>
-                    <div class="col-2" v-if="!positionid">
+                    <div class="col-2" v-if="!position">
                         <div class="text-caption text-uppercase" :class="Errors.amount.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.amount.type ? Errors.amount.msg : 'amount' }}</div>
                         <q-input 
                             v-model="amount" 
@@ -97,7 +97,7 @@
                     <div class="col-2">
                         <div class="text-caption text-uppercase text-grey">note</div>
                         <q-input 
-                            v-model="note" 
+                            v-model="notes" 
                             label="Enter Notes"
                             outlined 
                             :no-error-icon="true"
@@ -107,7 +107,7 @@
                 <div class="q-mb-md q-mt-xl">
                     <div class="text-caption text-uppercase" :class="Errors.payrollgroup.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.payrollgroup.type ? Errors.payrollgroup.msg : 'payroll group' }}</div>
                     <div class="q-gutter-sm">
-                        <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
+                        <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" class="text-capitalize"/>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
@@ -121,7 +121,7 @@
                             input-debounce="300"
                             :options="taxstatuses"
                             :error="Errors.taxstatus.type"
-                            dropdown-icon="keyboard_arrow_down"
+                            hide-dropdown-icon
                             :no-error-icon="true"
                             class="text-capitalize"
                         >
@@ -147,6 +147,7 @@
             <q-card-actions class="q-pa-lg bg">
                 <div class="row q-gutter-sm">
                     <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }" outline/>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                     <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
                         <template v-slot:prepend>
@@ -233,7 +234,7 @@ const LoadPositions = async () => {
     }
 };
 
-const positionid = ref('');
+const position = ref('');
 const datestart = ref(new Date().toISOString().split('T')[0]);
 const dateend = ref('');
 const salarygroup = ref('');
@@ -280,7 +281,7 @@ const ValidateSalary = () => {
         : clearErr('dateend')
     isError ||= req('salarygroup', salarygroup.value)
     // amount
-    isError ||= !positionid.value &&
+    isError ||= !position.value &&
         (!amount.value || isNaN(+amount.value) || +amount.value <= 0)
         ? setErr('amount', !amount.value ? 'required' : 'invalid amount')
         : clearErr('amount')
@@ -306,7 +307,7 @@ const Save = async () => {
     SubmitLoading.value = true;
     try {
         const response = await api.post(`/employee/${EmployeeStore.data?.employment?.id}/salary`, {
-            positionid: positionid.value,
+            positionid: (position.value.id ? position.value.id : EmployeeStore.data?.employment?.position?.id),
             salarytype: salarytype.value,
             datestart: datestart.value,
             dateend: dateend.value,
@@ -357,7 +358,7 @@ const applyBackendErrors = (backendErrors) => {
 }
 
 const ResetForm = () => {
-    positionid.value = '';
+    position.value = '';
     datestart.value = new Date().toISOString().split('T')[0];
     dateend.value = '';
     salarytype.value = '';

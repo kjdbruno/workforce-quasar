@@ -88,7 +88,7 @@
                             </div>
                         </div>
                         <div v-if="dt?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management'])" class="q-mt-md">
-                            <q-checkbox v-model="overide_signatories" :val="dt?.id" label="Overide" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="sm" class="tex-caption"/>
+                            <q-checkbox v-model="overide_signatories" :val="dt?.id" label="Overide" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="sm" class="tex-caption"/>
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,6 @@
                         </q-menu>
                     </q-btn>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="() => { Print(RecruitmentStore.data?.id) }"/>
-                    <!-- <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="cancel" @click="Toggle"/> -->
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>

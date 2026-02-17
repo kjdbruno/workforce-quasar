@@ -9,7 +9,7 @@
                 <div class="q-mb-md">
                     <div class="text-caption text-uppercase" :class="Errors.employmentstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employmentstatus.type ? Errors.employmentstatus.msg : 'employment status' }}</div>
                     <div class="q-gutter-sm">
-                        <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
+                        <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" class="text-capitalize"/>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
@@ -31,39 +31,6 @@
                             :error="Errors.employeeNo.type"
                             :no-error-icon="true"
                         />
-                    </div>
-                    <div class="col-2">
-                        <div class="text-caption text-uppercase" :class="Errors.departmentId.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.msg ? Errors.departmentId.msg : 'department' }}</div>
-                        <q-select
-                            outlined
-                            v-model="departmentId"
-                            label="Choose Department"
-                            emit-value
-                            map-options
-                            use-input
-                            input-debounce="300"
-                            :options="filteredDepartments"
-                            @filter="filterDepartmentFn"
-                            :error="Errors.departmentId.type"
-                            dropdown-icon="keyboard_arrow_down"
-                            :no-error-icon="true"
-                            class="text-capitalize"
-                        >
-                            <template v-slot:no-option>
-                                <q-item>
-                                    <q-item-section class="text-italic text-grey">
-                                    No options
-                                    </q-item-section>
-                                </q-item>
-                            </template>
-                            <template v-slot:option="scope">
-                                <q-item v-bind="scope.itemProps">
-                                    <q-item-section>
-                                        <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                            </template>
-                        </q-select>
                     </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
@@ -160,7 +127,6 @@ const SubmitLoading = ref(false);
 const employeeNo = ref('');
 const dateHired = ref('');
 const employmentstatus = ref('');
-const departmentId = ref('');
 const tin = ref('');
 const sssNo = ref('');
 const philhealthNo = ref('');
@@ -170,7 +136,6 @@ const Errors = reactive({
     employeeNo: { type: null, msg: '' },
     dateHired: { type: null, msg: '' },
     employmentstatus: { type: null, msg: '' },
-    departmentId: { type: null, msg: '' },
     tin: { type: null, msg: '' },
     sssNo: { type: null, msg: '' },
     philhealthNo: { type: null, msg: '' },
@@ -197,7 +162,6 @@ const ValidateEmployment = () => {
     let isError = false
 
     isError ||= req('employmentstatus', employmentstatus.value)
-    isError ||= req('departmentId', departmentId.value)
     isError ||= req('dateHired', dateHired.value)
 
     isError ||= maxLen('tin', tin.value, 15, 'invalid')
@@ -210,48 +174,12 @@ const ValidateEmployment = () => {
 }
 
 const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
-const departments = ref([]);
-
-const filteredDepartments = ref([]);
-
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        if (val === '') {
-        update(() => { targetRef.value = sourceRef.value; });
-            return;
-        }
-        update(() => {
-            const needle = val.toLowerCase();
-            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
-        });
-    };
-};
-
-const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
-
-const LoadDepartments = async () => {
-    try {
-        const { data } = await api.get(`/employee/option/department`);
-        departments.value = (data || []).map(d => {
-            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
-            return {
-                label: baseLabel,
-                value: Number(d.value ?? d.id)
-            };
-        });
-        filteredDepartments.value = [...departments.value];
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
 
 const PopulateData = () => {
     const app = EmployeeStore.data;
-    LoadDepartments();
     employeeNo.value = app.employment?.employee_no;
     dateHired.value = app.employment?.date_hired;
     employmentstatus.value = app.employment.employment_status;
-    departmentId.value = Number(app.employment.department_id);
     tin.value = app.employment.tin;
     sssNo.value = app.employment.sss_no;
     philhealthNo.value = app.employment.philhealth_no;
@@ -265,7 +193,6 @@ const Save = async () => {
         const response = await api.post(`/employee/${EmployeeStore.data?.employment?.id}/employment`, {
             employeeNo: employeeNo.value,
             dateHired: dateHired.value,
-            departmentId: departmentId.value,
             employmentstatus: employmentstatus.value,
             tin: tin.value,
             sssNo: sssNo.value,

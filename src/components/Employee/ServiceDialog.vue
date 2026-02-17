@@ -6,9 +6,9 @@
             </q-card-section>
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
-                <div class="card-main-grid">
+                <div class="card-grid">
                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                        <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                        <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                             <q-card-section class="text-center">
                                 <q-spinner-puff size="md"/>
                                 <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
@@ -16,14 +16,14 @@
                         </q-card>
                     </div>
                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                        <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                        <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                             <q-card-section class="text-center">
                                 <div class="text-caption text-uppercase text-grey">no data found</div>
                             </q-card-section>
                         </q-card>
                     </div>
                     <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                        <q-card class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" @click="salaryId = app.id" :class="{ 'card--active': salaryId === app.id, 'card--disabled': !app.is_active || !CanManageSalary  }">
+                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" @click="salaryId = app.id" :class="{ 'card--active': salaryId === app.id, 'card--disabled': !app.is_active || !CanManageSalary  }">
                             <q-card-section class="text-center full-width">
                                 <div class="text-subtitle2 text-uppercase">{{ formatCurrency(app?.amount) }}</div>
                                 <div class="text-caption text-uppercase">{{ app?.salarytype }}</div>
@@ -32,9 +32,8 @@
                                 <div class="text-caption text-uppercase">{{ app?.salarygroup }}</div>
                                 <div class="text-caption text-grey">{{ formatDateRange(app) }}</div>
                             </q-card-section>
-                            <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="app.is_active ? 'bg-positive' : 'bg-negative'"></div>
-                            <div class="absolute-top-right" v-if="app.is_active">
-                                <q-radio v-model="salaryId" :val="app.id" checked-icon="bi-check2-circle" unchecked-icon="bi-cicle" size="xs" />
+                            <div class="absolute-left" v-if="app.is_active">
+                                <q-radio v-model="salaryId" :val="app.id" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs"/>
                             </div>
                         </q-card>
                     </div>

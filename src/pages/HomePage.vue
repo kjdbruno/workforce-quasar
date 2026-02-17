@@ -62,6 +62,18 @@
                 </q-card>
             </div>
         </div>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-puff color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -160,7 +172,14 @@ const formatPhoto = (avatar) => {
     return `${process.env.VUE_APP_BACKEND_URL}${avatar}`
 }
 
+const PageLoading = ref(true);
 onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 2000)
+})
+
+onBeforeMount(() => {
     setGreeting();
     setDateInfo();
     getLocationAndWeather();

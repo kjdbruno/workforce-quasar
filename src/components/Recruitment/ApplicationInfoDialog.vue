@@ -191,7 +191,7 @@
                             input-debounce="300"
                             use-input
                             :options="applicationstatuses"
-                            dropdown-icon="keyboard_arrow_down"
+                            hide-dropdown-icon
                             :no-error-icon="true"
                             dense
                         />

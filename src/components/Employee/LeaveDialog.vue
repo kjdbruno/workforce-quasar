@@ -104,18 +104,18 @@
                             />
                         </div>
                     </div>
-                    <div class="card-grid">
-                        <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="!SubmitLoading && applications.length === 0">
+                    <div class="card-main-grid">
+                        <div class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="!SubmitLoading && applications.length === 0">
                             <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-uppercase text-grey">no data found</div>
                                 </q-card-section>
                             </q-card>
                         </div>
-                        <div v-for="(app, index) in applications" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  v-else>
-                            <q-card @click="() => { Print(app.id) }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple >
+                        <div v-for="(app, index) in applications" :key="`data-${app.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                            <q-card @click="() => { Print(app.id) }" class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm no-shadow">
                                 <q-card-section class="text-center full-width">
-                                    <div class="text-subtitle2 text-uppercase">{{ app.name }}</div>
+                                    <div class="text-subtitle2 text-uppercase">{{ app.leaveType?.name }}</div>
                                     <div class="text-caption text-uppercase text-grey">{{ app?.status }}</div>
                                 </q-card-section>
                                 <q-card-section class="full-width">

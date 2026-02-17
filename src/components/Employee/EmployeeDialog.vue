@@ -28,7 +28,7 @@
                             </div>
                             <div class="text-overline text-uppercase text-bold q-mb-md">personal information</div>
                             <div class="row q-col-gutter-xs q-mb-md">
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.firstname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.firstname.type ? Errors.firstname.msg : 'firstname' }}</div>
                                     <q-input 
                                         v-model="firstname" 
@@ -39,7 +39,7 @@
                                         input-class="text-capitalize"
                                     />
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.middlename.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.middlename.type ? Errors.middlename.msg : 'middlename' }}</div>
                                     <q-input 
                                         v-model="middlename" 
@@ -50,7 +50,7 @@
                                         input-class="text-capitalize"
                                     />
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.lastname.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.lastname.type ? Errors.lastname.msg : 'lastname' }}</div>
                                     <q-input 
                                         v-model="lastname"
@@ -77,13 +77,13 @@
                                 <div class="col-2">
                                     <div class="text-caption text-uppercase" :class="Errors.sex.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.sex.type ? Errors.sex.msg : 'sex' }}</div>
                                     <div class="q-gutter-sm">
-                                        <q-radio v-for="value in sexes" v-model="sex" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                                        <q-radio v-for="value in sexes" v-model="sex" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="text-caption text-uppercase" :class="Errors.civilstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.civilstatus.type ? Errors.civilstatus.msg : 'civil status' }}</div>
                                     <div class="q-gutter-sm">
-                                        <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                                        <q-radio v-for="value in civilstatuses" v-model="civilstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                                     </div>
                                 </div>
                             </div>
@@ -139,6 +139,7 @@
                                     <q-input 
                                         v-model="contactNo"
                                         label="Enter Contact No." 
+                                        mask="###########"
                                         outlined 
                                         :error="Errors.contactNo.type"
                                         :no-error-icon="true"
@@ -165,7 +166,7 @@
                                                 <div class="text-caption text-grey text-uppercase">{{ formatCurrency(data?.amount) }}</div>
                                             </q-card-section>
                                             <div class="absolute-left">
-                                                <q-radio v-model="positionId" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                                <q-radio v-model="positionId" :val="data.id" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" />
                                             </div>
                                         </q-card>
                                     </div>
@@ -184,7 +185,7 @@
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase" :class="Errors.employmentstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employmentstatus.type ? Errors.employmentstatus.msg : 'employment status' }}</div>
                                 <div class="q-gutter-sm">
-                                    <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
+                                    <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" class="text-capitalize"/>
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
@@ -206,39 +207,6 @@
                                         :error="Errors.employeeNo.type"
                                         :no-error-icon="true"
                                     />
-                                </div>
-                                <div class="col-2">
-                                    <div class="text-caption text-uppercase" :class="Errors.departmentId.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.msg ? Errors.departmentId.msg : 'department' }}</div>
-                                    <q-select
-                                        outlined
-                                        v-model="departmentId"
-                                        label="Choose Department"
-                                        emit-value
-                                        map-options
-                                        use-input
-                                        input-debounce="300"
-                                        :options="filteredDepartments"
-                                        @filter="filterDepartmentFn"
-                                        :error="Errors.departmentId.type"
-                                        dropdown-icon="keyboard_arrow_down"
-                                        :no-error-icon="true"
-                                        class="text-capitalize"
-                                    >
-                                        <template v-slot:no-option>
-                                            <q-item>
-                                                <q-item-section class="text-italic text-grey">
-                                                No options
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                        <template v-slot:option="scope">
-                                            <q-item v-bind="scope.itemProps">
-                                                <q-item-section>
-                                                    <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                                </q-item-section>
-                                            </q-item>
-                                        </template>
-                                    </q-select>
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
@@ -297,7 +265,7 @@
                             <div class="q-mb-md">
                                 <div class="text-caption text-uppercase" :class="Errors.payrollgroup.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.payrollgroup.type ? Errors.payrollgroup.msg : 'payroll group' }}</div>
                                 <div class="q-gutter-sm">
-                                    <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" class="text-capitalize"/>
+                                    <q-radio v-for="value in payrollgroups" v-model="payrollgroup" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" class="text-capitalize"/>
                                 </div>
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
@@ -313,7 +281,7 @@
                                         input-debounce="300"
                                         :options="salarygroups"
                                         :error="Errors.salarygroup.type"
-                                        dropdown-icon="keyboard_arrow_down"
+                                        hide-dropdown-icon
                                         :no-error-icon="true"
                                         class="text-capitalize"
                                     >
@@ -343,7 +311,7 @@
                                         input-debounce="300"
                                         :options="taxstatuses"
                                         :error="Errors.taxstatus.type"
-                                        dropdown-icon="keyboard_arrow_down"
+                                        hide-dropdown-icon
                                         :no-error-icon="true"
                                         class="text-capitalize"
                                     >
@@ -381,7 +349,7 @@
                                         :options="filteredShifts"
                                         @filter="filterShiftFn"
                                         :error="Errors.shiftId.type"
-                                        dropdown-icon="keyboard_arrow_down"
+                                        hide-dropdown-icon
                                         :no-error-icon="true"
                                         class="text-capitalize"
                                     >
@@ -498,7 +466,6 @@ const contactNo = ref('');
 const employeeNo = ref('');
 const dateHired = ref(new Date().toISOString().split('T')[0]);
 const employmentstatus = ref('');
-const departmentId = ref('');
 const positionId = ref('');
 const tin = ref('');
 const sssNo = ref('');
@@ -529,7 +496,6 @@ const Errors = reactive({
     employeeNo: { type: null, msg: '' },
     dateHired: { type: null, msg: '' },
     employmentstatus: { type: null, msg: '' },
-    departmentId: { type: null, msg: '' },
     positionId: { type: null, msg: '' },
     tin: { type: null, msg: '' },
     sssNo: { type: null, msg: '' },
@@ -622,7 +588,6 @@ const ValidateEmployment = () => {
 
   isError ||= req('positionId', positionId.value)
   isError ||= req('employmentstatus', employmentstatus.value)
-  isError ||= req('departmentId', departmentId.value)
   isError ||= req('dateHired', dateHired.value)
 
   isError ||= maxLen('tin', tin.value, 15, 'invalid')
@@ -674,7 +639,6 @@ const ResetForm = () => {
     employeeNo.value = '';
     dateHired.value = new Date().toISOString().split('T')[0]; // today
     employmentstatus.value = '';
-    departmentId.value = '';
     positionId.value = '';
     tin.value = '';
     sssNo.value = '';
@@ -703,7 +667,6 @@ const sexes = ref(["Male","Female"]);
 const civilstatuses = ref(["Single","Married","Widowed","Divorced","Separated"]);
 const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
 const positions = ref([]);
-const departments = ref([]);
 const shifts = ref([]);
 const salarygroups = ref([
     { value: "HIRE", label: "Hiring Rate" },
@@ -718,7 +681,6 @@ const salarygroups = ref([
 const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
 const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
 
-const filteredDepartments = ref([]);
 const filteredShifts = ref([]);
 
 const createFilterFn = (sourceRef, targetRef) => {
@@ -751,29 +713,12 @@ function formatCurrency(amountStr, currency = 'PHP') {
         });
 }
 
-const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
 const filterShiftFn = createFilterFn(shifts, filteredShifts);
 
 const LoadApplicants = async () => {
     try {
         const response = await api.get(`/employee/option/applicant`);
         applicants.value = response.data;
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const LoadDepartments = async () => {
-    try {
-        const { data } = await api.get(`/employee/option/department`);
-        departments.value = (data || []).map(d => {
-            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
-            return {
-                label: baseLabel,
-                value: Number(d.value ?? d.id)
-            };
-        });
-        filteredDepartments.value = [...departments.value];
     } catch (error) {
         console.error("Error fetching options:", error);
     }
@@ -805,7 +750,6 @@ const LoadPositions = async () => {
 };
 
 const PopulateData = () => {
-    LoadDepartments();
     LoadShifts();
     LoadPositions();
     LoadApplicants();
@@ -827,7 +771,6 @@ const Populate = (app) => {
     email.value = app.email;
     contactNo.value = app.contact_number;
     employmentstatus.value = app.vacancy.employment_status;
-    departmentId.value = app.vacancy.department_id;
     positionId.value = app.vacancy.position_id;
     shiftId.value = app.vacancy.shift_id;
 }
@@ -858,7 +801,6 @@ const Save = async () => {
             philhealthNo: philhealthNo.value,
             pagibigNo: pagibigNo.value,
             positionId: positionId.value,
-            departmentId: departmentId.value,
             employmentstatus: employmentstatus.value,
             //salary
             salarygroup: salarygroup.value,

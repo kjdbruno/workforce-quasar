@@ -1,15 +1,15 @@
 <template>
     <div>
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('ApplicationDialog') }">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('ApplicationDialog') }">
                     <q-card-section class="text-center">
                         <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section class="text-center">
                         <q-spinner-puff size="md"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
@@ -17,20 +17,20 @@
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section class="text-center">
                         <div class="text-caption text-uppercase text-grey">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                <q-card @click="() => { OpenDialog('ApplicationInfoDialog'); ApplicationStore.data = data; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center full-width">
+                <q-card @click="() => { OpenDialog('ApplicationInfoDialog'); ApplicationStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section class="text-center">
                         <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
                         <div class="text-caption text-uppercase">{{ data?.vacancy?.position?.name }}</div>
                         <div class="text-caption text-grey">{{ data?.vacancy?.salary_range }}</div>
                     </q-card-section>
-                    <q-card-section class="full-width">
+                    <q-card-section>
                         <div class="text-caption text-uppercase">{{ data?.status }}</div>
                         <div class="text-caption text-grey">{{ formatDate(data?.createdAt) }}</div>
                     </q-card-section>
@@ -89,6 +89,18 @@
                 </q-inner-loading>
             </q-toolbar>
         </q-footer>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-puff color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -202,7 +214,7 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll();
 })
 
@@ -213,6 +225,13 @@ const activeDialog = ref(null)
 const OpenDialog = (dialogName) => {
     activeDialog.value = dialogName
 }
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
+})
 
 </script>
 

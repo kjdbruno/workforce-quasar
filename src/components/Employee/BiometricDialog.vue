@@ -113,7 +113,15 @@ async function detectDescriptor() {
 const RegisterFace = async () => {
     SubmitLoading.value = true;
     const result = await detectDescriptor();
-
+    if (!result || !result.img || !result.descriptor) {
+        Toast.fire({
+            icon: "error",
+            title: "No face detected",
+            text: "Please align your face and try again."
+        });
+        SubmitLoading.value = false;
+        return;
+    }
     const canvas = document.createElement("canvas");
     canvas.width = result.img.width;
     canvas.height = result.img.height;

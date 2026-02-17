@@ -31,14 +31,14 @@
                         <q-btn unelevated size="sm" label="print employee data" text-color="primary" color="white" />
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm">
-                        <q-btn round size="sm" icon="arrow_back" text-color="primary" color="white" @click="() => { EmployeeStore.component = 'EmployeeComponent'}"/>
+                        <q-btn round size="sm" icon="bi-arrow-left" text-color="primary" color="white" @click="() => { EmployeeStore.component = 'EmployeeComponent'}"/>
                     </div>
                 </q-card>
             </div>
             <div class="col-9">
                 <div class="card-grid">
                     <div v-for="(data, index) in tabs" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }">
-                        <q-card @click="openDialog(data.dialog)" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" >
+                        <q-card @click="openDialog(data.dialog)" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm">
                             <q-card-section class="text-center">
                                 <div class="text-body2 text-grey text-uppercase">{{ data.label }}</div>
                             </q-card-section>
@@ -68,6 +68,18 @@
         <account-dialog v-model="activeDialog" dialog-name="AccountDialog"/>
         <signature-dialog v-model="activeDialog" dialog-name="SignatureDialog"/>
         <shift-dialog v-model="activeDialog" dialog-name="ShiftDialog"/>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-puff color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
     <!-- <div class="card-grid">
         <div class="card-anim-wrapper">
@@ -220,7 +232,7 @@ const GetEmployee = async () => {
     }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     GetEmployee()
 })
 
@@ -235,6 +247,13 @@ onBeforeMount(() => {
         `../../assets/cover/${randomNumber}.jpg`,
         import.meta.url
     ).href;
+})
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
 })
 
 </script>
