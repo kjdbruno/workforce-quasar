@@ -142,6 +142,12 @@
                         </q-select>
                     </div>
                 </div>
+                <div class="q-mb-md">
+                    <div class="text-caption text-uppercase text-grey'">for premium payment</div>
+                    <div class="q-gutter-sm">
+                        <q-checkbox v-model="isPremium" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" label="Additional Pay"/>
+                    </div>
+                </div>
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
@@ -243,6 +249,7 @@ const payrollgroup = ref('');
 const taxstatus = ref('');
 const amount = ref('');
 const notes = ref('');
+const isPremium = ref(false);
 
 const Errors = reactive({
     datestart: { type: null, msg: '' },
@@ -255,13 +262,13 @@ const Errors = reactive({
 });
 
 const failToast = () =>
-  Toast.fire({
-    icon: "error",
-    html: `
-      <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-      <div class="text-caption">Something went wrong.</div>
-    `
-  })
+    Toast.fire({
+        icon: "error",
+        html: `
+        <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+        <div class="text-caption">Something went wrong.</div>
+        `
+    })
 
 const setErr = (key, msg = 'required') => (Errors[key].type = true, Errors[key].msg = msg, true)
 const clearErr = (key) => (Errors[key].type = null, Errors[key].msg = '', false)
@@ -315,7 +322,8 @@ const Save = async () => {
             amount: amount.value,
             notes: notes.value,
             payrollgroup: payrollgroup.value,
-            taxstatus: taxstatus.value
+            taxstatus: taxstatus.value,
+            isPremium: isPremium.value
         });
         emit('update:modelValue', null);
         Toast.fire({
