@@ -4,7 +4,7 @@
         <q-header class="bg-white no-shadow q-mx-lg q-mt-md q-py-sm radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
             <q-toolbar class="header">
 
-                <q-btn flat round dense icon="menu" class="text-grey" @click="drawerClick"/>
+                <q-btn flat round dense icon="bi-list" class="text-grey" @click="drawerClick"/>
 
                 <q-toolbar-title class="text-grey text-uppercase">
                     {{ route.name }}
@@ -126,7 +126,9 @@
             </div>
 
             <div class="absolute" style="top: 30px; right: -17px">
-                <q-btn dense round unelevated color="primary" style="border: 6px solid #f2f2f7" :icon="miniState ? 'chevron_right' : 'chevron_left'" @click="miniState = !miniState"/>
+                <q-btn round unelevated color="primary" style="border: 6px solid #f2f2f7" @click="miniState = !miniState">
+                    <q-icon :name="miniState ? 'bi-arrow-right-short' : 'bi-arrow-left-short'" />
+                </q-btn>
             </div>
         </q-drawer>
 
