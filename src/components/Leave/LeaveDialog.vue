@@ -14,19 +14,19 @@
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.employeeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employeeid.type ? Errors.employeeid.msg : 'employee' }}</div>
                                 <div class="card-grid">
                                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" v-if="!displayedEmployees.length">
-                                            <q-card-section class="text-center">
+                                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedEmployees.length">
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
                                     <div v-for="(data, index) in displayedEmployees" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedEmployees.length">
-                                        <q-card @click="() => { employeeid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': employeeid === data.id }">
-                                            <q-card-section class="text-center">
+                                        <q-card @click="() => { employeeid = data.id }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': employeeid === data.id }">
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">{{ FormatName(data) }}</div>
                                             </q-card-section>
                                             <div class="absolute-left">
-                                                <q-radio v-model="employeeid" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                                <q-radio v-model="employeeid" :val="data.id" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" />
                                             </div>
                                         </q-card>
                                     </div>
@@ -39,19 +39,19 @@
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.typeid.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.typeid.type ? Errors.typeid.msg : 'leave type' }}</div>
                                 <div class="card-grid">
                                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" v-if="!leavetypes.length">
-                                            <q-card-section class="text-center">
+                                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!leavetypes.length">
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
                                     <div v-for="(data, index) in leavetypes" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="leavetypes.length">
-                                        <q-card @click="() => { typeid = data.id }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': typeid === data.id }">
-                                            <q-card-section class="text-center">
+                                        <q-card @click="() => { typeid = data.id }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': typeid === data.id }">
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">{{ data.name }}</div>
                                             </q-card-section>
                                             <div class="absolute-left">
-                                                <q-radio v-model="typeid" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
+                                                <q-radio v-model="typeid" :val="data.id" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" />
                                             </div>
                                         </q-card>
                                     </div>
@@ -111,9 +111,9 @@
                     <q-btn v-if="step < totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="next" @click="() => { NextStep() }" />
                     <q-btn v-if="step === totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
-                    <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search Employee...">
+                    <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search...">
                         <template v-slot:prepend>
-                            <q-icon name="search" style="font-size: 1rem;" />
+                            <q-icon name="bi-search" style="font-size: 1rem;" />
                         </template>
                         <template v-slot:after>
                             <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
@@ -122,10 +122,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="submitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

@@ -21,10 +21,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="submitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>
@@ -53,7 +57,7 @@ const isOpen = computed({
 const SubmitLoading = ref(false);
 
 const PopulateData = () => {
-    
+    date.value = '';
 }
 
 const date = ref();

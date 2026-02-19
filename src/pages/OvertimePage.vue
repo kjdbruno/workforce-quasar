@@ -23,32 +23,32 @@
                 </div>
             </q-card-section>
         </q-card>
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('OvertimeDialog'); OvertimeStore.isEdit = false; }" >
-                    <q-card-section class="text-center">
-                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('OvertimeDialog'); OvertimeStore.isEdit = false; }" >
+                    <q-card-section>
+                        <q-icon name="bi-plus-circle" color="grey" size="xl" />
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section class="text-center">
-                        <q-spinner-puff size="md"/>
+                        <q-spinner-ios color="dark"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
                         <div class="text-caption text-uppercase text-grey">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
-                <q-card @click="() => { OpenDialog('OvertimeInfoDialog'); OvertimeStore.data = data; }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm">
-                    <q-card-section class="text-center full-width">
+                <q-card @click="() => { OpenDialog('OvertimeInfoDialog'); OvertimeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm">
+                    <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ FormatDate(data?.date) }}</div>
                         <div class="text-caption text-capitalize">{{ FormatTimeRange(data) }}</div>
                     </q-card-section>
@@ -60,104 +60,18 @@
         </div>
         <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog" @saved="() => { LoadAll(); }"/>
         <overtime-info-dialog v-model="activeDialog" dialog-name="OvertimeInfoDialog" @saved="() => { LoadAll(); }"/>
-        
-        <q-dialog v-model="OvertimeDialog" full-height position="right" persistent square class="dialog">
-            <q-card class="dialog-card column full-height">
-                <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">overtime application</div>
-                </q-card-section>
-                <q-separator inset />
-                <q-card-section class="col q-pa-lg scroll">
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">date</div>
-                        <div class="text-body1 text-uppercase">{{ FormatDate(info?.date) }}</div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">time</div>
-                        <div class="text-body1 text-uppercase">{{ FormatTimeRange(info) }}</div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">status</div>
-                        <div class="text-body1 text-uppercase">{{ info?.status }}</div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey">employee</div>
-                        <div v-for="e in info?.applications" class="q-mb-xs">
-                            <div class="text-body1 text-uppercase">{{ FormatName(e.employee) }}</div>
-                            <div class="text-caption text-uppercase">{{ e?.employee?.employment?.position.name }}</div>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
                         </div>
-                    </div>
-                    <div class="row q-col-gutter-xl q-mb-md q-mt-xl">
-                        <div v-for="(dt, index) in info?.approvals">
-                            <div class="text-caption text-uppercase text-grey">{{ dt?.status == 'Pending' ? 'unsigned' : 'signed' }}</div>
-                            <div v-if="dt?.status == 'Approved'">
-                                <img :src="FormatSignature(dt?.setting)" width="150"/>
-                            </div>
-                            <div class="text-h6 text-uppercase">{{ FormatName(dt?.setting?.approver?.employeeAccount?.employee) }}</div>
-                        </div>
-                    </div>
-                </q-card-section>
-                
-                <q-card-actions class="q-pa-lg bg">
-                    <div class="q-gutter-sm">
-                        <q-btn v-if="canApprove && info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="approve">
-                            <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
-                                <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
-                                    <q-card-section>
-                                        <div class="text-h6 text-center text-uppercase">
-                                            proceed to approve
-                                        </div>
-                                    </q-card-section>
-                                    <q-card-actions>
-                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Approve(info?.id)"/>
-                                    </q-card-actions>
-                                </q-card>
-                            </q-menu>
-                        </q-btn>
-                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="modify" @click="() => { Modify(info); isEdit = true; Dialog = true; OvertimeDialog = false; LoadPersonnels(); }" />
-                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
-                            <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
-                                <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
-                                    <q-card-section>
-                                        <div class="text-h6 text-center text-uppercase">
-                                            proceed to cancel
-                                        </div>
-                                    </q-card-section>
-                                    <q-card-actions>
-                                        <q-btn unelevated size="md" color="primary" class="full-width text-capitalize" label="proceed" @click="Cancel(info?.id)"/>
-                                    </q-card-actions>
-                                </q-card>
-                            </q-menu>
-                        </q-btn>
-                        <q-btn v-if="info?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(info?.id)" />
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { OvertimeDialog = false; }" outline/>
-                    </div>
-                </q-card-actions>
-                <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
-                </q-inner-loading>
-            </q-card>
-        </q-dialog>
-        <q-dialog v-model="printDialog" full-height full-width class="pdf">
-            <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
-                <q-btn
-                    icon="close"
-                    class="fixed bg-white text-primary shadow-2"
-                    round
-                    dense
-                    v-close-popup
-                    style="top: 15px; right: 15px; z-index: 999;"
-                />
-                <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
-                    <div class="iframe-container">
-                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
-                    </div>
-                </q-card-section>
-            </q-card>
-        </q-dialog>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -195,27 +109,6 @@ const page = ref(1);
 const limit = ref(10);
 const filter = ref('');
 
-const Dialog = ref(false);
-const isEdit = ref(false)
-
-const id = ref('');
-const date = ref('');
-const timeStart = ref('');
-const timeEnd = ref('');
-const description = ref('');
-
-const employees = ref([
-    {
-        id: '',
-        employeeid: ""
-    }
-]);
-
-const EmptyEmployees = () => ({
-    id: '',
-    employeeid: ""
-})
-
 const LoadAll = async () => {
     loading.value = true;
     try {
@@ -244,357 +137,6 @@ const LoadAll = async () => {
     }
 }
 
-const Errors = reactive({
-    date: {
-        type: null, msg: ''
-    },
-    timeStart: {
-        type: null, msg: ''
-    },
-    timeEnd: {
-        type: null, msg: ''
-    },
-    description: {
-        type: null, msg: ''
-    },
-    employees: {
-        employeeid: {
-            type: [], msg: ''
-        }
-    }
-});
-
-const initErrors = () => {
-    Errors.employees.employeeid.type = employees.value.map(() => null);
-}
-
-const Validations = () => {
-
-    let isError = false;
-    
-    Errors.employees.employeeid = { type: null, msg: '' }
-
-    if (!date.value) {
-        Errors.date.type = true;
-        Errors.date.msg = 'employee is required';
-        isError = true;
-    }
-
-    if (!timeStart.value) {
-        Errors.timeStart.type = true;
-        Errors.timeStart.msg = 'time start is required';
-        isError = true;
-    }
-
-    if (!timeEnd.value) {
-        Errors.timeEnd.type = true;
-        Errors.timeEnd.msg = 'time end is required';
-        isError = true;
-    }
-
-    if (!description.value) {
-        Errors.description.type = true;
-        Errors.description.msg = 'description is required';
-        isError = true;
-    }
-
-    initErrors()
-    
-    employees.value.forEach((e, index) => {
-        if (!e.employeeid) {
-            Errors.employees.employeeid.type[index] = true;
-            Errors.employees.employeeid.msg = 'employee is required';
-            isError = true;
-        }
-    });
-
-    if (isError) {
-        Toast.fire({
-            icon: "error",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                <div class="text-caption">Something went wrong.</div>
-            `
-        })
-    }
-
-    return !isError
-}
-
-const personnels = ref([]);
-
-const filteredPersonnels = ref([]);
-
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        if (val === '') {
-        update(() => { targetRef.value = sourceRef.value; });
-            return;
-        }
-        update(() => {
-            const needle = val.toLowerCase();
-            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
-        });
-    };
-};
-
-const filterPersonnelFn = createFilterFn(personnels, filteredPersonnels);
-
-const LoadPersonnels = async () => {
-    try {
-        const { data } = await api.get(`/overtime/option/employee`);
-        personnels.value = data.map(d => ({
-            label: [ d?.first_name, d?.middle_name, d?.last_name, d?.suffix ].filter(Boolean).join(" "),
-            value: Number(d?.id)
-        }))
-        filteredPersonnels.value = [...personnels.value]
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const AddEmployee = () => {
-    const e = employees.value;
-    e.push({
-        id: '',
-        employeeid: ""
-    });
-}
-
-const RemoveEmployee = (index) => {
-    employees.value.splice(index, 1);
-}
-
-const Save = async () => {
-    if (!Validations()) return;
-    submitLoading.value = true;
-    try {
-        const response = id.value && isEdit
-            ? await api.post(`/overtime/${id.value}/update`, {
-                date: date.value,
-                timeStart: timeStart.value,
-                timeEnd: timeEnd.value,
-                description: description.value,
-                employees: employees.value
-            })
-            : await api.post('/overtime', {
-                date: date.value,
-                timeStart: timeStart.value,
-                timeEnd: timeEnd.value,
-                description: description.value,
-                employees: employees.value
-            });
-        LoadAll();
-        Dialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const Modify = (app) => {
-    id.value = app.id,
-    date.value = app.date;
-    timeStart.value = app.time_start;
-    timeEnd.value = app.time_end;
-    description.value = app.description;
-    MapApplicants(app.applications)
-}
-
-const MapApplicants = (data = []) => {
-    employees.value = data.map(item => ({
-        id: item.id ?? '',
-        employeeid: Number(item.employee_id) ?? '',
-    }))
-}
-
-const info = ref([])
-// const OvertimeDialog = ref(false);
-
-const GetOvertime = async (id) => {
-    submitLoading.value = true;
-    try {
-        const response  = await api.get(`/overtime/${id}`);
-        info.value = response.data.result;
-    } catch (error) {
-        console.error("Error fetching all data:", error);
-        Toast.fire({
-            icon: "error",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">Error</div>
-                <div class="text-caption text-capitalize;">Unable to fetch records</div>
-            `
-        });
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const canApprove = computed(() => {
-    if (!info.value?.approvals || info.value.approvals.length === 0) return false;
-
-    // Sort approvals by setting order
-    const sorted = [...info.value.approvals].sort(
-        (a, b) => a.setting.order - b.setting.order
-    );
-
-    // Find the first pending approval
-    const nextPending = sorted.find(req => req.status === 'Pending');
-    if (!nextPending) return false;
-
-    // Check if the current user is the approver of the next pending approval
-    return nextPending.setting?.approver?.id === AuthStore.user?.id;
-});
-
-const Approve = async (id) => {
-    submitLoading.value = true;
-    const userId = Number(AuthStore.user.id);
-    const overtime = info.value;
-    const myRequest = overtime.approvals.find(approval =>
-    Number(
-            approval?.setting?.approver?.employeeAccount?.user_id
-        ) === Number(userId)
-    );
-    const approvalid = myRequest?.id ?? null;
-
-    try {
-        const response = await api.post(`/overtime/${id}/approve`, {
-            approvalid
-        });
-        LoadAll()
-        OvertimeDialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const Cancel = async (id) => {
-
-    submitLoading.value = true;
-
-    try {
-
-        const response = await api.post(`/overtime/${id}/cancel`)
-        LoadAll()
-        OvertimeDialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-
-    } catch (e) {
-        
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-
-        submitLoading.value = false;
-
-    }
-}
-
-const printDialog = ref(false);
-const pdf = ref(null);
-
-const Print = async (id) => {
-    submitLoading.value = true;
-    try {
-        const res = await api.get(`/overtime/${id}/pdf`, {
-            responseType: 'arraybuffer',
-        })
-        const blob = new Blob([res.data], { type: 'application/pdf' });
-        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
-        pdf.value = pdfurl
-        printDialog.value = true;
-        submitLoading.value = false;
-    } catch (error) {
-        submitLoading.value = false;
-        console.error("Error generating PDF:", error);
-    }
-}
-
-const applyBackendErrors = (backendErrors) => {
-    const errorsArray = Array.isArray(backendErrors)
-        ? backendErrors
-        : backendErrors?.errors || []
-    Object.keys(Errors).forEach(key => {
-        Errors[key].type = null
-        Errors[key].messages = []
-    })
-    errorsArray.forEach(err => {
-        if (Errors[err.path] !== undefined) {
-            Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
-        }
-    })
-}
-
-const FormatSignature = (sign) => {
-    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
-}
-
-const FormatName = (profile) => {
-    if (!profile) return '';
-    const firstname = profile.first_name || '';
-    const middlename = profile.middle_name
-        ? profile.middle_name.charAt(0).toUpperCase() + '.'
-        : '';
-    const lastname = profile.last_name || '';
-    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
-    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
-}
-
 const FormatDate = (date) => {
     if (!date) return '';
     const d = new Date(date);
@@ -616,10 +158,7 @@ const FormatTimeRange = (data) => {
   return `${start.toLocaleTimeString('en-PH', options)} - ${end.toLocaleTimeString('en-PH', options)}`;
 };
 
-
-const popup = ref(null);
-
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll()
 })
 
@@ -627,6 +166,14 @@ const activeDialog = ref(null)
 const OpenDialog = (dialogName) => {
     activeDialog.value = dialogName
 }
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
+})
+
 
 </script>
 

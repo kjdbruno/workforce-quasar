@@ -12,7 +12,7 @@
                         <q-btn 
                             v-if="schedules.length > 1 && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" 
                             round 
-                            icon="delete" 
+                            icon="bi-trash3" 
                             flat 
                             unelevated 
                             color="grey" 
@@ -37,6 +37,7 @@
                                 :error="Errors.schedules.shiftId.type[index]"
                                 hide-dropdown-icon
                                 :no-error-icon="true"
+                                class="text-capitalize"
                             >
                                 <template v-slot:no-option>
                                     <q-item>

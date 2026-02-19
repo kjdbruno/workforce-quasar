@@ -59,15 +59,6 @@
                         </div>
                         <div class="col-10">
                             <div class="row items-center q-gutter-xs">
-                                <!-- <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;" >
-                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale" mask="##:##" fill-mask ref="popup" class="no-shadow custom-border radius-sm">
-                                        <q-time v-model="data.times[index]" mask="HH:mm" >
-                                            <div class="row items-center justify-end">
-                                                <q-btn v-close-popup label="Okay" color="primary" flat />
-                                            </div>
-                                        </q-time>
-                                    </q-popup-proxy>
-                                </q-input> -->
                                 <q-input v-for="(time, index) in data.times" outlined dense v-model="data.times[index]" style="width: 100px;" :readonly="true"/>
                                 <q-badge v-if="data.leaveType" rounded color="primary" :label="data.leaveType" class="text-uppercase"/>
                                 <q-badge v-if="data.holiday" rounded color="primary" :label="data.holiday" class="text-uppercase"/>
@@ -84,10 +75,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

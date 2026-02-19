@@ -21,34 +21,24 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
-                    <div>
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.file.type ? 'text-negative' : 'text-grey'">{{ Errors.file.type ? Errors.file.msg : 'signature' }}</div>
-                        <q-file 
-                            v-model="file" 
-                            label="Upload Signature"
-                            outlined 
-                            :error="Errors.file.type"
-                            :no-error-icon="true"
-                            class="col-2"
-                        />
-                    </div>
-                </div> -->
-                
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
                     <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { clear(); }" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

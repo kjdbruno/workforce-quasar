@@ -22,12 +22,12 @@
                         />
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.role.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.role.msg ? Errors.accounts.role.msg : 'role' }}</div>
-                        <q-radio  v-for="(v, index) in roles" v-model="value.role" checked-icon="bi-check2-circle" unchecked-icon="bi-circle" :val="v.value" :label="v.label" class="text-uppercase" :disable="isDisabled(v.value)"/>
+                        <div class="text-caption text-uppercase" :class="Errors.accounts.role.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.accounts.role.msg ? Errors.accounts.role.msg : 'role' }}</div>
+                        <q-radio  v-for="(v, index) in roles" v-model="value.role" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="v.value" :label="v.label" class="text-uppercase" :disable="isDisabled(v.value)"/>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-sm">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.username.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.username.msg ? Errors.accounts.username.msg : 'username' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.accounts.username.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.accounts.username.msg ? Errors.accounts.username.msg : 'username' }}</div>
                             <q-input 
                                 v-model="value.username" 
                                 label="Enter Username"
@@ -37,7 +37,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.password.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.password.msg ? Errors.accounts.password.msg : 'password' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.accounts.password.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.accounts.password.msg ? Errors.accounts.password.msg : 'password' }}</div>
                             <q-input 
                                 v-model="value.password" 
                                 label="Enter Password"
@@ -53,8 +53,8 @@
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.accounts.status.msg ? 'text-negative' : 'text-grey'">{{ Errors.accounts.status.msg ? Errors.accounts.status.msg : 'status' }}</div>
-                        <q-radio  v-for="(v, index) in statuses" v-model="value.status" checked-icon="bi-check2-circle" unchecked-icon="bi-circle" :val="v" :label="v" class="text-uppercase" :disable="isDisabled(v)"/>
+                        <div class="text-caption text-uppercase" :class="Errors.accounts.status.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.accounts.status.msg ? Errors.accounts.status.msg : 'status' }}</div>
+                        <q-radio  v-for="(v, index) in statuses" v-model="value.status" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="v" :label="v" class="text-uppercase" :disable="isDisabled(v)"/>
                     </div>
                 </div>
             </q-card-section>
@@ -67,10 +67,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

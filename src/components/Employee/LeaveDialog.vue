@@ -11,19 +11,19 @@
                     <div v-if="balances.length === 0">
                         <div class="row q-col-gutter-xs q-mb-xs">
                             <div class="col-2">
-                                <div class="text-caption text-uppercase text-grey q-mb-xs">leave</div>
+                                <div class="text-caption text-uppercase text-grey">leave</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.credit.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.credit.msg ? Errors.leaves.credit.msg : 'credit' }}</div>
+                                <div class="text-caption text-uppercase" :class="Errors.leaves.credit.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.leaves.credit.msg ? Errors.leaves.credit.msg : 'credit' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.earned.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.earned.msg ? Errors.leaves.earned.msg : 'earned' }}</div>
+                                <div class="text-caption text-uppercase" :class="Errors.leaves.earned.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.leaves.earned.msg ? Errors.leaves.earned.msg : 'earned' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs" :class="Errors.leaves.used.msg ? 'text-negative' : 'text-grey'">{{ Errors.leaves.used.msg ? Errors.leaves.used.msg : 'used' }}</div>
+                                <div class="text-caption text-uppercase" :class="Errors.leaves.used.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.leaves.used.msg ? Errors.leaves.used.msg : 'used' }}</div>
                             </div>
                             <div class="col-1">
-                                <div class="text-caption text-uppercase q-mb-xs text-grey">balance</div>
+                                <div class="text-caption text-uppercase text-grey">balance</div>
                             </div>
                         </div>
                         <div class="row q-col-gutter-xs q-mb-xs" v-for="(app, index) in leaves" :key="index">
@@ -69,12 +69,12 @@
                     </div>
                     <div v-else>
                         <div class="card-grid">
-                            <div v-for="(app, index) in balances" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                                <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                                    <q-card-section class="text-center full-width">
+                            <div v-for="(app, index) in balances" :key="`data-${app.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
+                                <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                                    <q-card-section>
                                         <div class="text-subtitle2 text-uppercase">{{ app?.leaveType?.name }}</div>
                                     </q-card-section>
-                                    <q-card-section class="full-width">
+                                    <q-card-section>
                                         <div class="text-caption">{{ app.balance }}</div>
                                         <div class="text-caption text-uppercase text-grey">balance</div>
                                     </q-card-section>
@@ -104,21 +104,21 @@
                             />
                         </div>
                     </div>
-                    <div class="card-main-grid">
+                    <div class="card-grid">
                         <div class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="!SubmitLoading && applications.length === 0">
-                            <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                            <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-uppercase text-grey">no data found</div>
                                 </q-card-section>
                             </q-card>
                         </div>
                         <div v-for="(app, index) in applications" :key="`data-${app.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                            <q-card @click="() => { Print(app.id) }" class="card card-menu card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm no-shadow">
-                                <q-card-section class="text-center full-width">
+                            <q-card @click="() => { Print(app.id) }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm no-shadow">
+                                <q-card-section>
                                     <div class="text-subtitle2 text-uppercase">{{ app.leaveType?.name }}</div>
                                     <div class="text-caption text-uppercase text-grey">{{ app?.status }}</div>
                                 </q-card-section>
-                                <q-card-section class="full-width">
+                                <q-card-section>
                                     <div class="text-caption">{{ FormatLeaveDate(app?.date_from, app?.date_to) }}</div>
                                     <div class="text-caption text-uppercase text-grey">{{ ComputeLeaveDays(app?.date_from, app?.date_to) }} day/s</div>
                                 </q-card-section>
@@ -135,17 +135,21 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>
     <q-dialog v-model="printDialog" full-height full-width class="pdf">
         <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
             <q-btn
-                icon="close"
+                icon="bi-x"
                 class="fixed bg-white text-primary shadow-2"
                 round
                 dense

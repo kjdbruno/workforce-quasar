@@ -14,31 +14,21 @@
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.personnels.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.personnels.type ? Errors.personnels.msg : 'employee' }}</div>
                                 <div class="card-grid">
                                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" v-if="!displayedEmployees.length">
-                                            <q-card-section class="text-center">
+                                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedEmployees.length">
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
-                                    <!-- <div v-for="(data, index) in displayedEmployees" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedEmployees.length">
-                                        <q-card @click="() => { TogglePersonnel(data.id) }" class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': (personnels?.value ?? []).includes(data.id) }">
-                                            <q-card-section class="text-center">
-                                                <div class="text-caption text-dark text-uppercase">{{ FormatName(data) }}</div>
-                                            </q-card-section>
-                                            <div class="absolute-left">
-                                                <q-checkbox v-model="personnels" :val="data.id" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" />
-                                            </div>
-                                        </q-card>
-                                    </div> -->
                                     <div v-if="displayedEmployees?.length" v-for="(data, index) in displayedEmployees" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" >
-                                        <q-card class="card card-menu card-hover-animate q-pa-md no-shadow cursor-pointer radius-sm q-mr-xs q-mb-xs" :class="{ 'card--active': IsSelected(data.id) }" @click="TogglePersonnel(data.id)" >
-                                            <q-card-section class="text-center">
+                                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': IsSelected(data.id) }" @click="TogglePersonnel(data.id)" >
+                                            <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">
                                                     {{ FormatName(data) }}
                                                 </div>
                                             </q-card-section>
                                             <div class="absolute-left">
-                                                <q-checkbox :model-value="IsSelected(data.id)" @update:model-value="(val) => SetSelected(data.id, val)" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" size="xs" @click.stop />
+                                                <q-checkbox :model-value="IsSelected(data.id)" @update:model-value="(val) => SetSelected(data.id, val)" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="xs" @click.stop />
                                             </div>
                                         </q-card>
                                     </div>
@@ -48,7 +38,7 @@
                         <div v-if="step === 1">
                             <div class="row q-col-gutter-xs q-mb-md">
                                 <div class="col-2">
-                                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.msg : 'date' }}</div>
+                                    <div class="text-caption text-uppercase " :class="Errors.date.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.date.type ? Errors.date.msg : 'date' }}</div>
                                     <q-input outlined v-model="date" label="Enter Date" :error="Errors.date.type" :no-error-icon="true">
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                             <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
@@ -58,24 +48,24 @@
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
                                 <div class="col-2">
-                                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeStart.type ? 'text-negative' : 'text-grey'">{{ Errors.timeStart.type ? Errors.timeStart.msg : 'start time' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.timeStart.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.timeStart.type ? Errors.timeStart.msg : 'start time' }}</div>
                                     <q-input outlined v-model="timeStart" label="Enter Time" :error="Errors.timeStart.type" :no-error-icon="true" mask="##:##" fill-mask>
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                             <q-time v-model="timeStart" mask="HH:mm" >
                                                 <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Okay" color="primary" flat />
+                                                    <q-btn v-close-popup label="Okay" color="primary" flat size="sm"/>
                                                 </div>
                                             </q-time>
                                         </q-popup-proxy>
                                     </q-input>
                                 </div>
                                 <div class="col-2">
-                                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.timeEnd.type ? 'text-negative' : 'text-grey'">{{ Errors.timeEnd.type ? Errors.timeEnd.msg : 'time end' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.timeEnd.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.timeEnd.type ? Errors.timeEnd.msg : 'time end' }}</div>
                                     <q-input outlined v-model="timeEnd" label="Enter Time" :error="Errors.timeEnd.type" :no-error-icon="true" mask="##:##" fill-mask>
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                             <q-time v-model="timeEnd" mask="HH:mm" >
                                                 <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Okay" color="primary" flat />
+                                                    <q-btn v-close-popup label="Okay" color="primary" flat size="sm"/>
                                                 </div>
                                             </q-time>
                                         </q-popup-proxy>
@@ -84,7 +74,7 @@
                             </div>
                             <div class="row q-col-gutter-xs q-mb-xl">
                                 <div class="col-4">
-                                    <div class="text-caption text-uppercase q-mb-xs" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'description' }}</div>
+                                    <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'description' }}</div>
                                     <q-input 
                                         v-model="description" 
                                         outlined 
@@ -108,7 +98,7 @@
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                     <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search Employee...">
                         <template v-slot:prepend>
-                            <q-icon name="search" style="font-size: 1rem;" />
+                            <q-icon name="bi-search" style="font-size: 1rem;" />
                         </template>
                         <template v-slot:after>
                             <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
@@ -117,10 +107,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="submitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <<q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

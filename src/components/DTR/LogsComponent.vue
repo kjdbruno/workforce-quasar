@@ -1,18 +1,25 @@
 <template>
     <div class="dtr-wrapper">
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div v-if="rows.length === 0" class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
-                <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" tag="label">
-                    <q-card-section class="text-center full-width q-pa-sm">
-                        <div class="text-caption text-uppercase">no data found</div>
+                <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label">
+                    <q-card-section>
+                        <div class="text-caption text-grey text-uppercase">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="() => { openDialog('LogDialog'); DTRStore.data = data }" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
-                    <q-card-section class="text-center full-width">
-                        <div class="text-subtitle2 text-uppercase">{{ FormatName(data) }}</div>
+                <q-card @click="() => { openDialog('LogDialog'); DTRStore.data = data }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
                     </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
@@ -26,29 +33,38 @@
                         <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                     </template>
                     <template v-slot:after>
-                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
                         </q-btn>
                     </template>
                     <template v-slot:prepend>
-                        <q-icon name="search" style="font-size: 1rem;" />
+                        <q-icon name="bi-search" style="font-size: 1rem;" />
                     </template>
                 </q-input>
-                <q-inner-loading :showing="loading">
-                    <q-spinner-puff size="md" />
-                </q-inner-loading>
             </q-toolbar>
         </q-footer>
         <log-dialog v-model="activeDialog" dialog-name="LogDialog" />
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -203,228 +219,7 @@ const LastPage = () => {
     }
 }
 
-const NewDialog = () => {
-    ResetForm();
-    dialog.value = true;
-    isEdit.value = false;
-}
-
-const ResetForm = () => {
-    id.value = '';
-    dateStart.value = new Date().toISOString().split('T')[0];
-    dateEnd.value = new Date().toISOString().split('T')[0];
-    isActive.value = false;
-    Errors.dateStart.type = false;
-    Errors.dateEnd.type = false;
-}
-
-const Save = async () => {
-    if (!Validations()) return;
-    submitLoading.value = true;
-    try {
-        const response = await api.post('/attendance', {
-                dateStart: dateStart.value,
-                dateEnd: dateEnd.value,
-            });
-        LoadAll();
-        dialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const applyBackendErrors = (backendErrors) => {
-
-    const errorsArray = Array.isArray(backendErrors)
-        ? backendErrors
-        : backendErrors?.errors || []
-        
-    Object.keys(Errors).forEach(key => {
-        Errors[key].type = null
-        Errors[key].messages = []
-    })
-    
-    errorsArray.forEach(err => {
-        if (Errors[err.path] !== undefined) {
-            Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
-        }
-    })
-}
-
-
-const UpdateList = (data) => {
-    const index = rows.value.findIndex(item => item.id === data.id)
-    if (index !== -1) {
-        rows.value[index] = data
-    }
-}
-
-const leaveDialog = ref(false);
-const DetailSubmitting = ref(false);
-const info = ref({});
-
-const DetailDialog = (data) => {
-    leaveDialog.value = true;
-    info.value = data;
-    LoadDetails(data.id);
-}
-
-const LoadDetails = async (id) => {
-    DetailSubmitting.value = true;
-    try {
-        const response  = await api.get(`/leave/${id}/details`);
-        info.value = response.data.data
-    } catch (error) {
-        console.error("Error fetching all data:", error);
-        Toast.fire({
-            icon: "error",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">Error</div>
-                <div class="text-caption text-capitalize;">Unable to fetch records</div>
-            `
-        });
-    } finally {
-        DetailSubmitting.value = false;
-    }
-}
-
-const canApprove = computed(() => {
-    if (!attendances.value.approvals || attendances.value.approvals.length === 0) return false;
-
-    // Sort approvals by setting order
-    const sorted = [...attendances.value.approvals].sort(
-        (a, b) => a.setting.order - b.setting.order
-    );
-
-    // Find the first pending approval
-    const nextPending = sorted.find(req => req.status === 'Pending');
-    if (!nextPending) return false;
-
-    // Check if the current user is the approver of the next pending approval
-    return nextPending.setting?.approver?.id === AuthStore.user?.id;
-});
-
-const Approve = async (id) => {
-    submitLoading.value = true;
-    const userId = Number(AuthStore.user.id);
-    const attendance = attendances.value;
-    const myRequest = attendance.approvals.find(a =>
-        Number(
-                a.setting?.approver?.employeeAccount?.user_id
-            ) === Number(userId)
-        );
-    const approvalid = myRequest?.id ?? null;
-
-    try {
-        const response = await api.post(`/attendance/${id}/approve`, {
-            approvalid
-        });
-        LoadAll()
-        AttendanceDialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const printDialog = ref(false);
-const pdf = ref(null);
-
-const Print = async (id) => {
-    submitLoading.value = true;
-    try {
-        const res = await api.get(`/attendance/${id}/pdf`, {
-            responseType: 'arraybuffer',
-        })
-        const blob = new Blob([res.data], { type: 'application/pdf' });
-        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
-        pdf.value = pdfurl
-        printDialog.value = true;
-        submitLoading.value = false;
-    } catch (error) {
-        submitLoading.value = false;
-        console.error("Error generating PDF:", error);
-    }
-}
-
-const Cancel = async (id) => {
-
-    submitLoading.value = true;
-
-    try {
-
-        const response = await api.post(`/leave/${id}/cancel`)
-        UpdateList(response.data.leave)
-        leaveDialog.value = false;
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-
-    } catch (e) {
-        
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-
-        submitLoading.value = false;
-
-    }
-}
-
-const FormatName = (profile) => {
+const formatName = (profile) => {
     if (!profile) return '';
     const firstname = profile.first_name || '';
     const middlename = profile.middle_name
@@ -435,50 +230,24 @@ const FormatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
+function formatCurrency(amountStr, currency = 'PHP') {
+    if (!amountStr) return '';
 
-const FormatSignature = (sign) => {
-    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
+    // Extract numeric value (handles "16,500.00 | Monthly")
+    const numeric = amountStr.split('|')[0].trim();
+
+    const num = parseFloat(numeric.replace(/,/g, ''));
+
+    if (isNaN(num)) return amountStr; // fallback
+
+    return num.toLocaleString('en-PH', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2
+    });
 }
 
-// const LogDialog = ref(false);
-const employee = ref(null);
-
-const UpdateDTR = async (id, employeeid, app) => {
-    submitLoading.value = true;
-    try {
-        const response = await api.post(`/attendance/dtr/${id}/update`, {
-                employeeid: employeeid,
-                attendances: app
-            });
-        GetAttendance(id)
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-
-    } finally {
-        submitLoading.value = false;
-    }
-}
-
-const popup = ref(null);
-
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll();
 })
 
@@ -486,6 +255,13 @@ const activeDialog = ref(null)
 const openDialog = (dialogName) => {
     activeDialog.value = dialogName
 }
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
+})
 
 </script>
 
