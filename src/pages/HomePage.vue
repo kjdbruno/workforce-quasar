@@ -67,7 +67,7 @@
                 <q-card class="no-shadow radius-md q-pa-md">
                     <q-card-section class="text-center">
                         <div>
-                            <q-spinner-puff color="dark"/>
+                            <q-spinner-ios color="dark"/>
                         </div>
                         <div class="text-dark text-uppercase text-caption">we're working on it!</div>
                     </q-card-section>

@@ -38,6 +38,7 @@ import LeaveComponent from 'src/components/Preferences/LeaveComponent.vue';
 import SignatoryComponent from 'src/components/Preferences/SignatoryComponent.vue';
 import PayrollGroupComponent from 'src/components/Preferences/PayrollGroupComponent.vue';
 import ShiftComponent from 'src/components/Preferences/ShiftComponent.vue';
+import CourseComponent from 'src/components/Preferences/CourseComponent.vue';
 
 
 const PreferenceStore = usePreferenceStore();
@@ -47,7 +48,7 @@ const components = {
     HolidayComponent,
     ShiftComponent,
     SchoolComponent,
-    DegreeComponent,
+    CourseComponent,
     IncidentClassComponent,
     IncidentRoleComponent,
     DepartmentComponent,
@@ -61,9 +62,10 @@ const components = {
 
 const navs = [
     // { component: 'UserComponent', label: 'User' },
+    { component: 'SchoolComponent', label: 'School' },
+    { component: 'CourseComponent', label: 'Degree' },
     { component: 'HolidayComponent', label: 'Holiday' },
     { component: 'ShiftComponent', label: 'Shift' },
-    // { component: 'SchoolComponent', label: 'School' },
     // { component: 'DegreeComponent', label: 'Degree' },
     // { component: 'IncidentClassComponent', label: 'Incident class' },
     // { component: 'IncidentRoleComponent', label: 'incident role' },

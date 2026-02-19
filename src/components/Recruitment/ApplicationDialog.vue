@@ -14,14 +14,14 @@
                             <div class="card-grid">
                                 <div key="data-none" class="inner-card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="displayedVacancies.length === 0">
                                     <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label">
-                                        <q-card-section class="text-center full-width q-pa-none">
+                                        <q-card-section>
                                             <div class="text-caption text-uppercase text-grey">no data found</div>
                                         </q-card-section>
                                     </q-card>
                                 </div>
                                 <div v-for="(data, index) in displayedVacancies" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" v-else>
                                     <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label" :class="{ 'card--active': vacancyId === data.id }" @click="vacancyId = data.id" >
-                                        <q-card-section class="text-center">
+                                        <q-card-section>
                                             <div class="text-caption text-uppercase">{{ data?.position?.name }}</div>
                                             <div class="text-caption text-grey text-uppercase">{{ (data?.position?.salary_type == 'Monthly' ? formatCurrency(data?.position?.monthly_salary) : (data?.position?.salary_type == 'Daily' ? formatCurrency(data?.position?.daily_salary) : data?.position?.salary_type == 'Hourly' ? formatCurrency(data?.position?.hourly_salary) : null)) }}</div>
                                         </q-card-section>
@@ -508,7 +508,7 @@
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                     <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search...">
                         <template v-slot:prepend>
-                            <q-icon name="search" style="font-size: 1rem;" />
+                            <q-icon name="bi-search" style="font-size: 1rem;" />
                         </template>
                         <template v-slot:after>
                             <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
@@ -517,10 +517,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>
@@ -602,7 +606,6 @@ const documents = ref([
         file: ''
     }
 ]);
-const applicationstatus = ref('');
 
 const Errors = reactive({
     vacancyId: {

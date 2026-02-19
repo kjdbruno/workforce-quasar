@@ -1,36 +1,37 @@
 <template>
     <div>
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
-                    <q-card-section class="text-center">
-                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
+                    <q-card-section>
+                        <q-icon name="bi-plus-circle" size="xl" color="grey"/>
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
-                        <q-spinner-puff size="md"/>
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <q-spinner-ios color="dark"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
                         <div class="text-caption text-uppercase text-grey">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
-                    <q-card-section class="text-center full-width">
+                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
+                    <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
-                    <q-card-section class="text-center full-width">
+                    <q-card-section>
                         <div class="text-caption text-grey text-uppercase">{{ FormatTimeRange(data?.start_time, data?.end_time) }}</div>
                     </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
@@ -43,7 +44,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-1">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.code.type ? 'text-negative' : 'text-grey'">{{ Errors.code.type ? Errors.code.msg : 'code' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.code.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.code.type ? Errors.code.msg : 'code' }}</div>
                             <q-input 
                                 v-model="code" 
                                 label="Enter Code"
@@ -54,7 +55,7 @@
                             />
                         </div>
                         <div class="col-3">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
@@ -67,7 +68,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.starttime.type ? 'text-negative' : 'text-grey'">{{ Errors.starttime.type ? Errors.starttime.msg : 'start time' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.starttime.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.starttime.type ? Errors.starttime.msg : 'start time' }}</div>
                             <q-input outlined v-model="starttime" label="Enter Time" mask="time" :error="Errors.starttime.type" :no-error-icon="true">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-time v-model="starttime" mask="HH:mm">
@@ -79,7 +80,7 @@
                             </q-input>
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.endtime.msg ? 'text-negative' : 'text-grey'">{{ Errors.endtime.msg ? Errors.endtime.msg : 'end time' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.endtime.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.endtime.msg ? Errors.endtime.msg : 'end time' }}</div>
                             <q-input outlined v-model="endtime" label="Enter Time" mask="time" :error="Errors.endtime.type" :no-error-icon="true">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
                                     <q-time v-model="endtime" mask="HH:mm">
@@ -92,8 +93,8 @@
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.breakminutes.type ? 'text-negative' : 'text-grey'">{{ Errors.breakminutes.type ? Errors.breakminutes.msg : 'break minutes' }}</div>
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase" :class="Errors.breakminutes.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.breakminutes.type ? Errors.breakminutes.msg : 'break mins' }}</div>
                             <q-input 
                                 v-model="breakminutes" 
                                 label="Enter Minutes"
@@ -103,8 +104,8 @@
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.graceminutes.type ? 'text-negative' : 'text-grey'">{{ Errors.graceminutes.type ? Errors.graceminutes.msg : 'grace minutes' }}</div>
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase" :class="Errors.graceminutes.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.graceminutes.type ? Errors.graceminutes.msg : 'grace mins' }}</div>
                             <q-input 
                                 v-model="graceminutes" 
                                 label="Enter Minutes"
@@ -114,8 +115,8 @@
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.earliestminutes.type ? 'text-negative' : 'text-grey'">{{ Errors.earliestminutes.type ? Errors.earliestminutes.msg : 'earliest minutes' }}</div>
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase" :class="Errors.earliestminutes.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.earliestminutes.type ? Errors.earliestminutes.msg : 'earliest mins' }}</div>
                             <q-input 
                                 v-model="earliestminutes" 
                                 label="Enter Minutes"
@@ -125,8 +126,8 @@
                                 input-class="text-capitalize"
                             />
                         </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.latestminutes.type ? 'text-negative' : 'text-grey'">{{ Errors.latestminutes.type ? Errors.latestminutes.msg : 'latest minutes' }}</div>
+                        <div class="col-1">
+                            <div class="text-caption text-uppercase" :class="Errors.latestminutes.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.latestminutes.type ? Errors.latestminutes.msg : 'latest mins' }}</div>
                             <q-input 
                                 v-model="latestminutes" 
                                 label="Enter Minutes"
@@ -138,34 +139,39 @@
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase text-grey q-mb-xs" >crosses midnight</div>
-                        <q-checkbox right-label v-model="crossesmidnight" label="crosses midnight" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
+                        <div class="text-caption text-uppercase text-grey" >crosses midnight</div>
+                        <q-checkbox right-label v-model="crossesmidnight" label="crosses midnight" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.days.type ? 'text-negative' : 'text-grey'">{{ Errors.days.type ? Errors.days.msg : 'shift day/s' }}</div>
+                        <div class="text-caption text-uppercase" :class="Errors.days.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.days.type ? Errors.days.msg : 'shift day/s' }}</div>
                         <div class="q-gutter-sm">
-                            <q-checkbox right-label v-model="days" :val="1" label="monday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="2" label="tuesday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="3" label="wednesday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="4" label="thursday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="5" label="friday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="6" label="saturday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
-                            <q-checkbox right-label v-model="days" :val="7" label="sunday" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="1" label="monday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="2" label="tuesday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="3" label="wednesday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="4" label="thursday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="5" label="friday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="6" label="saturday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
+                            <q-checkbox right-label v-model="days" :val="7" label="sunday" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
                         </div>
                     </div>
                 </q-card-section>
                 
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                        <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
+                    <q-card class="no-shadow radius-md q-pa-md">
+                        <q-card-section class="text-center">
+                            <div>
+                                <q-spinner-ios color="dark"/>
+                            </div>
+                            <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                        </q-card-section>
+                    </q-card>
                 </q-inner-loading>
             </q-card>
         </q-dialog>
@@ -179,28 +185,37 @@
                         <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                     </template>
                     <template v-slot:after>
-                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
                         </q-btn>
                     </template>
                     <template v-slot:prepend>
-                        <q-icon name="search" style="font-size: 1rem;" />
+                        <q-icon name="bi-search" style="font-size: 1rem;" />
                     </template>
                 </q-input>
-                <q-inner-loading :showing="loading">
-                    <q-spinner-puff size="md" />
-                </q-inner-loading>
             </q-toolbar>
         </q-footer>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -214,7 +229,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -238,6 +254,7 @@ const earliestminutes = ref('');
 const latestminutes = ref('');
 const crossesmidnight = ref(false);
 const days = ref([]);
+const isActive = ref(false);
 
 const Errors = reactive({
     code: { type: null, msg: '' },
@@ -366,6 +383,7 @@ const ModifyDialog = (data) => {
     earliestminutes.value = data.earliest_minutes;
     latestminutes.value = data.latest_minutes;
     crossesmidnight.value = (data.crosses_midnight ? true : false);
+    isActive.value = (data.is_active ? true : false);
     days.value = data.days.map(d => Number(d.day_of_week));
 }
 
@@ -380,17 +398,16 @@ const ResetForm = () => {
     earliestminutes.value = '';
     latestminutes.value = '';
     crossesmidnight.value = false;
+    isActive.value = false;
     days.value = [];
-    Errors.code.type = null;
-    Errors.name.type = null;
-    Errors.starttime.type = null;
-    Errors.endtime.type = null;
-    Errors.breakminutes.type = null;
-    Errors.graceminutes.type = null;
-    Errors.latestminutes.type = null;
-    Errors.earliestminutes.type = null;
-    Errors.days.type = null;
+    ResetErrors()
 }
+
+const ResetErrors = () =>
+    Object.values(Errors).forEach(e => {
+        e.type = null;
+        e.msg = null;
+});
 
 const Save = async () => {
     if (!Validations()) return;
@@ -422,7 +439,11 @@ const Save = async () => {
                 days: days.value,
             });
         dialog.value = false;
-        LoadAll();
+        if (id.value && isEdit) {
+            UpdateList(response.data.shift);
+        } else {
+            LoadAll();
+        }
         Toast.fire({
             icon: "success",
             html: `
@@ -451,14 +472,16 @@ const applyBackendErrors = (backendErrors) => {
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
+
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
-        Errors[key].messages = []
+        Errors[key].msg = ''     // ✅ string
     })
+
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
+            Errors[err.path].msg = err.msg  // ✅ assign string
         }
     })
 }
@@ -470,7 +493,38 @@ const UpdateList = (data) => {
     }
 }
 
-onMounted(() => {
+const Toggle = async () => {
+    submitLoading.value = true;
+    try {
+        const response = isActive.value
+            ? await api.post(`/shift/${id.value}/disable`)
+            : await api.post(`/shift/${id.value}/enable`)
+        dialog.value = false;
+        UpdateList(response.data.shift)
+        Toast.fire({
+            icon: "success",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">granted!</div>
+                <div class="text-caption text-capitalize;">${response.data.message}<div>
+            `
+        });
+    } catch (e) {
+        if (e.response && e.response.data) {
+            applyBackendErrors(e.response.data);
+            Toast.fire({
+                icon: "error",
+                html: `
+                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
+                    <div class="text-caption">Something went wrong.</div>
+                `
+            })
+        }
+    } finally {
+        submitLoading.value = false;
+    }
+}
+
+onBeforeMount(() => {
     LoadAll();
 })
 
@@ -483,16 +537,21 @@ const FormatTimeRange = (start, end) => {
         d.setHours(h, m, 0, 0);
 
         return d.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
         });
     };
 
     return `${format(start)} - ${format(end)}`;
 };
 
-
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
+})
 
 </script>
 

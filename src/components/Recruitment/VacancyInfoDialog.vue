@@ -129,17 +129,21 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>
     <q-dialog v-model="printDialog" full-height full-width class="pdf">
         <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
             <q-btn
-                icon="close"
+                icon="bi-x"
                 class="fixed bg-white text-primary shadow-2"
                 round
                 dense
@@ -148,7 +152,7 @@
             />
             <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
                 <div class="iframe-container">
-                <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
                 </div>
             </q-card-section>
         </q-card>

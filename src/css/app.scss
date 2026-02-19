@@ -183,7 +183,7 @@ body {
   transition: transform 220ms cubic-bezier(.2,.8,.2,1),
               box-shadow 220ms ease;
   will-change: transform, box-shadow;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
 }
 .inner-card-anim-wrapper .card-hover-animate:hover {
   transform: scale(1.05);

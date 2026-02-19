@@ -1,35 +1,35 @@
 <template>
     <div>
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
-                    <q-card-section class="text-center">
-                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
+                    <q-card-section>
+                        <q-icon name="bi-plus-circle" size="xl" color="grey" />
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
-                        <q-spinner-puff size="md"/>
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <q-spinner-ios color="dark"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section class="text-center">
                         <div class="text-caption text-uppercase text-grey">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
-                    <q-card-section class="text-center full-width">
+                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
+                    <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                         <div class="text-caption text-uppercase">{{ formatSalary(data) }}</div>
                     </q-card-section>
-                    <q-card-section class="text-center full-width">
+                    <q-card-section>
                         <div class="text-caption text-capitalize">{{ data.department?.name }}</div>
                         <div class="text-caption text-grey text-uppercase">{{ data?.status }}</div>
                     </q-card-section>
@@ -46,7 +46,7 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Position"
@@ -57,7 +57,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.departmentId.type ? 'text-negative' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'departmentI' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.departmentId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'department' }}</div>
                             <q-select
                                 outlined
                                 v-model="departmentId"
@@ -69,7 +69,7 @@
                                 :options="filteredDepartments"
                                 @filter="filterDepartmentFn"
                                 :error="Errors.departmentId.type"
-                                dropdown-icon="keyboard_arrow_down"
+                                hide-dropdown-icon
                                 :no-error-icon="true"
                                 class="text-capitalize"
                             >
@@ -92,7 +92,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.description.type ? 'text-negative' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'job description' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'job description' }}</div>
                             <q-input 
                                 v-model="description" 
                                 label="Enter Job Description"
@@ -105,7 +105,7 @@
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.qualifications.name.msg ? 'text-negative' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
                             <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
                                 <q-input
                                     v-model="qualifications[index]"
@@ -115,25 +115,21 @@
                                     :no-error-icon="true"
                                 >
                                     <template v-slot:append>
-                                        <q-btn
-                                            v-if="qualifications.length > 1"
-                                            flat unelevated round icon="block" size="sm"
-                                            @click="remove(index)"
-                                        />
+                                        <q-btn v-if="qualifications.length > 1" flat unelevated round icon="bi-trash3" size="sm" @click="remove(index)"  />
                                     </template>
                                 </q-input>
                             </div>
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="text-caption text-uppercase q-mb-xs" :class="Errors.salarytype.type ? 'text-negative' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
+                        <div class="text-caption text-uppercase" :class="Errors.salarytype.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
                         <div class="q-gutter-sm">
-                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="value" :label="value" />
+                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
                         </div>
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.monthly.type ? 'text-negative' : 'text-grey'">{{ Errors.monthly.type ? Errors.monthly.msg : 'monthly salary' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.monthly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.monthly.type ? Errors.monthly.msg : 'monthly salary' }}</div>
                             <q-input 
                                 v-model="monthly" 
                                 label="Enter Amount"
@@ -144,7 +140,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.daily.type ? 'text-negative' : 'text-grey'">{{ Errors.daily.type ? Errors.daily.msg : 'daily salary' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.daily.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.daily.type ? Errors.daily.msg : 'daily salary' }}</div>
                             <q-input 
                                 v-model="daily" 
                                 label="Enter Amount"
@@ -155,7 +151,7 @@
                             />
                         </div>
                         <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.hourly.type ? 'text-negative' : 'text-grey'">{{ Errors.hourly.type ? Errors.hourly.msg : 'hourly salary' }}</div>
+                            <div class="text-caption text-uppercase" :class="Errors.hourly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.hourly.type ? Errors.hourly.msg : 'hourly salary' }}</div>
                             <q-input 
                                 v-model="hourly" 
                                 label="Enter Amount"
@@ -177,10 +173,14 @@
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
+                    <q-card class="no-shadow radius-md q-pa-md">
+                        <q-card-section class="text-center">
+                            <div>
+                                <q-spinner-ios color="dark"/>
+                            </div>
+                            <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                        </q-card-section>
+                    </q-card>
                 </q-inner-loading>
             </q-card>
         </q-dialog>
@@ -194,28 +194,37 @@
                         <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                     </template>
                     <template v-slot:after>
-                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
                         </q-btn>
                     </template>
                     <template v-slot:prepend>
-                        <q-icon name="search" style="font-size: 1rem;" />
+                        <q-icon name="bi-search" style="font-size: 1rem;" />
                     </template>
                 </q-input>
-                <q-inner-loading :showing="loading">
-                    <q-spinner-puff size="md" />
-                </q-inner-loading>
             </q-toolbar>
         </q-footer>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -289,7 +298,7 @@ const Validations = () => {
     qualifications.value.forEach((e, index) => {
         if (!e) {
             Errors.qualifications.name.type[index] = true;
-            Errors.qualifications.name.msg = 'qualification is required';
+            Errors.qualifications.name.msg = 'required';
             isError = true;
         }
     });
@@ -408,14 +417,14 @@ const ResetForm = () => {
     salarytype.value = '';
     description.value = '';
     qualifications.value = [""];
-    Errors.name.type = null;
-    Errors.departmentId.type = null;
-    Errors.monthly.type = null;
-    Errors.daily.type = null;
-    Errors.hourly.type = null;
-    Errors.salarytype.type = null;
-    Errors.description.type = null;
+    ResetErrors()
 }
+
+const ResetErrors = () =>
+    Object.values(Errors).forEach(e => {
+        e.type = null;
+        e.msg = null;
+});
 
 const Save = async () => {
     if (!Validations()) return;
@@ -569,7 +578,7 @@ const remove = (index) => {
     qualifications.value.splice(index, 1);
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll();
     LoadDepartments()
 })
@@ -604,6 +613,13 @@ const LoadDepartments = async () => {
         console.error("Error fetching options:", error);
     }
 };
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
+})
 
 </script>
 

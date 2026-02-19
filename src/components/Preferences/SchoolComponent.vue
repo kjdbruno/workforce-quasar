@@ -2,40 +2,36 @@
     <div>
         <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card
-                    key="data-add"
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                    v-ripple
-                    @click="NewDialog()"
-                >
-                    <q-card-section class="text-center">
-                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()">
+                    <q-card-section>
+                        <q-icon color="grey" name="bi-plus-circle" size="xl"/>
                     </q-card-section>
                 </q-card>
             </div>
-            
-            <div
-                v-for="(data, index) in rows"
-                :key="`data-${data.id}`"
-                class="card-anim-wrapper"
-                :style="{ animationDelay: `${index * 120}ms` }"
-            >
-                <q-card
-                    @click="ModifyDialog(data)"
-                    class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm"
-                    v-ripple
-                    >
-                    <q-card-section class="text-center full-width">
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <q-spinner-ios color="dark"/>
+                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase text-grey">no data found</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
+                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple >
+                    <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
                     <q-card-section>
-                        <div class="text-caption text-grey">{{ data.type }}</div>
+                        <div class="text-caption text-grey text-uppercase">{{ data.type }}</div>
                     </q-card-section>
-                    <div
-                        class="absolute-top-left q-ma-sm"
-                        style="width: 7px; height: 7px; border-radius: 50%;"
-                        :class="data.isActive ? 'bg-positive' : 'bg-negative'"
-                    ></div>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.isActive ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
         </div>
@@ -48,35 +44,11 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-4">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">school name</span>
-                                <q-icon
-                                    :name="Errors.name.type ? 'error' : 'info'"
-                                    :color="Errors.name.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.name.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.name.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.name.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
+                            <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
-                                outlined
+                                label="Enter Name"
+                                outlined 
                                 :error="Errors.name.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
@@ -84,114 +56,32 @@
                         </div>
                     </div>
                     <div class="q-mb-md">
-                        <div class="q-mb-xs">
-                            <span class="text-caption text-uppercase text-grey q-mr-sm">school type</span>
-                            <q-icon
-                                :name="Errors.type.type ? 'error' : 'info'"
-                                :color="Errors.type.type ? 'negative' : 'grey'"
-                                class="cursor-pointer"
-                                size="xs"
-                            >
-                                <q-tooltip anchor="top middle" self="center middle" :class="Errors.type.type ? 'bg-negative' : 'bg-grey'">
-                                    <template v-if="Errors.type.type">
-                                        <div 
-                                            v-for="(msg, i) in Errors.type.messages" 
-                                            :key="i" 
-                                            class="text-capitalize"
-                                        >
-                                            <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="text-capitalize">
-                                            <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                        </div>
-                                    </template>
-                                </q-tooltip>
-                            </q-icon>
+                        <div class="text-caption text-uppercase" :class="Errors.type.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.type.type ? Errors.type.msg : 'type' }}</div>
+                        <div class="q-gutter-xs">
+                            <q-radio v-for="value in types" right-label v-model="type" :label="value" :val="value" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" class="text-capitalize" />
                         </div>
-                        <q-radio 
-                            v-for="(v, index) in types" 
-                            v-model="type" 
-                            checked-icon="task_alt" 
-                            unchecked-icon="panorama_fish_eye" 
-                            :val="v.value" 
-                            :label="v.label"
-                            class="text-uppercase" 
-                        />
                     </div>
                     <div class="row q-col-gutter-xs q-mb-md">
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">school website</span>
-                                <q-icon
-                                    :name="Errors.website.type ? 'error' : 'info'"
-                                    :color="Errors.website.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.website.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.website.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.website.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
+                            <div class="text-caption text-uppercase text-grey">website</div>
                             <q-input 
                                 v-model="website" 
+                                label="Enter Website"
                                 outlined 
-                                :error="Errors.website.type"
-                                :no-error-icon="true"
+                                input-class="text-capitalize"
                             />
                         </div>
                         <div class="col-2">
-                            <div class="q-mb-xs">
-                                <span class="text-caption text-uppercase text-grey q-mr-sm">school contact number</span>
-                                <q-icon
-                                    :name="Errors.contactNo.type ? 'error' : 'info'"
-                                    :color="Errors.contactNo.type ? 'negative' : 'grey'"
-                                    class="cursor-pointer"
-                                    size="xs"
-                                >
-                                    <q-tooltip anchor="top middle" self="center middle" :class="Errors.contactNo.type ? 'bg-negative' : 'bg-grey'">
-                                        <template v-if="Errors.contactNo.type">
-                                            <div 
-                                                v-for="(msg, i) in Errors.contactNo.messages" 
-                                                :key="i" 
-                                                class="text-capitalize"
-                                            >
-                                                <q-icon name="error" color="white" size="xs" />&nbsp;{{ msg || 'Invalid input' }}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="text-capitalize">
-                                                <q-icon name="info" color="white" size="xs" />&nbsp;Required
-                                            </div>
-                                        </template>
-                                    </q-tooltip>
-                                </q-icon>
-                            </div>
+                            <div class="text-caption text-uppercase text-grey">contact no.</div>
                             <q-input 
                                 v-model="contactNo" 
+                                label="Enter Contact No."
                                 outlined 
-                                :error="Errors.contactNo.type"
-                                :no-error-icon="true"
+                                input-class="text-capitalize"
                             />
                         </div>
                     </div>
                 </q-card-section>
-                
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
@@ -200,10 +90,14 @@
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
+                    <q-card class="no-shadow radius-md q-pa-md">
+                        <q-card-section class="text-center">
+                            <div>
+                                <q-spinner-ios color="dark"/>
+                            </div>
+                            <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                        </q-card-section>
+                    </q-card>
                 </q-inner-loading>
             </q-card>
         </q-dialog>
@@ -217,28 +111,37 @@
                         <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                     </template>
                     <template v-slot:after>
-                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
                         </q-btn>
                     </template>
                     <template v-slot:prepend>
-                        <q-icon name="search" style="font-size: 1rem;" />
+                        <q-icon name="bi-search" style="font-size: 1rem;" />
                     </template>
                 </q-input>
-                <q-inner-loading :showing="loading">
-                    <q-spinner-puff size="md" />
-                </q-inner-loading>
             </q-toolbar>
         </q-footer>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -252,8 +155,11 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
+
+import moment from 'moment'
 
 import { api } from 'src/boot/axios';
 
@@ -272,72 +178,33 @@ const website = ref('');
 const contactNo = ref('');
 const isActive = ref(false);
 
-const errors = ref([]);
-
 const Errors = reactive({
     name: { 
-        type: null, messages: []
+        type: null, msg: '' 
     },
-    type: { 
-        type: null, messages: []
-    },
-    website: { 
-        type: null, messages: []
-    },
-    contactNo: { 
-        type: null, messages: []
+    type: {
+        type: null, msg: ''
     }
 });
 
 const Validations = () => {
-
+    
     let isError = false;
 
-    Object.keys(Errors).forEach(key => {
-        Errors[key].type = null;
-        Errors[key].messages = [];
-    });
-
     if (!name.value) {
-        Errors.name.type = true;
-        Errors.name.messages.push('Name is required');
-        isError = true;
+        Errors.name.type = true
+        Errors.name.msg = ('required')
+        isError = true
     } else {
-        Errors.name.type = null;
+        Errors.name.type = null
     }
 
     if (!type.value) {
-        Errors.type.type = true;
-        Errors.type.messages.push('School type is required');
-        isError = true;
+        Errors.type.type = true
+        Errors.type.msg = ('required')
+        isError = true
     } else {
-        Errors.type.type = null;
-    }
-
-    if (website.value) {
-        const websitePattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$/i;
-        if (!websitePattern.test(website.value)) {
-            Errors.website.type = true;
-            Errors.website.messages.push('Website must be valid');
-            isError = true;
-        } else {
-            Errors.website.type = null;
-        }
-    } else {
-        Errors.website.type = null;
-    }
-
-    if (contactNo.value) {
-        const phonePattern = /^[0-9+\-\s]{7,15}$/;
-        if (!phonePattern.test(contactNo.value)) {
-            Errors.contactNo.type = true;
-            Errors.contactNo.messages.push('Contact No must be valid');
-            isError = true;
-        } else {
-            Errors.contactNo.type = null;
-        }
-    } else {
-        Errors.contactNo.type = null;
+        Errors.type.type = null
     }
 
     if (isError) {
@@ -352,6 +219,7 @@ const Validations = () => {
 
     return !isError
 }
+
 
 const rows = ref([]);
 
@@ -374,16 +242,6 @@ const LoadAll = async () => {
         });
         rows.value = data.data;
         meta.value = data.meta;
-
-        if (!rows.value.length) {
-            Toast.fire({
-                icon: "info",
-                html: `
-                <div class="text-h6 text-bold text-uppercase">Notice</div>
-                <div class="text-caption text-capitalize;">No records found!</div>
-                `
-            });
-        }
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
@@ -437,10 +295,10 @@ const NewDialog = () => {
     isEdit.value = false;
 }
 
-const ModifyDialog = (data) => {
+const ModifyDialog = async (data) => {
     ResetForm();
     dialog.value = true;
-    isEdit.value = false;
+    isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
     type.value = data.type;
@@ -456,14 +314,16 @@ const ResetForm = () => {
     website.value = '';
     contactNo.value = '';
     isActive.value = false;
-    Errors.name.type = null;
-    Errors.type.type = null;
-    Errors.website.type = null;
-    Errors.contactNo.type = null;
+    ResetErrors()
 }
 
-const Save = async () => {
+const ResetErrors = () =>
+    Object.values(Errors).forEach(e => {
+        e.type = null;
+        e.msg = null;
+});
 
+const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
     try {
@@ -480,12 +340,12 @@ const Save = async () => {
                 website: website.value,
                 contactNo: contactNo.value
             });
+        dialog.value = false;
         if (id.value && isEdit) {
             UpdateList(response.data.school);
         } else {
             LoadAll();
         }
-        dialog.value = false;
         Toast.fire({
             icon: "success",
             html: `
@@ -513,19 +373,20 @@ const applyBackendErrors = (backendErrors) => {
     const errorsArray = Array.isArray(backendErrors)
         ? backendErrors
         : backendErrors?.errors || []
-        
+
     Object.keys(Errors).forEach(key => {
         Errors[key].type = null
-        Errors[key].messages = []
+        Errors[key].msg = ''     // ✅ string
     })
-    
+
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
             Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
+            Errors[err.path].msg = err.msg  // ✅ assign string
         }
     })
 }
+
 
 const UpdateList = (data) => {
     const index = rows.value.findIndex(item => item.id === data.id)
@@ -540,8 +401,8 @@ const Toggle = async () => {
         const response = isActive.value
             ? await api.post(`/school/${id.value}/disable`)
             : await api.post(`/school/${id.value}/enable`)
-        UpdateList(response.data.school)
         dialog.value = false;
+        UpdateList(response.data.school)
         Toast.fire({
             icon: "success",
             html: `
@@ -550,7 +411,6 @@ const Toggle = async () => {
             `
         });
     } catch (e) {
-
         if (e.response && e.response.data) {
             applyBackendErrors(e.response.data);
             Toast.fire({
@@ -567,51 +427,22 @@ const Toggle = async () => {
 }
 
 const types = ref([
-    { 
-        label: 'Private', 
-        value: 'Private' 
-    },
-    { 
-        label: 'SUC', 
-        value: 'SUC' 
-    },
-    { 
-        label: 'LUC', 
-        value: 'LUC' 
-    },
-    { 
-        label: 'Special HEIs', 
-        value: 'Special HEIs' 
-    },
-    { 
-        label: 'TVET', 
-        value: 'TVET' 
-    }
-]);
+    'Private', 'Public', 'SUC', 'LUC'
+])
 
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        update(() => {
-            if (!val) {
-                targetRef.value = sourceRef.value.slice(0, 5);
-            } else {
-                const needle = val.toLowerCase().trim()
-                targetRef.value = sourceRef.value
-                    .filter(v => (v.label ?? '').toLowerCase().includes(needle))
-                    .slice(0, 5)
-            }
-        })
-    }
-}
-
-const filteredTypes = ref([]);
-const filterTypeFn = createFilterFn(types, filteredTypes);
-
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll();
+})
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
 })
 
 </script>
 
 <style scoped>
+
 </style>

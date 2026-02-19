@@ -157,7 +157,7 @@
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                     <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
                         <template v-slot:prepend>
-                            <q-icon name="search" style="font-size: 1rem;" />
+                            <q-icon name="bi-search" style="font-size: 1rem;" />
                         </template>
                         <template v-slot:after>
                             <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
@@ -166,10 +166,14 @@
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">
-                <div class="text-center">
-                    <q-spinner-puff size="md"/>
-                    <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                </div>
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
             </q-inner-loading>
         </q-card>
     </q-dialog>

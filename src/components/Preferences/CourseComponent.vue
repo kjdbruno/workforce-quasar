@@ -27,11 +27,6 @@
                 <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple >
                     <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
-                        <div class="text-caption text-capitalize">{{ formatDate(data?.date) }}</div>
-                    </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption">{{ data.multiplier }}</div>
-                        <div class="text-caption text-uppercase text-grey">multiplier</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.isActive ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
@@ -40,37 +35,18 @@
         <q-dialog v-model="dialog" full-height position="right" persistent square class="dialog">
             <q-card class="dialog-card column full-height">
                 <q-card-section class="q-pa-lg">
-                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify holiday' : 'create new holiday' }}</div>
+                    <div class="text-h6 text-uppercase">{{ isEdit ? 'modify course' : 'create new course' }}</div>
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="row q-col-gutter-xs q-mb-xs">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
+                    <div class="row q-col-gutter-xs q-mb-md">
+                        <div class="col-4">
+                            <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'name' }}</div>
                             <q-input 
                                 v-model="name" 
                                 label="Enter Name"
                                 outlined 
                                 :error="Errors.name.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.date.type ? 'text-negative' : 'text-grey'">{{ Errors.date.type ? Errors.date.msg : 'date (YYYY-MM-DD)' }}</div>
-                            <q-input outlined v-model="date" label="Enter Date" :error="Errors.date.type" :no-error-icon="true">
-                                <q-popup-proxy cover transition-show="scale" transition-hide="scale" ref="popup" class="no-shadow custom-border radius-sm">
-                                    <q-date v-model="date" mask="YYYY-MM-DD" @update:model-value="() => { popup.hide() }" />
-                                </q-popup-proxy>
-                            </q-input>
-                        </div>
-                        <div class="col-1">
-                            <div class="text-caption text-uppercase q-mb-xs" :class="Errors.name.type ? 'text-negative' : 'text-grey'">{{ Errors.multiplier.type ? Errors.multiplier.msg : 'multiplier' }}</div>
-                            <q-input 
-                                v-model="multiplier" 
-                                label="Enter Multiplier"
-                                outlined 
-                                :error="Errors.multiplier.type"
                                 :no-error-icon="true"
                                 input-class="text-capitalize"
                             />
@@ -168,19 +144,11 @@ const submitLoading = ref(false);
 
 const id = ref('');
 const name = ref('');
-const date = ref(new Date().toISOString().split('T')[0]);
-const multiplier = ref('');
 const isActive = ref(false);
 
 const Errors = reactive({
     name: { 
         type: null, msg: '' 
-    },
-    date: {
-        type: null, msg: ''
-    },
-    multiplier: {
-        type: null, msg: ''
     }
 });
 
@@ -194,22 +162,6 @@ const Validations = () => {
         isError = true
     } else {
         Errors.name.type = null
-    }
-
-    if (!date.value) {
-        Errors.date.type = true
-        Errors.date.msg = ('required')
-        isError = true
-    } else {
-        Errors.date.type = null
-    }
-
-    if (!multiplier.value) {
-        Errors.multiplier.type = true
-        Errors.multiplier.msg = ('required')
-        isError = true
-    } else {
-        Errors.multiplier.type = null
     }
 
     if (isError) {
@@ -238,7 +190,7 @@ const filter = ref('');
 const LoadAll = async () => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/holiday`, {
+        const { data } = await api.get(`/course`, {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
@@ -306,16 +258,12 @@ const ModifyDialog = async (data) => {
     isEdit.value = true;
     id.value = data.id;
     name.value = data.name;
-    date.value = data.date;
-    multiplier.value = data.multiplier;
     isActive.value = (data.isActive ? true : false);
 }
 
 const ResetForm = () => {
     id.value = '';
     name.value = '';
-    date.value = new Date().toISOString().split('T')[0];
-    multiplier.value = '';
     isActive.value = false;
     ResetErrors()
 }
@@ -331,19 +279,15 @@ const Save = async () => {
     submitLoading.value = true;
     try {
         const response = id.value && isEdit
-            ? await api.post(`/holiday/${id.value}/update`, {
-                name: name.value,
-                date: date.value,
-                multiplier: multiplier.value
+            ? await api.post(`/course/${id.value}/update`, {
+                name: name.value
             })
-            : await api.post('/holiday', {
-                name: name.value,
-                date: date.value,
-                multiplier: multiplier.value
+            : await api.post('/course', {
+                name: name.value
             });
         dialog.value = false;
         if (id.value && isEdit) {
-            UpdateList(response.data.holiday);
+            UpdateList(response.data.course);
         } else {
             LoadAll();
         }
@@ -382,8 +326,8 @@ const applyBackendErrors = (backendErrors) => {
 
     errorsArray.forEach(err => {
         if (Errors[err.path] !== undefined) {
-        Errors[err.path].type = true
-        Errors[err.path].msg = err.msg  // ✅ assign string
+            Errors[err.path].type = true
+            Errors[err.path].msg = err.msg  // ✅ assign string
         }
     })
 }
@@ -400,10 +344,10 @@ const Toggle = async () => {
     submitLoading.value = true;
     try {
         const response = isActive.value
-            ? await api.post(`/holiday/${id.value}/disable`)
-            : await api.post(`/holiday/${id.value}/enable`)
+            ? await api.post(`/course/${id.value}/disable`)
+            : await api.post(`/course/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.holiday)
+        UpdateList(response.data.course)
         Toast.fire({
             icon: "success",
             html: `
@@ -426,13 +370,6 @@ const Toggle = async () => {
         submitLoading.value = false;
     }
 }
-
-const formatDate = (date) => {
-    if (!date) return ''
-    return moment(date).format('MMMM Do, YYYY')
-}
-
-const popup = ref(null)
 
 onBeforeMount(() => {
     LoadAll();

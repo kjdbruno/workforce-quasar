@@ -1,31 +1,31 @@
 <template>
     <div>
-        <div class="card-main-grid">
+        <div class="card-grid">
             <div class="card-anim-wrapper">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()" >
-                    <q-card-section class="text-center">
-                        <q-avatar size="75px" font-size="52px" color="grey" text-color="white" icon="add" />
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="NewDialog()" >
+                    <q-card-section>
+                        <q-icon name="bi-plus-circle" color="grey" size="xl" />
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="loading">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
-                        <q-spinner-puff size="md"/>
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <q-spinner-ios color="dark"/>
                         <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-else-if="!loading && rows.length === 0">
-                <q-card key="data-add" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
-                    <q-card-section class="text-center">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
                         <div class="text-caption text-uppercase text-grey">no data found</div>
                     </q-card-section>
                 </q-card>
             </div>
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
-                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" v-ripple>
-                    <q-card-section class="text-center full-width">
+                <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
+                    <q-card-section>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                     </q-card-section>
                     <q-card-section>
@@ -76,10 +76,14 @@
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
-                    <div class="text-center">
-                        <q-spinner-puff size="md"/>
-                        <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
-                    </div>
+                    <q-card class="no-shadow radius-md q-pa-md">
+                        <q-card-section class="text-center">
+                            <div>
+                                <q-spinner-ios color="dark"/>
+                            </div>
+                            <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                        </q-card-section>
+                    </q-card>
                 </q-inner-loading>
             </q-card>
         </q-dialog>
@@ -93,16 +97,16 @@
                         <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                     </template>
                     <template v-slot:after>
-                        <q-btn unelevated size="xs" round color="primary" icon="first_page" :disable="page <= 1" @click="FirstPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_back" :disable="page <= 1" @click="PreviousPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="arrow_forward" :disable="page >= meta.TotalPages" @click="NextPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
                         </q-btn>
-                        <q-btn unelevated size="xs" round color="primary" icon="last_page" :disable="page >= meta.TotalPages" @click="LastPage">
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
                             <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
                         </q-btn>
                     </template>
@@ -110,11 +114,20 @@
                         <q-icon name="search" style="font-size: 1rem;" />
                     </template>
                 </q-input>
-                <q-inner-loading :showing="loading">
-                    <q-spinner-puff size="md" />
-                </q-inner-loading>
             </q-toolbar>
         </q-footer>
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -128,7 +141,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch
+    watch,
+    onBeforeMount
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -270,6 +284,7 @@ const ResetAllErrors = () => {
     });
 }
 
+
 const Save = async () => {
     if (!Validations()) return;
     submitLoading.value = true;
@@ -362,8 +377,15 @@ const Toggle = async () => {
     }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     LoadAll();
+})
+
+const PageLoading = ref(true);
+onMounted(() => {
+    setTimeout(() => {
+        PageLoading.value = false
+    }, 1000)
 })
 
 </script>

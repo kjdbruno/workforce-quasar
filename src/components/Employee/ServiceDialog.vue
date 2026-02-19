@@ -58,7 +58,7 @@
     <q-dialog v-model="printDialog" full-height full-width class="pdf">
         <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
             <q-btn
-                icon="close"
+                icon="bi-x"
                 class="fixed bg-white text-primary shadow-2"
                 round
                 dense
