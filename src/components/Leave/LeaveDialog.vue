@@ -266,7 +266,7 @@ const Save = async () => {
                 dateend: dateend.value,
                 reason: reason.value
             })
-            : await api.post('/leave', {
+            : await api.post('/socket/leave/create', {
                 employeeid: employeeid.value,
                 typeid: typeid.value,
                 datestart: datestart.value,

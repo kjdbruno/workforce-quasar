@@ -245,6 +245,7 @@ const SubmitLoading = ref(false);
 
 const PopulateData = () => {
     LoadAttendance()
+    overide_signatories.value = []
 }
 
 const attendanceId = ref('');

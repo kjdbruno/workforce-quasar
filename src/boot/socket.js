@@ -71,9 +71,11 @@ export default boot(({ app, router }) => {
 
         // Handle notifications
         socket.on('EmitNotifications', (data) => {
-
+            
             const count = data.count
             const notifications = data.notifications
+
+            // console.log(`notifications loaded, count: ${data.count}, notifications: ${data.notifications}`)
 
             // example: store in Pinia
             authStore.count = count

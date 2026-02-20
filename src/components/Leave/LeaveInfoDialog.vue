@@ -298,7 +298,7 @@ const Approve = async (id) => {
     const approvalid = myRequest?.id ?? null;
 
     try {
-        const response = await api.post(`/leave/${id}/approve`, {
+        const response = await api.post(`/socket/leave/${id}/approve`, {
             approvalid
         });
         emit('saved');

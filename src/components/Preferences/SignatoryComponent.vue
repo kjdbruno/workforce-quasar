@@ -26,18 +26,10 @@
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }">
                 <q-card @click="ShowDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section>
-                        <div class="text-subtitle2 text-uppercase">{{ data.type }}</div>
-                    </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption text-uppercase">{{ data.owner?.name }}</div>
-                        <div class="text-caption text-grey text-capitalize">owner</div>
-                    </q-card-section>
-                    <q-card-section>
-                        <div class="text-caption text-uppercase">{{ data.approver?.name }}</div>
-                        <div class="text-caption text-grey text-capitalize">approver</div>
+                        <div class="text-body1 text-uppercase">{{ formatName(data?.owner?.employeeAccount?.employee) }}</div>
+                        <div class="text-caption text-grey text-uppercase">{{ data?.owner?.role }}</div>
                     </q-card-section>
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.is_active ? 'bg-positive' : 'bg-negative'"></div>
-                    <div class="text-caption text-grey absolute-top-right q-ma-sm">{{ FormatOrdinal(data.order) }}</div>
                 </q-card>
             </div>
         </div>
@@ -50,24 +42,24 @@
                 <q-card-section class="col q-pa-lg scroll">
                     <div v-if="isDetail">
                         <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">document type</div>
-                            <div class="text-body1 text-uppercase">{{ info?.type }}</div>
+                            <div class="text-subtitle2 text-uppercase q-mb-sm">owner</div>
+                            <div class="text-body1 text-uppercase">{{ formatName(info?.owner?.employeeAccount?.employee) }}</div>
+                            <div class="text-caption text-grey text-uppercase">{{ info?.owner?.employeeAccount?.employee?.employment?.position?.name }}</div>
                         </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">owner</div>
-                            <div class="text-body1 text-uppercase">{{ info?.owner?.name }}</div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">approver</div>
-                            <div class="text-body1 text-uppercase">{{ info?.approver?.name }}</div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">description</div>
-                            <div class="text-body1 text-uppercase">{{ info?.description }}</div>
-                        </div>
-                        <div class="q-mb-md">
-                            <div class="text-caption text-uppercase text-grey">order</div>
-                            <div class="text-body1 text-uppercase">{{ FormatOrdinal(info?.order) }}</div>
+                        <div class="row q-col-gutter-xs">
+                            <div v-for="app in signs" class="col-2">
+                                <div class="text-body1 text-uppercase text-bold">
+                                    <span>{{ app?.type }}</span>
+                                    <q-checkbox v-model="signatory_data" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="app.id" class="text-capitalize"/>
+                                </div>
+                                <div class="q-mb-sm" v-for="v in app.signatories">
+                                    <div class="text-body1 text-uppercase">{{ FormatOrdinal(v.order) }}</div>
+                                    <div class="text-caption text-uppercase text-grey">{{ v?.description }}</div>
+                                    <img :src="formatSignature(v?.approver?.employeeAccount?.employee?.signature)" width="150"/>
+                                    <div class="text-body1 text-uppercase">{{ formatName(v?.approver?.employeeAccount?.employee) }}</div>
+                                    <div class="text-caption text-grey text-uppercase">{{ v?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div v-else>
@@ -232,7 +224,7 @@
                 <q-card-actions class="q-pa-lg bg">
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                        <q-btn v-if="isDetail" unelevated size="md" color="primary" class="btn text-capitalize" :label="info?.is_active ? 'disable' : 'enable'" @click="Toggle(info)"/>
+                        <q-btn v-if="isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="update" @click="() => { Update() }"/>
                         <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { AddSignatory() }" outline/>
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
                     </div>
@@ -303,8 +295,8 @@ import {
     computed,
     onMounted,
     ref, 
-    watch,
-    onBeforeMount
+    onBeforeMount,
+    watch
 } from 'vue';
 
 import { api } from 'src/boot/axios';
@@ -480,12 +472,33 @@ const NewDialog = () => {
 }
 
 const info = ref([])
+const signs = ref([])
 
 const ShowDialog = (data) => {
     ResetForm();
     dialog.value = true;
     isDetail.value = true;
     info.value = data;
+    LoadSignatory(data.owner_id)
+}
+
+const LoadSignatory = async (id) => {
+    submitLoading.value = true;
+    try {
+        const response = await api.get(`/signatory/${id}/detail`);
+        signs.value = response.data;
+    } catch (error) {
+        console.error("Error fetching all data:", error);
+        Toast.fire({
+            icon: "error",
+            html: `
+                <div class="text-h6 text-bold text-uppercase">Error</div>
+                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+            `
+        });
+    } finally {
+        submitLoading.value = false;
+    }
 }
 
 const ResetForm = () => {
@@ -549,12 +562,24 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
-const Toggle = async (app) => {
+const signatory_data = ref([])
+
+watch(
+  signs,
+  (newApps) => {
+    signatory_data.value = newApps
+      .filter(app => app.isActive)
+      .map(app => app.id)
+  },
+  { immediate: true, deep: true }
+)
+
+const Update = async (app) => {
     submitLoading.value = true;
     try {
-        const response = app.is_active
-            ? await api.post(`/signatory/${app.id}/disable`)
-            : await api.post(`/signatory/${app.id}/enable`)
+        const response =  await api.post(`/signatory/${info.value.owner_id}/update`, {
+            signatories: signatory_data.value
+        })
         dialog.value = false;
         LoadAll()
         Toast.fire({
@@ -660,6 +685,22 @@ const AddSignatory = () => {
 const RemoveSignatory = (index) => {
     const e = signatories.value;
     e.splice(index, 1);
+}
+
+const formatName = (profile) => {
+    if (!profile) return '';
+    const firstname = profile.first_name || '';
+    const middlename = profile.middle_name
+        ? profile.middle_name.charAt(0).toUpperCase() + '.'
+        : '';
+    const lastname = profile.last_name || '';
+    const suffix = profile.suffix ? ` ${profile.suffix}` : '';
+    return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
+}
+
+const formatSignature = (sign) => {
+    console.log(sign)
+    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
 
 onBeforeMount(() => {
