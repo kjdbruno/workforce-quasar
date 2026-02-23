@@ -52,7 +52,7 @@
                                 <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
                             </div>
                         </div>
-                        <div v-if="dt?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management'])" class="q-mt-md">
+                        <div v-if="dt?.status == 'Pending' && AuthStore.hasRole(['SuperAdmin', 'Management']) && LeaveStore.data?.status !== 'Cancelled'" class="q-mt-md">
                             <q-checkbox v-model="overide_signatories" :val="dt?.id" label="Overide" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" size="sm" class="tex-caption"/>
                         </div>
                     </div>
@@ -89,13 +89,12 @@
                             </q-card>
                         </q-menu>
                     </q-btn>
-                    <q-btn v-if="LeaveStore.data?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(LeaveStore.data?.id)" />
-                    <q-btn v-if="LeaveStore.data?.status !== 'Cancelled' && AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
-                        <q-menu @before-show="() => {  }" transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                    <q-btn v-if="LeaveStore.data?.status !== 'Cancelled' && AuthStore.hasRole(['SuperAdmin', 'Admin', 'Management', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="cancel">
+                        <q-menu transition-show="jump-up" transition-hide="jump-down" :offset="[0, 15]" class="radius-sm" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                             <q-card class="no-shadow  radius-sm q-pa-lg" style="width: 300px;">
                                 <q-card-section>
                                     <div class="text-h6 text-center text-uppercase">
-                                        proceed to approve
+                                        proceed to cancel
                                     </div>
                                 </q-card-section>
                                 <q-card-actions>
@@ -104,6 +103,7 @@
                             </q-card>
                         </q-menu>
                     </q-btn>
+                    <q-btn v-if="LeaveStore.data?.status !== 'Cancelled'" unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="Print(LeaveStore.data?.id)" />
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
                 </div>
             </q-card-actions>
@@ -334,7 +334,7 @@ const Cancel = async (id) => {
 
     try {
 
-        const response = await api.post(`/leave/${id}/cancel`)
+        const response = await api.post(`/socket/leave/${id}/cancel`)
         emit('saved');
         emit('update:modelValue', null);
         Toast.fire({

@@ -17,10 +17,16 @@ export const useAuthStore = defineStore('auth', {
         hasNotifications: null,
     }),
     getters: {
-        hasRole: (state) => (roles = []) => roles.includes(state.user?.role),
-        // optional helpers
-        isHR: (state) => state.user?.role === 'HR',
+        hasRole: (state) => (roles = []) => {
+        const userRole = state.user?.role
+        if (!userRole) return false
 
+        const roleList = Array.isArray(roles) ? roles : [roles]
+
+        return roleList.some(r =>
+            String(r).toLowerCase() === String(userRole).toLowerCase()
+        )
+        },
         // ✅ check if a specific user is online
         isUserOnline: (state) => (userId) => {
             const id = Number(userId);
