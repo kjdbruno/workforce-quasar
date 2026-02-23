@@ -393,7 +393,7 @@ const HasOverrideSignatories = computed(() =>
 const Overide = async (id) => {
     SubmitLoading.value = true;
     try {
-        const response = await api.post(`leave/${id}/overide`, {
+        const response = await api.post(`/socket/leave/${id}/overide`, {
             signatories: overide_signatories.value
         })
         Toast.fire({

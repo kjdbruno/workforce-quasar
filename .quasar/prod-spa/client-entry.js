@@ -20,6 +20,10 @@ import { createApp } from 'vue'
 
 
 
+import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
+
+import '@quasar/extras/bootstrap-icons/bootstrap-icons.css'
+
 import '@quasar/extras/roboto-font/roboto-font.css'
 
 import '@quasar/extras/material-icons/material-icons.css'
@@ -146,7 +150,9 @@ createQuasarApp(createApp, quasarUserOptions)
       
       import('boot/socket'),
       
-      import('boot/sweetalert')
+      import('boot/sweetalert'),
+      
+      import('boot/helper')
       
     ]).then(bootFiles => {
       const boot = mapFn(bootFiles).filter(entry => typeof entry === 'function')

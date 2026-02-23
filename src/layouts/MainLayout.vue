@@ -11,14 +11,10 @@
                 </q-toolbar-title>
 
                 <div class="q-gutter-sm">
-                    <!-- <q-btn flat round dense class="text-white">
-                        <q-icon name="bi-chat-square" color="secondary" />
-                        <q-badge color="red" floating>2</q-badge>
-                    </q-btn> -->
 
                     <q-btn flat round dense class="text-white">
                         <q-icon name="bi-bell" color="secondary" />
-                        <q-badge color="red" floating>{{ authStore.count }}</q-badge>
+                        <q-badge color="red" floating rounded>{{ authStore.count }}</q-badge>
                         <q-menu :offset="[5, 5]" class="radius-md" @hide="() => { ReadNotification()}" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
                             <q-card class="no-shadow" style="width: 350px;" >
                                 <div v-if="authStore.count === 0" class="q-pa-md text-center">
@@ -44,12 +40,46 @@
                         </q-menu>
                     </q-btn>
 
-                    <q-btn v-if="authStore.user.role === 'SuperAdmin'" flat round dense @click="() => { authStore.logout() }">
-                        <q-icon name="bi-box-arrow-right" color="secondary" />
+                    <q-btn flat round dense class="text-white">
+                        <q-icon name="bi-chat" color="secondary" />
+                        <q-badge color="red" floating rounded>{{ authStore.count }}</q-badge>
                     </q-btn>
-                    <q-btn v-else flat round dense class="text-white" @click="meDialog = !meDialog">
+                        
+                    <q-btn flat round dense class="text-white">
                         <q-icon name="bi-person" color="secondary" />
-                        <q-badge color="positive" rounded floating />
+                        <q-badge v-if="isOnline" color="positive" rounded floating />
+                        <q-menu :offset="[5, 5]" class="radius-md" style="box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;">
+                            <q-card class="no-shadow" style="width: 350px;" >
+                                <q-card-section>
+                                    <q-item>
+                                        <q-item-section avatar>
+                                            <q-avatar>
+                                                <img :src="formatPhoto(authStore.user?.avatar)">
+                                            </q-avatar>
+                                        </q-item-section>
+                                        <q-item-section>
+                                            <q-item-label class="text-uppercase">{{ authStore.user.role !== 'SuperAdmin' ? formatName(authStore.employees[0].employee) : authStore.user?.name }}</q-item-label>
+                                            <q-item-label caption class="text-capitalize">{{ authStore.user.role !== 'SuperAdmin' ? authStore.employees[0].employee?.employment?.position?.name : authStore.user?.role }}</q-item-label>
+                                        </q-item-section>
+                                    </q-item>
+                                </q-card-section>
+                                <q-separator />
+                                <q-card-section class="q-pa-none" >
+                                    <q-list>
+                                        <q-item clickable @click="meDialog = !meDialog" v-if="authStore.user.role !== 'SuperAdmin'">
+                                            <q-item-section>
+                                                <q-item-label class="text-uppercase">my account</q-item-label>
+                                            </q-item-section>
+                                        </q-item>
+                                        <q-item clickable @click="() => { authStore.logout() }">
+                                            <q-item-section>
+                                                <q-item-label class="text-uppercase">sign out</q-item-label>
+                                            </q-item-section>
+                                        </q-item>
+                                    </q-list>
+                                </q-card-section>
+                            </q-card>
+                        </q-menu>
                     </q-btn>
                 </div>
 
@@ -133,7 +163,6 @@
         </q-drawer>
 
         <q-page-container>
-            
             <div class="q-mx-lg q-mt-lg">
                 <router-view />
             </div>
@@ -186,6 +215,13 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
+const props = defineProps({
+    userId: {
+        type: [Number, String],
+        required: true
+    }
+})
+
 const drawer = ref(true)
 const miniState = ref(true)
 
@@ -233,9 +269,9 @@ const formatPhoto = (avatar) => {
 const userRole = computed(() => String(authStore.user?.role || '').trim())
 
 const filteredMenuItems = computed(() => {
-  const role = userRole.value
-  if (!role) return []
-  return menuItems.filter(i => !i.roles || i.roles.includes(role))
+    const role = userRole.value
+    if (!role) return []
+    return menuItems.filter(i => !i.roles || i.roles.includes(role))
 })
 
 onMounted(() => {
@@ -248,7 +284,6 @@ const randomCover = ref('');
 
 onBeforeMount(() => {
     const randomNumber = Math.floor(Math.random() * TOTAL_COVERS) + 1;
-
     randomCover.value = new URL(
         `../assets/cover/${randomNumber}.jpg`,
         import.meta.url
@@ -262,6 +297,10 @@ const formatDate = (timestamp) => {
 const ReadNotification = () => {
     if (socket?.connected) socket.emit('ReadNotification')
 }
+
+const isOnline = computed(() =>
+    authStore.isUserOnline(authStore.user.id)
+)
 
 </script>
 
@@ -278,14 +317,12 @@ const ReadNotification = () => {
     .card-profile {
         overflow: hidden;
         background: linear-gradient(
-  135deg,
-  #c94a4a 0%,
-  #a91f1f 65%,
-  #900201 100%
-);
+            135deg,
+            #c94a4a 0%,
+            #a91f1f 65%,
+            #900201 100%
+        );
     }
-
-    /* COVER PHOTO */
     .cover-photo {
         height: 175px;
         width: 100%;
@@ -293,29 +330,23 @@ const ReadNotification = () => {
     }
 
     .cover-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-
-    /* Optional dark overlay for readability */
     .cover-photo::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.55)
-    );
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.55)
+        );
     }
-
-    /* PROFILE IMAGE SECTION */
     .profile-section {
-    margin-top: -80px; /* pulls image over cover */
+        margin-top: -80px;
     }
-
-    /* PROFILE IMAGE */
     .profile-img {
         width: 150px;
         height: 150px;

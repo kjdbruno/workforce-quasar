@@ -20,6 +20,35 @@ export const useAuthStore = defineStore('auth', {
         hasRole: (state) => (roles = []) => roles.includes(state.user?.role),
         // optional helpers
         isHR: (state) => state.user?.role === 'HR',
+
+        // ✅ check if a specific user is online
+        isUserOnline: (state) => (userId) => {
+            const id = Number(userId);
+            return state.onlineUsers.some(u => Number(u.user_id) === id);
+        },
+
+        // ✅ check if YOU are online
+        amIOnline: (state) => {
+            const myId = Number(state.user?.id);
+            if (!myId) return false;
+            return state.onlineUsers.some(u => Number(u.user_id) === myId);
+        },
+
+        // optional: get online users list only
+        onlineUserIds: (state) =>
+            state.onlineUsers
+            .filter(u => u.is_online)
+            .map(u => Number(u.user_id)),
+
+        onlineUsersDetailed: (state) =>
+            state.onlineUsers
+                .filter(u => u.is_online)
+                .map(u => ({
+                    id: u.user_id,
+                    name: u.User?.name,
+                    role: u.User?.role,
+                    avatar: u.User?.avatar,
+                })),
     },
     actions: {
         async login(username, password) {
@@ -94,6 +123,40 @@ export const useAuthStore = defineStore('auth', {
         async readNotification() {
             this.count = 0;
             this.socket.emit('ReadNotification', { id: this.user.id });
+        },
+        // ✅ set online users from API/socket payload (your exact array format)
+        setOnlineUsers(list = []) {
+            this.onlineUsers = Array.isArray(list) ? list : [];
+        },
+
+        // ✅ mark online (if you receive 1 record only)
+        upsertOnlineUser(record) {
+            if (!record?.user_id) return;
+
+            const id = Number(record.user_id);
+            const idx = this.onlineUsers.findIndex(u => Number(u.user_id) === id);
+
+            if (idx >= 0) {
+            this.onlineUsers[idx] = { ...this.onlineUsers[idx], ...record };
+            } else {
+            this.onlineUsers.push(record);
+            }
+        },
+
+        // ✅ mark offline (soft)
+        markUserOffline(userId) {
+            const id = Number(userId);
+            const idx = this.onlineUsers.findIndex(u => Number(u.user_id) === id);
+
+            if (idx >= 0) {
+            this.onlineUsers[idx].is_online = false;
+            }
+        },
+
+        // ✅ function you can call anywhere
+        checkIfOnline(userId) {
+            if (!userId) return this.amIOnline;
+            return this.isUserOnline(userId);
         },
     },
     persist: true,
