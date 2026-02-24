@@ -20,7 +20,7 @@
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null) }" outline/>
                 </div>
             </q-card-actions>
-            <q-inner-loading :showing="submitLoading">
+            <q-inner-loading :showing="SubmitLoading">
                 <q-card class="no-shadow radius-md q-pa-md">
                     <q-card-section class="text-center">
                         <div>

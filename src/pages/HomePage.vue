@@ -42,11 +42,8 @@
                                 </div>
                             </q-card-section>
                         </div>
-                        <div class="col-3">
-                            <img
-                                :src="AuthStore.user.role !== 'SuperAdmin' ? (AuthStore.employees[0]?.employee.photo.avatar) : '~assets/default.png'"
-                                alt="Welcome"
-                                />
+                        <div class="col-3" v-if="AuthStore.user.role !== 'SuperAdmin'">
+                            <img v-if="AuthStore.user.role !== 'SuperAdmin'"  :src="(AuthStore.employees.photo)" alt="Welcome" />
                         </div>
                     </div>
                     <q-inner-loading :showing="WelcomeLoading" dark>

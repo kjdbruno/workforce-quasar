@@ -104,6 +104,12 @@
                         />
                     </div>
                 </div>
+                <div class="q-mb-md">
+                    <div class="text-caption text-uppercase" :class="Errors.employmentstatus.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.employmentstatus.type ? Errors.employmentstatus.msg : 'employment status' }}</div>
+                    <div class="q-gutter-sm">
+                        <q-radio v-for="value in employmentstatuses" v-model="employmentstatus" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" class="text-capitalize"/>
+                    </div>
+                </div>
                 <div class="q-mb-md q-mt-xl">
                     <div class="text-caption text-uppercase" :class="Errors.payrollgroup.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.payrollgroup.type ? Errors.payrollgroup.msg : 'payroll group' }}</div>
                     <div class="q-gutter-sm">
@@ -218,6 +224,7 @@ const salarygroups = ref([
 const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
 const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
 const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
+const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
 
 function formatCurrency(salaryRange, currency = 'PHP') {
     if (!salaryRange) return '';
@@ -249,6 +256,7 @@ const datestart = ref(new Date().toISOString().split('T')[0]);
 const dateend = ref('');
 const salarygroup = ref('');
 const salarytype = ref('');
+const employmentstatus = ref('');
 const payrollgroup = ref('');
 const taxstatus = ref('');
 const amount = ref('');
@@ -260,6 +268,7 @@ const Errors = reactive({
     dateend: { type: null, msg: '' },
     salarygroup: { type: null, msg: '' },
     salarytype: { type: null, msg: '' },
+    employmentstatus: { type: null, msg: '' },
     amount: { type: null, msg: '' },
     payrollgroup: { type: null, msg: '' },
     taxstatus: { type: null, msg: '' },
@@ -296,7 +305,7 @@ const ValidateSalary = () => {
         (!amount.value || isNaN(+amount.value) || +amount.value <= 0)
         ? setErr('amount', !amount.value ? 'required' : 'invalid amount')
         : clearErr('amount')
-
+    isError ||= req('employmentstatus', employmentstatus.value)
     isError ||= req('payrollgroup', payrollgroup.value)
     isError ||= req('taxstatus', taxstatus.value)
 
@@ -320,6 +329,7 @@ const Save = async () => {
         const response = await api.post(`/employee/${EmployeeStore.data?.employment?.id}/salary`, {
             positionid: (position.value.id ? position.value.id : EmployeeStore.data?.employment?.position?.id),
             salarytype: salarytype.value,
+            employmentstatus: employmentstatus.value,
             datestart: datestart.value,
             dateend: dateend.value,
             salarygroup: salarygroup.value,

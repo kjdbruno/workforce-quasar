@@ -54,13 +54,13 @@
                                     <q-item>
                                         <q-item-section avatar>
                                             <q-avatar>
-                                                <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
-                                                <img v-else src="~assets/default.png">
+                                                <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees.photo)">
+                                                <q-icon v-if="authStore.user.role === 'SuperAdmin'" name="bi-person-circle" size="lg" color="grey-8"/>
                                             </q-avatar>
                                         </q-item-section>
                                         <q-item-section>
-                                            <q-item-label class="text-uppercase">{{ authStore.user.role !== 'SuperAdmin' ? formatName(authStore.employees[0].employee) : authStore.user?.name }}</q-item-label>
-                                            <q-item-label caption class="text-capitalize">{{ authStore.user.role !== 'SuperAdmin' ? authStore.employees[0].employee?.employment?.position?.name : authStore.user?.role }}</q-item-label>
+                                            <q-item-label class="text-uppercase">{{ authStore.user.role !== 'SuperAdmin' ? formatName(authStore.employees) : authStore.user?.name }}</q-item-label>
+                                            <q-item-label caption class="text-capitalize">{{ authStore.user.role !== 'SuperAdmin' ? authStore.employees?.employment?.position?.name : authStore.user?.role }}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </q-card-section>
@@ -139,8 +139,8 @@
                         <q-item class="q-mb-sm">
                             <q-item-section avatar>
                                 <q-avatar>
-                                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
-                                    <img v-else src="~assets/default.png">
+                                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees.photo)">
+                                    <q-icon v-if="authStore.user.role === 'SuperAdmin'" name="bi-person-circle" size="lg" color="grey-8"/>
                                 </q-avatar>
                             </q-item-section>
                             <q-item-section>
@@ -152,8 +152,8 @@
                 </div>
                 <div v-if="miniState" class="text-center">
                     <q-avatar class="q-mb-sm">
-                        <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
-                        <img v-else src="~assets/default.png">
+                        <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees.photo)">
+                        <q-icon v-if="authStore.user.role === 'SuperAdmin'" name="bi-person-circle" size="lg" color="grey-8"/>
                     </q-avatar>
                 </div>
             </div>
@@ -178,26 +178,26 @@
                     <img :src="randomCover" alt="Cover"/>
                 </div>
                 <q-card-section class="text-center profile-section">
-                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)" alt="Profile" class="profile-img">
-                    <img v-else src="~assets/default.png" alt="Profile" class="profile-img">
+                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees.photo)" alt="Profile" class="profile-img">
+                    <q-icon v-if="authStore.user.role === 'SuperAdmin'" name="bi-person-circle" size="lg" color="grey-8"/>
                 </q-card-section>
                 <q-card-section class="text-center q-pt-sm">
-                    <div class="text-caption text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.employee_no }}</div>
-                    <div class="text-h5 text-uppercase text-bold text-white">{{ formatName(authStore.employees[0].employee) }}</div>
-                    <div class="text-body1 text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.position?.name }}</div>
-                    <div class="text-caption text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.employment_status }}</div>
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees?.employment?.employee_no }}</div>
+                    <div class="text-h5 text-uppercase text-bold text-white">{{ formatName(authStore.employees) }}</div>
+                    <div class="text-body1 text-uppercase text-white">{{ authStore.employees?.employment?.position?.name }}</div>
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees?.employment?.employment_status }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
                     <div class="text-caption text-uppercase text-white">email address</div>
-                    <div class="text-body1 text-bold text-white">{{ authStore.employees[0].employee?.email }}</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees?.email }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
                     <div class="text-caption text-uppercase text-white">contact number</div>
-                    <div class="text-body1 text-bold text-white">{{ authStore.employees[0].employee?.contact_number }}</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees?.contact_number }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
                     <div class="text-caption text-uppercase text-white">adderss</div>
-                    <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees[0].employee?.address }}</div>
+                    <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees?.address }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
                     <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout() }"/>
