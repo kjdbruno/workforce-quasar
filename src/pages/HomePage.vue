@@ -44,7 +44,7 @@
                         </div>
                         <div class="col-3">
                             <img
-                                :src="formatPhoto(AuthStore.user?.avatar)"
+                                :src="AuthStore.user.role !== 'SuperAdmin' ? (AuthStore.employees[0]?.employee.photo.avatar) : '~assets/default.png'"
                                 alt="Welcome"
                                 />
                         </div>

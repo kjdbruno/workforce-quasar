@@ -160,8 +160,9 @@ export default boot(({ app }) => {
     console.log('online users:', users);
   });
 
-  socket.on('EmitEmployee', (employees) => {
-    authStore.employees = employees;
+  socket.on('EmitEmployee', (data) => {
+    authStore.employees = data;
+    console.log(`employee data: ${data}`)
   });
 
   socket.on('EmitNotifications', (data) => {

@@ -7,7 +7,7 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="profile-section q-mb-lg">
-                    <img :src="FormatAvatar(photo?.avatar)" alt="Profile" class="profile-img" />
+                    <img :src="(photo?.avatar)" alt="Profile" class="profile-img" />
                 </div>
                 <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                     <div>

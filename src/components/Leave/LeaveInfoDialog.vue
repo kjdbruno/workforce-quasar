@@ -40,13 +40,13 @@
                                     <div class="text-body1 text-uppercase text-italic">{{ dt?.original_approver_position }}</div>
                                 </div>
                                 <div class="text-caption text-uppercase text-italic text-bold q-mb-lg">overiden by</div>
-                                <img :src="FormatSignature(dt?.override_signature)" width="150"/>
+                                <img :src="(dt?.override_signature)" width="150"/>
                                 <div class="text-h6 text-uppercase">{{ dt?.override_name }}</div>
                                 <div class="text-body1 text-uppercase text-italic">{{ dt?.override_position }}</div>
                                 <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>
                             </div>
                             <div v-if="!dt?.is_overide">
-                                <img :src="FormatSignature(dt?.original_signature)" width="150"/>
+                                <img :src="(dt?.original_signature)" width="150"/>
                                 <div class="text-h6 text-uppercase">{{ dt?.original_approver_name }}</div>
                                 <div class="text-body1 text-uppercase text-italic">{{ dt?.original_approver_position }}</div>
                                 <div class="text-caption text-uppercase text-italic">{{ FormatSigned(dt?.signed_at) }}</div>

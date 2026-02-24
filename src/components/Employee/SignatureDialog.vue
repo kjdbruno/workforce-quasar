@@ -10,7 +10,7 @@
                     <div class="col-3">
                         <div class="q-mb-lg">
                             <div v-if="signature"class="text-body1 text-capitalize text-grey">current signature</div>
-                            <img v-if="signature" :src="FormatSignature(signature)" width="200"/>
+                            <img v-if="signature" :src="(signature)" width="200"/>
                             <div v-else class="text-body1 text-capitalize text-grey">no signature found</div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@ const GetSignature = async (id) => {
                 id: id
             }
         });
-        signature.value = response.data.record;
+        signature.value = response.data.record.signature;
 
     } catch (error) {
         console.error("Error fetching all data:", error);

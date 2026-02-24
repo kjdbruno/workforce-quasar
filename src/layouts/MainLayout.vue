@@ -54,7 +54,8 @@
                                     <q-item>
                                         <q-item-section avatar>
                                             <q-avatar>
-                                                <img :src="formatPhoto(authStore.user?.avatar)">
+                                                <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
+                                                <img v-else src="~assets/default.png">
                                             </q-avatar>
                                         </q-item-section>
                                         <q-item-section>
@@ -138,7 +139,8 @@
                         <q-item class="q-mb-sm">
                             <q-item-section avatar>
                                 <q-avatar>
-                                    <img :src="formatPhoto(authStore.user?.avatar)">
+                                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
+                                    <img v-else src="~assets/default.png">
                                 </q-avatar>
                             </q-item-section>
                             <q-item-section>
@@ -150,7 +152,8 @@
                 </div>
                 <div v-if="miniState" class="text-center">
                     <q-avatar class="q-mb-sm">
-                        <img :src="formatPhoto(authStore.user?.avatar)">
+                        <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)">
+                        <img v-else src="~assets/default.png">
                     </q-avatar>
                 </div>
             </div>
@@ -175,7 +178,8 @@
                     <img :src="randomCover" alt="Cover"/>
                 </div>
                 <q-card-section class="text-center profile-section">
-                    <img :src="formatPhoto(authStore.user?.avatar)" alt="Profile" class="profile-img" />
+                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees[0]?.employee.photo.avatar)" alt="Profile" class="profile-img">
+                    <img v-else src="~assets/default.png" alt="Profile" class="profile-img">
                 </q-card-section>
                 <q-card-section class="text-center q-pt-sm">
                     <div class="text-caption text-uppercase text-white">{{ authStore.employees[0].employee?.employment?.employee_no }}</div>

@@ -45,7 +45,7 @@
                             </q-card-section>
                         </q-card>
                     </div>
-                    <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" @click="ViewDocument(app)" v-else>
+                    <div v-for="(app, index) in rows" :key="`data-${app.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" @click="Print(app.id)" v-else>
                         <q-card class="card card-hover-animate flex flex-center q-pa-md no-shadow cursor-pointer radius-sm" >
                             <q-card-section class="text-center full-width">
                                 <div class="text-subtitle2 text-uppercase">{{ app?.filename }}</div>
@@ -68,6 +68,23 @@
                     <div class="text-caption text-grey text-uppercase q-mt-xs">we're working on it!</div>
                 </div>
             </q-inner-loading>
+        </q-card>
+    </q-dialog>
+    <q-dialog v-model="printDialog" full-height full-width class="pdf">
+        <q-card class="bg-white q-pa-none" style="height: 100vh; overflow: hidden;">
+            <q-btn
+                icon="bi-x"
+                class="fixed bg-white text-primary shadow-2"
+                round
+                dense
+                v-close-popup
+                style="top: 15px; right: 15px; z-index: 999;"
+            />
+            <q-card-section class="q-pa-none" style="height: 100%; overflow: hidden;">
+                <div class="iframe-container">
+                    <iframe v-if="pdf" :src="pdf" frameborder="0"></iframe>
+                </div>
+            </q-card-section>
         </q-card>
     </q-dialog>
 </template>
@@ -265,6 +282,26 @@ const AddDocument = () => {
 const RemoveDocument = (index) => {
     const d = documents.value;
     d.splice(index, 1);
+}
+
+const printDialog = ref(false);
+const pdf = ref(null);
+
+const Print = async (id) => {
+    SubmitLoading.value = true;
+    try {
+        const res = await api.get(`/employee/document/${id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+        SubmitLoading.value = false;
+    } catch (error) {
+        SubmitLoading.value = false;
+        console.error("Error generating PDF:", error);
+    }
 }
 </script>
 
