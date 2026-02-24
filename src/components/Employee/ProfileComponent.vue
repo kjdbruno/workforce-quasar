@@ -7,7 +7,7 @@
                         <img :src="randomCover" alt="Cover"/>
                     </div>
                     <q-card-section class="text-center profile-section">
-                        <img :src="(employee?.photo?.avatar)" alt="Profile" class="profile-img" />
+                        <img :src="(employee?.photo)" alt="Profile" class="profile-img" />
                     </q-card-section>
                     <q-card-section class="text-center q-pt-sm">
                         <div class="text-caption text-uppercase text-white">{{ employee?.employment?.employee_no }}</div>

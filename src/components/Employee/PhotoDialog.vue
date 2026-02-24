@@ -7,7 +7,7 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="profile-section q-mb-lg">
-                    <img :src="(photo?.avatar)" alt="Profile" class="profile-img" />
+                    <img :src="(photo)" alt="Profile" class="profile-img" />
                 </div>
                 <div class="row" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                     <div>
@@ -92,8 +92,7 @@ const GetPhoto = async (id) => {
                 id: id
             }
         });
-        photo.value = response.data.record;
-
+        photo.value = response.data.record.photo;
     } catch (error) {
         console.error("Error fetching all data:", error);
         Toast.fire({
