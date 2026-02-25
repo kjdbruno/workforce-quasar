@@ -55,7 +55,7 @@
                                 <div class="q-mb-sm" v-for="v in app.signatories">
                                     <div class="text-body1 text-uppercase">{{ FormatOrdinal(v.order) }}</div>
                                     <div class="text-caption text-uppercase text-grey">{{ v?.description }}</div>
-                                    <img :src="formatSignature(v?.approver?.employeeAccount?.employee?.signature)" width="150"/>
+                                    <img :src="(v?.approver?.employeeAccount?.employee?.signature?.signature)" width="150"/>
                                     <div class="text-body1 text-uppercase">{{ formatName(v?.approver?.employeeAccount?.employee) }}</div>
                                     <div class="text-caption text-grey text-uppercase">{{ v?.approver?.employeeAccount?.employee?.employment?.position?.name }}</div>
                                 </div>
@@ -696,11 +696,6 @@ const formatName = (profile) => {
     const lastname = profile.last_name || '';
     const suffix = profile.suffix ? ` ${profile.suffix}` : '';
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
-}
-
-const formatSignature = (sign) => {
-    console.log(sign)
-    return `${process.env.VUE_APP_BACKEND_URL}${sign.signature}`
 }
 
 onBeforeMount(() => {

@@ -89,7 +89,7 @@ const GetSignature = async (id) => {
             icon: "error",
             html: `
                 <div class="text-h6 text-bold text-uppercase">Error</div>
-                <div class="text-caption text-capitalize;">Unable to fetch records</div>
+                <div class="text-caption text-capitalize;">${error.response.data.message}</div>
             `
         });
     } finally {

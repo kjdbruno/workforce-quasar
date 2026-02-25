@@ -98,7 +98,7 @@ const Save = async () => {
     const dateStart = moment(date.value.from).format('YYYY-MM-DD');
     const dateEnd = moment(date.value.to).format('YYYY-MM-DD');
     try {
-        const response = await api.post('/attendance', {
+        const response = await api.post('/socket/attendance/create', {
                 dateStart: dateStart,
                 dateEnd: dateEnd,
             });
