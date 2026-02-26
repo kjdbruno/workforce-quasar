@@ -40,10 +40,10 @@
                         </q-menu>
                     </q-btn>
 
-                    <q-btn flat round dense class="text-white">
+                    <!-- <q-btn flat round dense class="text-white" @click="() => MessageDialog = true">
                         <q-icon name="bi-chat" color="secondary" />
                         <q-badge color="red" floating rounded>{{ authStore.count }}</q-badge>
-                    </q-btn>
+                    </q-btn> -->
                         
                     <q-btn flat round dense class="text-white">
                         <q-icon name="bi-person" color="secondary" />
@@ -200,10 +200,92 @@
                     <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees?.address }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
-                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout() }"/>
+                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout(); meDialog = false; }"/>
                 </q-card-section>
             </q-card>
         </q-dialog>
+
+        <!-- <q-dialog v-model="MessageDialog" full-height position="right" square class="dialog profile-dialog">
+            <q-card class="card q-pa-md">
+                <q-card-section>
+                    <div class="text-h5 text-uppercase">workforce messenger</div>
+                </q-card-section>
+                <q-card-section v-if="!isConvo">
+                    <div class="q-mb-md">
+                        <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                            <template v-slot:prepend>
+                                <q-icon name="bi-search" style="font-size: 1rem;" />
+                            </template>
+                        </q-input>
+                    </div>
+                    <q-list>
+                        <q-item clickable v-ripple class="radius-sm q-pt-md q-pb-md" v-for="app in authStore.onlineUsers" @click="() => { ViewConvo(app) }">
+                            <q-item-section avatar>
+                            <q-avatar>
+                                <img :src="app.avatar">
+                                <q-badge v-if="app?.UserLog?.is_online" color="positive" rounded floating />
+                            </q-avatar>
+                            </q-item-section>
+                            <q-item-section class="text-capitalize">
+                                <div class="text-subtitle1 text-bold">{{ app.name }}</div>
+                                <div class="text-caption text-grey">{{ app.username }}</div>
+                            </q-item-section>
+                            <q-item-section side class="text-capitalize">
+                                <div class="text-caption text-grey">{{ app.role }}</div>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-card-section>
+                <div v-if="isConvo">
+                    <q-item>
+                        <q-item-section avatar>
+                            <q-avatar>
+                                <img :src="info?.avatar">
+                            </q-avatar>
+                        </q-item-section>
+                        <q-item-section>
+                            <q-item-label class="text-h6 text-capitalize">{{ info?.name }}</q-item-label>
+                            <q-item-label caption>
+                                {{ info?.role }}
+                            </q-item-label>
+                        </q-item-section>
+                    </q-item>
+                    <div class="scrollable" style="height: 50%;">
+
+                    </div>
+                </div>
+            </q-card> -->
+            <!-- <q-card key="data-add" class="card card-profile no-shadow radius-sm q-mb-sm q-pb-lg">
+                <div class="cover-photo">
+                    <img :src="randomCover" alt="Cover"/>
+                </div>
+                <q-card-section class="text-center profile-section">
+                    <img v-if="authStore.user.role !== 'SuperAdmin'" :src="(authStore.employees.photo)" alt="Profile" class="profile-img">
+                    <q-icon v-if="authStore.user.role === 'SuperAdmin'" name="bi-person-circle" size="lg" color="grey-8"/>
+                </q-card-section>
+                <q-card-section class="text-center q-pt-sm">
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees?.employment?.employee_no }}</div>
+                    <div class="text-h5 text-uppercase text-bold text-white">{{ formatName(authStore.employees) }}</div>
+                    <div class="text-body1 text-uppercase text-white">{{ authStore.employees?.employment?.position?.name }}</div>
+                    <div class="text-caption text-uppercase text-white">{{ authStore.employees?.employment?.employment_status }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">email address</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees?.email }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">contact number</div>
+                    <div class="text-body1 text-bold text-white">{{ authStore.employees?.contact_number }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <div class="text-caption text-uppercase text-white">adderss</div>
+                    <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees?.address }}</div>
+                </q-card-section>
+                <q-card-section class="text-center">
+                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout() }"/>
+                </q-card-section>
+            </q-card> -->
+        <!-- </q-dialog> -->
         
     </q-layout>
 </template>
@@ -305,6 +387,19 @@ const ReadNotification = () => {
 const isOnline = computed(() =>
     authStore.isUserOnline(authStore.user.id)
 )
+
+/**
+ * Messaging
+ */
+const MessageDialog = ref(false)
+const isConvo = ref(false)
+
+const info = ref([])
+const convo = ref([]);
+const ViewConvo = async (app) => {
+    info.value = app;
+    isConvo.value = true
+}
 
 </script>
 

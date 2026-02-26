@@ -63,47 +63,89 @@ export default boot(({ app, router }) => {
   });
 
     // Response Interceptor: Handle token expiration/invalidity
+  // api.interceptors.response.use(
+  //   response => response,
+  //   async error => {
+  //     const originalRequest = error.config;
+  //     const authStore = useAuthStore();
+
+  //     // Check if the error is 401 Unauthorized or 403 Forbidden
+  //     // And ensure it's not the login request itself (to avoid loop)
+  //     if (error.response && (error.response.status === 401 || error.response.status === 403) && originalRequest.url !== '/') {
+  //       console.warn('Authentication error:', error.response.data.message || error.response.data.error);
+
+  //       // Check for specific token expiration message
+  //       if (error.response.data.error === 'Token expired' || error.response.data.error === 'Failed to authenticate token') {
+  //         // Notify.create({
+  //         //     type: 'negative',
+  //         //     message: error.response.data.message || 'Your session has expired. Please log in again.'
+  //         // });
+  //         console.log(error.response.data.message || 'Your session has expired. Please log in again.')
+  //       } else if (error.response.data.error === 'No token provided' || error.response.data.error === 'Token not properly formatted') {
+  //         // Notify.create({
+  //         //     type: 'warning',
+  //         //     message: 'No valid authentication token found. Please log in.'
+  //         // });
+  //         console.log('No valid authentication token found. Please log in.')
+  //         window.location.reload();
+  //       } else if (error.response.data.error === 'API key is missing' || error.response.data.error === 'Invalid API key') {
+  //           // Notify.create({
+  //         //     type: 'negative',
+  //         //     message: error.response.data.error || 'Authentication error: Invalid API key.'
+  //         // });
+  //         console.log(error.response.data.error || 'Authentication error: Invalid API key.')
+  //       }
+
+  //       authStore.clearAuthData(); // Clear client-side token and user data
+  //       router.push('/'); // Redirect to login page
+
+  //       return Promise.reject(error); // Reject the promise to stop further processing
+  //     }
+
+  //     return Promise.reject(error);
+  //   }
+  // );
   api.interceptors.response.use(
-    response => response,
-    async error => {
-      const originalRequest = error.config;
-      const authStore = useAuthStore();
+  (response) => response,
+  async (error) => {
+    const authStore = useAuthStore();
+    const status = error?.response?.status;
+    const errMsg = error?.response?.data?.error || error?.response?.data?.message;
 
-      // Check if the error is 401 Unauthorized or 403 Forbidden
-      // And ensure it's not the login request itself (to avoid loop)
-      if (error.response && (error.response.status === 401 || error.response.status === 403) && originalRequest.url !== '/') {
-        console.warn('Authentication error:', error.response.data.message || error.response.data.error);
+    // ✅ avoid infinite loop: don't run on login endpoint
+    const url = error?.config?.url || '';
+    const isAuthEndpoint =
+      url.includes('/login') ||
+      url.includes('/check-token') ||
+      url.includes('/logout');
 
-        // Check for specific token expiration message
-        if (error.response.data.error === 'Token expired' || error.response.data.error === 'Failed to authenticate token') {
-          // Notify.create({
-          //     type: 'negative',
-          //     message: error.response.data.message || 'Your session has expired. Please log in again.'
-          // });
-          console.log(error.response.data.message || 'Your session has expired. Please log in again.')
-        } else if (error.response.data.error === 'No token provided' || error.response.data.error === 'Token not properly formatted') {
-          // Notify.create({
-          //     type: 'warning',
-          //     message: 'No valid authentication token found. Please log in.'
-          // });
-          console.log('No valid authentication token found. Please log in.')
-        } else if (error.response.data.error === 'API key is missing' || error.response.data.error === 'Invalid API key') {
-            // Notify.create({
-          //     type: 'negative',
-          //     message: error.response.data.error || 'Authentication error: Invalid API key.'
-          // });
-          console.log(error.response.data.error || 'Authentication error: Invalid API key.')
-        }
+    // ✅ handle token missing / malformed (even if status isn't 401/403)
+    const isTokenProblem =
+      errMsg === 'No token provided' ||
+      errMsg === 'Token not properly formatted' ||
+      errMsg === 'Token expired' ||
+      errMsg === 'Failed to authenticate token';
 
-        authStore.clearAuthData(); // Clear client-side token and user data
-        router.push('/'); // Redirect to login page
+    if (!isAuthEndpoint && (status === 401 || status === 403 || isTokenProblem)) {
+      console.warn('Auth problem:', errMsg);
 
-        return Promise.reject(error); // Reject the promise to stop further processing
-      }
+      // clear
+      authStore.clearAuthData();
 
+      // ✅ full reset (best for Quasar SPA to clear all state)
+      window.location.href = '/'; // or '/login'
       return Promise.reject(error);
     }
-  );
+
+    // API key issues (optional)
+    if (errMsg === 'API key is missing' || errMsg === 'Invalid API key') {
+      console.warn('API key problem:', errMsg);
+      // you can show Notify here
+    }
+
+    return Promise.reject(error);
+  }
+);
 });
 
 export { api };

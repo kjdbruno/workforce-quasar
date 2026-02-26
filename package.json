@@ -2,7 +2,7 @@
   "name": "workforce-quasar",
   "version": "0.0.1",
   "description": "HRIS with Payroll System",
-  "productName": "Workforce",
+  "productName": "HRIS",
   "author": "Kenneth Jay Bruno",
   "type": "module",
   "private": true,

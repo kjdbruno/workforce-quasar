@@ -167,18 +167,18 @@ const tabs = [
     { label: 'face recognition', dialog: 'BiometricDialog'},
     { label: 'account', dialog: 'AccountDialog'},
     { label: 'shift', dialog: 'ShiftDialog'},
-    { label: 'id', dialog: 'IdentificationDialog'},
+    // { label: 'id', dialog: 'IdentificationDialog'},
     { label: 'dtr', dialog: 'AttendanceDialog'},
     { label: 'leaves', dialog: 'LeaveDialog'},
-    { label: 'overtime', dialog: 'OvertimeDialog'},
+    // { label: 'overtime', dialog: 'OvertimeDialog'},
     { label: 'education', dialog: 'EducationDialog'},
     { label: 'trainings', dialog: 'TrainingDialog'},
     { label: 'experiences', dialog: 'ExperienceDialog'},
     { label: 'dependents', dialog: 'DependentDialog'},
     { label: 'documents', dialog: 'DocumentDialog'},
-    { label: 'performance', dialog: 'PerformanceDialog'},
-    { label: 'incidents', dialog: 'IncidentDialog'},
-    { label: 'payslip', dialog: 'PayslipDialog'},
+    // { label: 'performance', dialog: 'PerformanceDialog'},
+    // { label: 'incidents', dialog: 'IncidentDialog'},
+    // { label: 'payslip', dialog: 'PayslipDialog'},
 ]
 
 const formatName = (profile) => {

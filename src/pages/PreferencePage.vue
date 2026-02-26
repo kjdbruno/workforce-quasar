@@ -75,6 +75,7 @@ const navs = [
     // { component: 'ScheduleComponent', label: 'schedule' },
     { component: 'LeaveComponent', label: 'leave' },
     { component: 'SignatoryComponent', label: 'signatory' },
+    { component: 'UserComponent', label: 'user' },
     // { component: 'PayrollGroupComponent', label: 'payroll group' },
 ]
 

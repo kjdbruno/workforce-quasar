@@ -27,34 +27,35 @@ export const useAuthStore = defineStore('auth', {
             String(r).toLowerCase() === String(userRole).toLowerCase()
         )
         },
-        // ✅ check if a specific user is online
+        // ✅ check if a specific user is online (NEW SHAPE)
         isUserOnline: (state) => (userId) => {
             const id = Number(userId);
-            return state.onlineUsers.some(u => Number(u.user_id) === id);
+            return state.onlineUsers.some(u => Number(u.id) === id && !!u.UserLog?.is_online);
         },
 
-        // ✅ check if YOU are online
+        // ✅ check if YOU are online (NEW SHAPE)
         amIOnline: (state) => {
             const myId = Number(state.user?.id);
             if (!myId) return false;
-            return state.onlineUsers.some(u => Number(u.user_id) === myId);
+            return state.onlineUsers.some(u => Number(u.id) === myId && !!u.UserLog?.is_online);
         },
 
-        // optional: get online users list only
+        // ✅ list of online user ids
         onlineUserIds: (state) =>
             state.onlineUsers
-            .filter(u => u.is_online)
-            .map(u => Number(u.user_id)),
+            .filter(u => !!u.UserLog?.is_online)
+            .map(u => Number(u.id)),
 
+        // ✅ detailed list for UI
         onlineUsersDetailed: (state) =>
             state.onlineUsers
-                .filter(u => u.is_online)
-                .map(u => ({
-                    id: u.user_id,
-                    name: u.User?.name,
-                    role: u.User?.role,
-                    avatar: u.User?.avatar,
-                })),
+            .filter(u => !!u.UserLog?.is_online)
+            .map(u => ({
+                id: u.id,
+                name: u.name,
+                role: u.role,
+                avatar: u.avatar, // base64 string if you converted server-side
+            })),
     },
     actions: {
         async login(username, password) {
@@ -136,26 +137,30 @@ export const useAuthStore = defineStore('auth', {
         },
 
         // ✅ mark online (if you receive 1 record only)
-        upsertOnlineUser(record) {
-            if (!record?.user_id) return;
+        upsertOnlineUser(user) {
+            if (!user?.id) return;
 
-            const id = Number(record.user_id);
-            const idx = this.onlineUsers.findIndex(u => Number(u.user_id) === id);
+            const id = Number(user.id);
+            const idx = this.onlineUsers.findIndex(u => Number(u.id) === id);
 
             if (idx >= 0) {
-            this.onlineUsers[idx] = { ...this.onlineUsers[idx], ...record };
+                this.onlineUsers[idx] = { ...this.onlineUsers[idx], ...user };
             } else {
-            this.onlineUsers.push(record);
+                this.onlineUsers.push(user);
             }
         },
 
         // ✅ mark offline (soft)
         markUserOffline(userId) {
             const id = Number(userId);
-            const idx = this.onlineUsers.findIndex(u => Number(u.user_id) === id);
+            const idx = this.onlineUsers.findIndex(u => Number(u.id) === id);
 
             if (idx >= 0) {
-            this.onlineUsers[idx].is_online = false;
+                // ensure UserLog exists then set is_online false
+                this.onlineUsers[idx].UserLog = {
+                ...(this.onlineUsers[idx].UserLog || {}),
+                is_online: false
+                };
             }
         },
 

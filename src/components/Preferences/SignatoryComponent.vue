@@ -71,73 +71,47 @@
                         </div>
                         <div class="row q-col-gutter-xs q-mb-xl">
                             <div class="col-3">
-                                <div class="text-caption text-uppercase" :class="Errors.ownerid.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.ownerid.msg ? Errors.ownerid.msg : 'owner' }}</div>
-                                <q-select
-                                    outlined
-                                    v-model="ownerid"
-                                    label="Choose Owner"
-                                    emit-value
-                                    map-options
-                                    use-input
-                                    input-debounce="300"
-                                    :options="filteredOwners"
-                                    @filter="filterOwnerFn"
-                                    :error="Errors.ownerid.type"
-                                    hide-dropdown-icon
-                                    :no-error-icon="true"
-                                    class="text-capitalize"
-                                    v-if="type !== 'Vacancy'"
+                                <div
+                                class="text-caption text-uppercase"
+                                :class="Errors.ownerid.msg ? 'text-negative text-italic' : 'text-grey'"
                                 >
-                                    <template v-slot:no-option>
-                                        <q-item>
-                                            <q-item-section class="text-italic text-grey">
-                                            No options
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
-                                    <template v-slot:option="scope">
-                                        <q-item v-bind="scope.itemProps">
-                                            <q-item-section>
-                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                                <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
-                                </q-select>
+                                {{ Errors.ownerid.msg ? Errors.ownerid.msg : 'owner' }}
+                                </div>
+
                                 <q-select
-                                    outlined
-                                    v-model="ownerid"
-                                    label="Choose Owner"
-                                    emit-value
-                                    map-options
-                                    use-input
-                                    input-debounce="300"
-                                    :options="filteredApprovers"
-                                    @filter="filterApproverFn"
-                                    :error="Errors.ownerid.type"
-                                    hide-dropdown-icon
-                                    :no-error-icon="true"
-                                    class="text-capitalize"
-                                    v-if="type === 'Vacancy'"
+                                outlined
+                                v-model="ownerid"
+                                label="Choose Owner"
+                                emit-value
+                                map-options
+                                use-input
+                                input-debounce="300"
+                                :options="ownerOptions"
+                                @filter="onOwnerFilter"
+                                :error="!!Errors.ownerid.type"
+                                hide-dropdown-icon
+                                :no-error-icon="true"
+                                class="text-capitalize"
                                 >
-                                    <template v-slot:no-option>
-                                        <q-item>
-                                            <q-item-section class="text-italic text-grey">
-                                            No options
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
-                                    <template v-slot:option="scope">
-                                        <q-item v-bind="scope.itemProps">
-                                            <q-item-section>
-                                                <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                                <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
-                                            </q-item-section>
-                                        </q-item>
-                                    </template>
+                                <template v-slot:no-option>
+                                    <q-item>
+                                    <q-item-section class="text-italic text-grey">
+                                        No options
+                                    </q-item-section>
+                                    </q-item>
+                                </template>
+
+                                <template v-slot:option="scope">
+                                    <q-item v-bind="scope.itemProps">
+                                    <q-item-section>
+                                        <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                        <q-item-label caption>{{ $CapitalizeWords(scope.opt.role) }}</q-item-label>
+                                    </q-item-section>
+                                    </q-item>
+                                </template>
                                 </q-select>
                             </div>
-                        </div>
+                            </div>
                         <div class="row q-col-gutter-xs q-mb-xs">
                             <div class="col-3">
                                 <div class="text-caption text-uppercase" :class="Errors.signatories.approverid.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.signatories.approverid.msg ? Errors.signatories.approverid.msg : 'approver' }}</div>
@@ -657,6 +631,22 @@ const LoadManagers = async () => {
     } catch (error) {
         console.error("Error fetching options:", error);
     }
+};
+
+const specialTypes = ["Vacancy", "Overtime"];
+
+const isSpecialType = computed(() => specialTypes.includes(type.value)); // if type is ref
+// if type is not ref, remove .value
+
+const ownerOptions = computed(() => {
+    return isSpecialType.value ? filteredApprovers.value : filteredOwners.value;
+});
+
+const onOwnerFilter = (val, update, abort) => {
+    // forward to the correct handler
+    return isSpecialType.value
+        ? filterApproverFn(val, update, abort)
+        : filterOwnerFn(val, update, abort);
 };
 
 function FormatOrdinal(n) {

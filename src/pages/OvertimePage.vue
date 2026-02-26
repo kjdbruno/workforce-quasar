@@ -24,7 +24,7 @@
             </q-card-section>
         </q-card>
         <div class="card-grid">
-            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
+            <div class="card-anim-wrapper" :style="{ animationDelay: `120ms` }" v-if="AuthStore.hasRole(['SuperAdmin', 'Management'])">
                 <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('OvertimeDialog'); OvertimeStore.isEdit = false; }" >
                     <q-card-section>
                         <q-icon name="bi-plus-circle" color="grey" size="xl" />
