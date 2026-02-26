@@ -4,7 +4,7 @@
             <q-card-section>
                 <div class="q-gutter-xs">
                     <q-btn
-                        v-for="(btn, index) in navs"
+                        v-for="(btn, index) in visibleNavs"
                         unelevated
                         :class="PreferenceStore.component === `${btn.component}` ? 'bg-primary text-white' : 'bg-accent'"
                         @click="PreferenceStore.component = `${btn.component}`"
@@ -21,8 +21,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, onBeforeMount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, onBeforeMount, computed } from 'vue';
 import { usePreferenceStore } from '../stores/preference-store';
+import { useAuthStore } from 'src/stores/auth-store';
 
 import UserComponent from 'src/components/Preferences/UserComponent.vue';
 import HolidayComponent from 'src/components/Preferences/HolidayComponent.vue';
@@ -40,8 +41,8 @@ import PayrollGroupComponent from 'src/components/Preferences/PayrollGroupCompon
 import ShiftComponent from 'src/components/Preferences/ShiftComponent.vue';
 import CourseComponent from 'src/components/Preferences/CourseComponent.vue';
 
-
 const PreferenceStore = usePreferenceStore();
+const AuthStore = useAuthStore();
 
 const components = {
     UserComponent,
@@ -60,24 +61,28 @@ const components = {
     PayrollGroupComponent
 };
 
+const hasRole = (roles = []) => roles.includes(AuthStore.user?.role);
+
 const navs = [
     // { component: 'UserComponent', label: 'User' },
-    { component: 'SchoolComponent', label: 'School' },
-    { component: 'CourseComponent', label: 'Degree' },
-    { component: 'HolidayComponent', label: 'Holiday' },
-    { component: 'ShiftComponent', label: 'Shift' },
+    { component: 'SchoolComponent', label: 'School', roles: ["SuperAdmin", "Admin", "HR"] },
+    { component: 'CourseComponent', label: 'Degree', roles: ["SuperAdmin", "Admin", "HR"] },
+    { component: 'HolidayComponent', label: 'Holiday', roles: ["SuperAdmin", "Admin", "HR"] },
+    { component: 'ShiftComponent', label: 'Shift', roles: ["SuperAdmin", "Admin", "HR"] },
     // { component: 'DegreeComponent', label: 'Degree' },
     // { component: 'IncidentClassComponent', label: 'Incident class' },
     // { component: 'IncidentRoleComponent', label: 'incident role' },
-    { component: 'DepartmentComponent', label: 'department' },
+    { component: 'DepartmentComponent', label: 'department', roles: ["SuperAdmin", "Admin", "HR"] },
     // { component: 'CompanyComponent', label: 'company' },
-    { component: 'PositionComponent', label: 'position' },
+    { component: 'PositionComponent', label: 'position', roles: ["SuperAdmin", "Admin", "HR"] },
     // { component: 'ScheduleComponent', label: 'schedule' },
-    { component: 'LeaveComponent', label: 'leave' },
-    { component: 'SignatoryComponent', label: 'signatory' },
-    { component: 'UserComponent', label: 'user' },
+    { component: 'LeaveComponent', label: 'leave', roles: ["SuperAdmin", "Admin", "HR"] },
+    { component: 'SignatoryComponent', label: 'signatory', roles: ["SuperAdmin", "Admin", "HR"] },
+    { component: 'UserComponent', label: 'user', roles: ["SuperAdmin", "Admin"] },
     // { component: 'PayrollGroupComponent', label: 'payroll group' },
 ]
+
+const visibleNavs = computed(() => navs.filter(n => hasRole(n.roles)));
 
 </script>
 

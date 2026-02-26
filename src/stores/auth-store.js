@@ -84,6 +84,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 await api.post('/logout'); // If you have server-side logout
                 this.clearAuthData();
+                // resetAllStores();
                 // Use the globally exported Router instance
                 if (Router) { // Check if Router is defined
                     Router.push('/');

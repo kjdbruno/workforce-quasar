@@ -72,7 +72,7 @@
                                                 <q-item-label class="text-uppercase">my account</q-item-label>
                                             </q-item-section>
                                         </q-item>
-                                        <q-item clickable @click="() => { authStore.logout() }">
+                                        <q-item clickable @click="() => { authStore.logout(); authStore.$reset(); ApplicationStore.$reset(); DTRStore.$reset(); EmployeeStore.$reset(); LeaveStore.$reset(); NavigationStore.$reset(); OvertimeStore.$reset(); PreferenceStore.$reset(); RecruitmentStore.$reset(); }">
                                             <q-item-section>
                                                 <q-item-label class="text-uppercase">sign out</q-item-label>
                                             </q-item-section>
@@ -200,7 +200,7 @@
                     <div class="text-body1 text-capitalize text-bold text-white">{{ authStore.employees?.address }}</div>
                 </q-card-section>
                 <q-card-section class="text-center">
-                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout(); meDialog = false; }"/>
+                    <q-btn unelevated size="sm" label="sign out" text-color="primary" color="white" @click="() => { authStore.logout(); meDialog = false; authStore.$reset(); ApplicationStore.$reset(); DTRStore.$reset(); EmployeeStore.$reset(); LeaveStore.$reset(); NavigationStore.$reset(); OvertimeStore.$reset(); PreferenceStore.$reset(); RecruitmentStore.$reset(); }"/>
                 </q-card-section>
             </q-card>
         </q-dialog>
@@ -294,12 +294,28 @@
 import { ref, computed, onMounted, onBeforeMount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from 'src/stores/auth-store';
+import { useApplicationStore } from 'src/stores/application-store';
+import { useDTRStore } from 'src/stores/dtr-store';
+import { useEmployeeStore } from 'src/stores/employee-store';
+import { useLeaveStore } from 'src/stores/leave-store';
+import { useNavigationStore } from 'src/stores/nav-store';
+import { useOvertimeStore } from 'src/stores/overtime-store';
+import { usePreferenceStore } from 'src/stores/preference-store';
+import { useRecruitmentStore } from 'src/stores/recruitment-store';
 import moment from 'moment';
 import { socket } from 'src/boot/socket'
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const ApplicationStore = useApplicationStore();
+const DTRStore = useDTRStore();
+const EmployeeStore = useEmployeeStore();
+const LeaveStore = useLeaveStore();
+const NavigationStore = useNavigationStore();
+const OvertimeStore = useOvertimeStore();
+const PreferenceStore = usePreferenceStore();
+const RecruitmentStore = useRecruitmentStore();
 
 const props = defineProps({
     userId: {

@@ -172,7 +172,7 @@
                         <div class="text-subtitle2 text-uppercase  text-bold q-mb-sm">documents uploaded</div>
                         <div class="card-grid">
                             <div v-for="(data, index) in info?.documents" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                                <q-card  class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" @click="() => { ViewDocument(data); }">
+                                <q-card  class="card card-hover-animate flex flex-center no-shadow cursor-pointer radius-sm q-mr-sm q-mb-sm" @click="() => { ViewDocument(data.id); }">
                                     <q-card-section class="text-center">
                                         <div class="text-caption">{{ data?.filename }}</div>
                                     </q-card-section>
@@ -351,9 +351,21 @@ const applyBackendErrors = (backendErrors) => {
     })
 }
 
-const ViewDocument = (data) => {
-    const file = `${process.env.VUE_APP_BACKEND_URL}${data.document}`;
-    window.open(file, '_blank');
+const ViewDocument = async (id) => {
+    SubmitLoading.value = true;
+    try {
+        const res = await api.get(`/application/document/${id}/pdf`, {
+            responseType: 'arraybuffer',
+        })
+        const blob = new Blob([res.data], { type: 'application/pdf' });
+        const pdfurl = window.URL.createObjectURL(blob) + "#view=FitW";
+        pdf.value = pdfurl
+        printDialog.value = true;
+        SubmitLoading.value = false;
+    } catch (error) {
+        SubmitLoading.value = false;
+        console.error("Error generating PDF:", error);
+    }
 }
 
 const printDialog = ref(false);
