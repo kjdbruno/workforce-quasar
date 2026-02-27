@@ -320,6 +320,7 @@ const PopulateData = () => {
     LoadPositions();
     payrollgroup.value = app?.employment?.payroll_group;
     taxstatus.value = app?.employment?.tax_status;
+    employmentstatus.value = app?.employment?.employment_status;
 }
 
 const Save = async () => {
