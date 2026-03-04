@@ -286,7 +286,18 @@
                 </q-card-section>
             </q-card> -->
         <!-- </q-dialog> -->
-        
+        <transition name="glass-fade">
+            <div id="glass-overlay" v-show="authStore.PageLoading">
+                <q-card class="no-shadow radius-md q-pa-md">
+                    <q-card-section class="text-center">
+                        <div>
+                            <q-spinner-ios color="dark"/>
+                        </div>
+                        <div class="text-dark text-uppercase text-caption">we're working on it!</div>
+                    </q-card-section>
+                </q-card>
+            </div>
+        </transition>
     </q-layout>
 </template>
 

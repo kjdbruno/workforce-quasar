@@ -70,7 +70,7 @@ const routes = [
       if (!auth.isAuthenticated) {
         next('/')
       } else {
-        employee.component = employee.component ?? 'EmployeeComponent'
+        employee.component = 'EmployeeComponent'
         next()
       }
     },

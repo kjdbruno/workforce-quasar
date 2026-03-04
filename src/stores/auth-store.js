@@ -15,6 +15,8 @@ export const useAuthStore = defineStore('auth', {
         notifications: [],
         count: 0,
         hasNotifications: null,
+        //
+        PageLoading: false,
     }),
     getters: {
         hasRole: (state) => (roles = []) => {
@@ -87,7 +89,11 @@ export const useAuthStore = defineStore('auth', {
                 // resetAllStores();
                 // Use the globally exported Router instance
                 if (Router) { // Check if Router is defined
-                    Router.push('/');
+                    this.PageLoading = true;
+                    setTimeout(() => {
+                        this.PageLoading = false;
+                        Router.push('/');
+                    }, 2000)
                 } else {
                     console.error('Router instance not available for redirect (exported method).');
                 }

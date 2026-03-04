@@ -43,10 +43,23 @@
                                             <div class="text-caption">{{ position?.description || 'N/A' }}</div>
                                         </div>
                                         <div class="q-mb-md">
-                                            <div class="text-caption text-uppercase text-grey">job qualification</div>
+                                            <div class="text-caption text-uppercase text-grey">job qualification/s</div>
                                             <div class="text-caption">
                                                 <template v-if="Array.isArray(position?.qualification) && position?.qualification.length">
                                                     <div v-for="(dt, index) in position?.qualification" :key="index">
+                                                        {{ index + 1 }}. {{ dt }}
+                                                    </div>
+                                                </template>
+                                                <div v-else>
+                                                    N/A
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="q-mb-md">
+                                            <div class="text-caption text-uppercase text-grey">job benefit/s</div>
+                                            <div class="text-caption">
+                                                <template v-if="Array.isArray(position?.benefit) && position?.benefit.length">
+                                                    <div v-for="(dt, index) in position?.benefit" :key="index">
                                                         {{ index + 1 }}. {{ dt }}
                                                     </div>
                                                 </template>
@@ -159,7 +172,7 @@
                     <q-btn v-if="step === totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
                     <!-- <q-btn v-if="RecruitmentStore.data" unelevated size="md" color="primary" class="btn text-capitalize" :label="RecruitmentStore.data?.status ? 'disable' : 'enable'" @click="Toggle"/> -->
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm(); ResetErrors(); }" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                     <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search...">
                         <template v-slot:prepend>
                             <q-icon name="bi-search" style="font-size: 1rem;" />

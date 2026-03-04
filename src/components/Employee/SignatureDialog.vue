@@ -26,8 +26,8 @@
             <q-card-actions class="q-pa-lg bg">
                 <div class="q-gutter-sm">
                     <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save(); }" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { clear(); }" outline/>
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { clear(); }"/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">

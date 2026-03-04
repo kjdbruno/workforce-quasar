@@ -57,7 +57,7 @@
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
+                        <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }"/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">

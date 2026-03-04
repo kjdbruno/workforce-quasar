@@ -504,8 +504,8 @@
                     <q-btn v-if="step > 0" unelevated size="md" color="primary" class="btn text-capitalize" label="previous" @click="() => { PreviousStep() }" />
                     <q-btn v-if="step < totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="next" @click="() => { NextStep() }" />
                     <q-btn v-if="step === totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
-                    <q-btn v-if="(step === 2 || step === 3 || step === 4 || step === 5)" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { (step === 2 ? AddEducation() : (step === 3 ? AddTraining() : (step === 4 ? AddExperience() : step === 5 ? AddDocument() : null))) }" outline/>
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn v-if="(step === 2 || step === 3 || step === 4 || step === 5)" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { (step === 2 ? AddEducation() : (step === 3 ? AddTraining() : (step === 4 ? AddExperience() : step === 5 ? AddDocument() : null))) }"/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                     <q-input v-if="step === 0" outlined dense debounce="1000" v-model="search" placeholder="Search...">
                         <template v-slot:prepend>
                             <q-icon name="bi-search" style="font-size: 1rem;" />

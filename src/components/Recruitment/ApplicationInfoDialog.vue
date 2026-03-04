@@ -214,7 +214,7 @@
                     </div>
                     <div class="q-gutter-sm">
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="() => { Print(); }"/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                        <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" />
                     </div>
                 </div>
             </q-card-actions>

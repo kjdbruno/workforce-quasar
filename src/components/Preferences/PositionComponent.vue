@@ -44,122 +44,140 @@
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="col q-pa-lg scroll">
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
-                            <q-input 
-                                v-model="name" 
-                                label="Enter Position"
-                                outlined 
-                                :error="Errors.name.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase" :class="Errors.departmentId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'department' }}</div>
-                            <q-select
-                                outlined
-                                v-model="departmentId"
-                                label="Choose Department"
-                                emit-value
-                                map-options
-                                use-input
-                                input-debounce="300"
-                                :options="filteredDepartments"
-                                @filter="filterDepartmentFn"
-                                :error="Errors.departmentId.type"
-                                hide-dropdown-icon
-                                :no-error-icon="true"
-                                class="text-capitalize"
-                            >
-                                <template v-slot:no-option>
-                                    <q-item>
-                                        <q-item-section class="text-italic text-grey">
-                                        No options
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                                <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
-                                        <q-item-section>
-                                            <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </template>
-                            </q-select>
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'job description' }}</div>
-                            <q-input 
-                                v-model="description" 
-                                label="Enter Job Description"
-                                outlined 
-                                :error="Errors.description.type" 
-                                type="textarea"
-                                :no-error-icon="true"
-                            />
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-4">
-                            <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
-                            <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
-                                <q-input
-                                    v-model="qualifications[index]"
-                                    label="Enter Qualification"
-                                    outlined
-                                    :error="Errors.qualifications.name.type[index]"
+                    <div class="row q-col-gutter-xs">
+                        <div class="col-5">
+                            <div class="row q-col-gutter-xs q-mb-md">
+                                <div class="col-6">
+                                    <div class="text-caption text-uppercase" :class="Errors.name.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.name.type ? Errors.name.msg : 'position' }}</div>
+                                    <q-input 
+                                        v-model="name" 
+                                        label="Enter Position"
+                                        outlined 
+                                        :error="Errors.name.type"
+                                        :no-error-icon="true"
+                                        input-class="text-capitalize"
+                                    />
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-caption text-uppercase" :class="Errors.departmentId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.departmentId.type ? Errors.departmentId.msg : 'department' }}</div>
+                                    <q-select
+                                        outlined
+                                        v-model="departmentId"
+                                        label="Choose Department"
+                                        emit-value
+                                        map-options
+                                        use-input
+                                        input-debounce="300"
+                                        :options="filteredDepartments"
+                                        @filter="filterDepartmentFn"
+                                        :error="Errors.departmentId.type"
+                                        hide-dropdown-icon
+                                        :no-error-icon="true"
+                                        class="text-capitalize"
+                                    >
+                                        <template v-slot:no-option>
+                                            <q-item>
+                                                <q-item-section class="text-italic text-grey">
+                                                No options
+                                                </q-item-section>
+                                            </q-item>
+                                        </template>
+                                        <template v-slot:option="scope">
+                                            <q-item v-bind="scope.itemProps">
+                                                <q-item-section>
+                                                    <q-item-label>{{ $CapitalizeWords(scope.opt.label) }}</q-item-label>
+                                                </q-item-section>
+                                            </q-item>
+                                        </template>
+                                    </q-select>
+                                </div>
+                            </div>
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase" :class="Errors.description.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.description.type ? Errors.description.msg : 'job description' }}</div>
+                                <q-input 
+                                    v-model="description" 
+                                    label="Enter Job Description"
+                                    outlined 
+                                    :error="Errors.description.type" 
+                                    type="textarea"
                                     :no-error-icon="true"
-                                >
-                                    <template v-slot:append>
-                                        <q-btn v-if="qualifications.length > 1" flat unelevated round icon="bi-trash3" size="sm" @click="remove(index)"  />
-                                    </template>
-                                </q-input>
+                                />
+                            </div>
+                            <div class="q-mb-md">
+                                <div class="text-caption text-uppercase" :class="Errors.salarytype.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
+                                <div class="q-gutter-sm">
+                                    <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
+                                </div>
+                            </div>
+                            <div class="row q-col-gutter-xs q-mb-md">
+                                <div class="col-4">
+                                    <div class="text-caption text-uppercase" :class="Errors.monthly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.monthly.type ? Errors.monthly.msg : 'monthly salary' }}</div>
+                                    <q-input 
+                                        v-model="monthly" 
+                                        label="Enter Amount"
+                                        outlined 
+                                        :error="Errors.monthly.type"
+                                        :no-error-icon="true"
+                                        input-class="text-capitalize"
+                                    />
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-caption text-uppercase" :class="Errors.daily.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.daily.type ? Errors.daily.msg : 'daily salary' }}</div>
+                                    <q-input 
+                                        v-model="daily" 
+                                        label="Enter Amount"
+                                        outlined 
+                                        :error="Errors.daily.type"
+                                        :no-error-icon="true"
+                                        input-class="text-capitalize"
+                                    />
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-caption text-uppercase" :class="Errors.hourly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.hourly.type ? Errors.hourly.msg : 'hourly salary' }}</div>
+                                    <q-input 
+                                        v-model="hourly" 
+                                        label="Enter Amount"
+                                        outlined 
+                                        :error="Errors.hourly.type"
+                                        :no-error-icon="true"
+                                        input-class="text-capitalize"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="q-mb-md">
-                        <div class="text-caption text-uppercase" :class="Errors.salarytype.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.salarytype.type ? Errors.salarytype.msg : 'salary type' }}</div>
-                        <div class="q-gutter-sm">
-                            <q-radio v-for="value in salarytypes" v-model="salarytype" checked-icon="bi-check-circle-fill" unchecked-icon="bi-check-circle" :val="value" :label="value" />
-                        </div>
-                    </div>
-                    <div class="row q-col-gutter-xs q-mb-md">
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase" :class="Errors.monthly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.monthly.type ? Errors.monthly.msg : 'monthly salary' }}</div>
-                            <q-input 
-                                v-model="monthly" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.monthly.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase" :class="Errors.daily.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.daily.type ? Errors.daily.msg : 'daily salary' }}</div>
-                            <q-input 
-                                v-model="daily" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.daily.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
-                        </div>
-                        <div class="col-2">
-                            <div class="text-caption text-uppercase" :class="Errors.hourly.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.hourly.type ? Errors.hourly.msg : 'hourly salary' }}</div>
-                            <q-input 
-                                v-model="hourly" 
-                                label="Enter Amount"
-                                outlined 
-                                :error="Errors.hourly.type"
-                                :no-error-icon="true"
-                                input-class="text-capitalize"
-                            />
+                        <div class="col-5">
+                            <div class="q-mb-lg">
+                                <div class="text-caption text-uppercase" :class="Errors.qualifications.name.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.qualifications.name.msg ? Errors.qualifications.name.msg : 'job qualification' }}</div>
+                                <div v-for="(value, index) in qualifications" :key="index" class="q-mb-xs">
+                                    <q-input
+                                        v-model="qualifications[index]"
+                                        label="Enter Qualification"
+                                        outlined
+                                        :error="Errors.qualifications.name.type[index]"
+                                        :no-error-icon="true"
+                                    >
+                                        <template v-slot:append>
+                                            <q-btn v-if="qualifications.length > 1" flat unelevated round icon="bi-trash3" size="sm" @click="remove(index)"  />
+                                        </template>
+                                    </q-input>
+                                </div>
+                            </div>
+                            <div class="q-mb-lg">
+                                <div class="text-caption text-uppercase" :class="Errors.benefits.name.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.benefits.name.msg ? Errors.benefits.name.msg : 'job benefits' }}</div>
+                                <div v-for="(value, index) in benefits" :key="index" class="q-mb-xs">
+                                    <q-input
+                                        v-model="benefits[index]"
+                                        label="Enter Benefit"
+                                        outlined
+                                        :error="Errors.benefits.name.type[index]"
+                                        :no-error-icon="true"
+                                    >
+                                        <template v-slot:append>
+                                            <q-btn v-if="benefits.length > 1" flat unelevated round icon="bi-trash3" size="sm" @click="RemoveBenefit(index)"  />
+                                        </template>
+                                    </q-input>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </q-card-section>
@@ -168,8 +186,9 @@
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isEdit" unelevated size="md" color="primary" class="btn text-capitalize" :label="isActive ? 'disable' : 'enable'" @click="Toggle"/>
-                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="Add" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
+                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn-lg text-capitalize" label="add qualification" @click="Add"/>
+                        <q-btn v-if="!isEdit || isActive" unelevated size="md" color="primary" class="btn-lg text-capitalize" label="add benefit" @click="AddBenefit"/>
+                        <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }"/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">
@@ -262,6 +281,7 @@ const hourly = ref('');
 const salarytype = ref('');
 const description = ref('');
 const qualifications = ref([""]);
+const benefits = ref([""]);
 const isActive = ref(false);
 
 const Errors = reactive({
@@ -273,10 +293,12 @@ const Errors = reactive({
     salarytype: { type: null, msg: '' },
     description: { type: null, msg: '' },
     qualifications: { name: { type: [], msg: '' } },
+    benefits: { name: { type: [], msg: '' } },
 });
 
 const initErrors = () => {
     Errors.qualifications.name.type = qualifications.value.map(() => null);
+    Errors.benefits.name.type = benefits.value.map(() => null);
 }
 
 const Validations = () => {
@@ -284,6 +306,7 @@ const Validations = () => {
     let isError = false;
 
     Errors.qualifications.name = { type: null, msg: '' }
+    Errors.benefits.name = { type: null, msg: '' }
     
     if (!name.value) { Errors.name.type = true; Errors.name.msg = 'required'; isError = true } else { Errors.name.type = null; }
     if (!departmentId.value) { Errors.departmentId.type = true; Errors.departmentId.msg = 'required'; isError = true } else { Errors.departmentId.type = null; }
@@ -299,6 +322,14 @@ const Validations = () => {
         if (!e) {
             Errors.qualifications.name.type[index] = true;
             Errors.qualifications.name.msg = 'required';
+            isError = true;
+        }
+    });
+
+    benefits.value.forEach((e, index) => {
+        if (!e) {
+            Errors.benefits.name.type[index] = true;
+            Errors.benefits.name.msg = 'required';
             isError = true;
         }
     });
@@ -404,6 +435,7 @@ const ModifyDialog = async (data) => {
     salarytype.value = data.salary_type;
     description.value = data.description;
     qualifications.value = data.qualification;
+    benefits.value = data.benefit;
     isActive.value = (data.is_active ? true : false);
 }
 
@@ -417,6 +449,7 @@ const ResetForm = () => {
     salarytype.value = '';
     description.value = '';
     qualifications.value = [""];
+    benefits.value = [""];
     ResetErrors()
 }
 
@@ -439,7 +472,8 @@ const Save = async () => {
                 hourly: hourly.value,
                 salarytype: salarytype.value,
                 description: description.value,
-                qualifications: qualifications.value
+                qualifications: qualifications.value,
+                benefits: benefits.value
             })
             : await api.post('/position', {
                 name: name.value,
@@ -449,7 +483,8 @@ const Save = async () => {
                 hourly: hourly.value,
                 salarytype: salarytype.value,
                 description: description.value,
-                qualifications: qualifications.value
+                qualifications: qualifications.value,
+                benefits: benefits.value
             });
         dialog.value = false;
         LoadAll();
@@ -565,6 +600,7 @@ const formatSalary = (data, currency = 'PHP') => {
 
 
 const qualificationInputs = ref([]);
+const benefitInputs = ref([]);
 
 const Add = async () => {
     qualifications.value.unshift("");
@@ -576,6 +612,18 @@ const Add = async () => {
 
 const remove = (index) => {
     qualifications.value.splice(index, 1);
+}
+
+const AddBenefit = async () => {
+    benefits.value.unshift("");
+    await nextTick();
+    if (benefitInputs.value[0]) {
+        benefitInputs.value[0].focus();
+    }
+}
+
+const RemoveBenefit = (index) => {
+    benefits.value.splice(index, 1);
 }
 
 onBeforeMount(() => {

@@ -46,9 +46,6 @@
                             <img v-if="AuthStore.user.role !== 'SuperAdmin'"  :src="(AuthStore.employees.photo)" alt="Welcome" />
                         </div>
                     </div>
-                    <q-inner-loading :showing="WelcomeLoading" dark>
-                        <q-spinner-puff />
-                    </q-inner-loading>
                 </q-card>
             </div>
             <div class="col-3">

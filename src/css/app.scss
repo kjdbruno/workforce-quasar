@@ -573,3 +573,26 @@ body {
   opacity: 1;
   backdrop-filter: blur(10px);
 }
+
+/**
+  * Custom button width
+  */
+.btn-xs {
+  width: 80px !important;
+}
+
+.btn-sm {
+  width: 100px !important;
+}
+
+.btn-md {
+  width: 125px !important;
+}
+
+.btn-lg {
+  width: 175px !important;
+}
+
+.btn-xl {
+  width: 250px !important;
+}

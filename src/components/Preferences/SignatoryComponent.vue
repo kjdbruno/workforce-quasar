@@ -199,8 +199,8 @@
                     <div class="q-gutter-sm">
                         <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save" />
                         <q-btn v-if="isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="update" @click="() => { Update() }"/>
-                        <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { AddSignatory() }" outline/>
-                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }" outline/>
+                        <q-btn v-if="!isDetail" unelevated size="md" color="primary" class="btn text-capitalize" label="add" @click="() => { AddSignatory() }"/>
+                        <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { dialog = false; }"/>
                     </div>
                 </q-card-actions>
                 <q-inner-loading :showing="submitLoading">

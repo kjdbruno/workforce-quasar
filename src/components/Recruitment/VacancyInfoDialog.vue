@@ -26,6 +26,10 @@
                     <div class="text-caption text-uppercase text-grey">job qualifications</div>
                     <div class="text-body1" v-for="(v, index) in info?.position?.qualification" :key="index">{{ (index+1) }}. {{ v || 'N/A' }}</div>
                 </div>
+                <div class="q-mb-md">
+                    <div class="text-caption text-uppercase text-grey">job benefits</div>
+                    <div class="text-body1" v-for="(v, index) in info?.position?.benefit" :key="index">{{ (index+1) }}. {{ v || 'N/A' }}</div>
+                </div>
                 <div class="row q-col-gutter-lg q-mb-md">
                     <div>
                         <div class="text-caption text-uppercase text-grey">department</div>
@@ -125,7 +129,7 @@
                         </q-menu>
                     </q-btn>
                     <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="print" @click="() => { Print(RecruitmentStore.data?.id) }"/>
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                 </div>
             </q-card-actions>
             <q-inner-loading :showing="SubmitLoading">

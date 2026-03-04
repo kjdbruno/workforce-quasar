@@ -159,8 +159,8 @@
             <q-card-actions class="q-pa-lg bg">
                 <div class="row q-gutter-sm">
                     <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }" outline/>
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }" outline/>
+                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }"/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                     <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
                         <template v-slot:prepend>
                             <q-icon name="bi-search" style="font-size: 1rem;" />

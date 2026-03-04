@@ -406,7 +406,7 @@
                     <q-btn v-if="step > 0" unelevated size="md" color="primary" class="btn text-capitalize" label="back"  @click="() => { PreviousStep(); }"/>
                     <q-btn v-if="step < totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="next"  @click="() => { NextStep(); }"/>
                     <q-btn v-if="step === totalSteps - 1" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="() => { Save() }" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="discard" v-close-popup outline/>
+                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" v-close-popup/>
                     <q-input v-if="step === 1 && !applicant" outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
                         <template v-slot:prepend>
                             <q-icon name="bi-search" style="font-size: 1rem;" />
