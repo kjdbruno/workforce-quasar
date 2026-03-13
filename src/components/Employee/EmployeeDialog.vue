@@ -163,7 +163,7 @@
                                         <q-card @click="() => { positionId = data.id }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': positionId === data.id }">
                                             <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
-                                                <div class="text-caption text-grey text-uppercase">{{ data.Departments?.name }}</div>
+                                                <div class="text-caption text-grey text-uppercase">{{ data.department?.name }}</div>
                                             </q-card-section>
                                             <q-card-section>
                                                 <div class="text-caption text-grey text-uppercase">{{ formatCurrency(data?.amount) }}</div>
