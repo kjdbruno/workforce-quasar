@@ -153,14 +153,14 @@
                                 <div class="text-caption text-uppercase q-mb-sm" :class="Errors.positionId.type ? 'text-negative text-italic' : 'text-grey'">{{ Errors.positionId.type ? Errors.positionId.msg : 'position' }}</div>
                                 <div class="card-grid">
                                     <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                                        <q-card class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
+                                        <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
                                             <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">no record found</div>
                                             </q-card-section>
                                         </q-card>
                                     </div>
                                     <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
-                                        <q-card @click="() => { positionId = data.id }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': positionId === data.id }">
+                                        <q-card @click="() => { positionId = data.id }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': positionId === data.id }">
                                             <q-card-section>
                                                 <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
                                                 <div class="text-caption text-grey text-uppercase">{{ data.department?.name }}</div>
