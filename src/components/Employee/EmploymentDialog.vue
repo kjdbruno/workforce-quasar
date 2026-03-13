@@ -39,6 +39,7 @@
                         <q-input 
                             v-model="tin" 
                             label="Enter TIN"
+                            mask="###-###-###-###"
                             outlined 
                             :error="Errors.tin.type"
                             :no-error-icon="true"
@@ -50,6 +51,7 @@
                         <q-input 
                             v-model="sssNo" 
                             label="Enter SSS No."
+                            mask="##-#######-#"
                             outlined 
                             :error="Errors.sssNo.type"
                             :no-error-icon="true"
@@ -61,6 +63,7 @@
                         <q-input 
                             v-model="philhealthNo"
                             label="Enter Philhealth No." 
+                            mask="##-#########-#" 
                             outlined 
                             :error="Errors.philhealthNo.type"
                             :no-error-icon="true"
@@ -72,6 +75,7 @@
                         <q-input 
                             v-model="pagibigNo" 
                             label="Enter Pagibig No."
+                            mask="####-####-####"
                             outlined 
                             :error="Errors.pagibigNo.type"
                             :no-error-icon="true"

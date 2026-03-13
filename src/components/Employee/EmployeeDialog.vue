@@ -242,7 +242,7 @@
                                     <q-input 
                                         v-model="philhealthNo"
                                         label="Enter Philhealth No."
-                                        mask="##-#######-#" 
+                                        mask="##-#########-#" 
                                         outlined 
                                         :error="Errors.philhealthNo.type"
                                         :no-error-icon="true"
