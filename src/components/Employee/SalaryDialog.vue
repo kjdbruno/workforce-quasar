@@ -20,6 +20,9 @@
                             <q-card @click="() => { position = data; salarytype = data.salary_type; amount = data.amount }" class="card card-menu card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': position === data }">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
+                                    <div class="text-caption text-grey text-uppercase">{{ data.department?.name }}</div>
+                                </q-card-section>
+                                <q-card-section class="text-center">
                                     <div class="text-caption text-grey text-uppercase">{{ formatCurrency(data?.amount) }}</div>
                                 </q-card-section>
                                 <div class="absolute-left">
