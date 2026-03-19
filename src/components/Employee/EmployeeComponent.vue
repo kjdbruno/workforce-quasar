@@ -1,5 +1,22 @@
 <template>
     <div class="wrapper">
+        <div class="q-mb-sm">
+            <q-card class="no-shadow radius-xs">
+                <q-card-section>
+                    <div class="q-gutter-xs">
+                        <q-btn
+                            v-for="(btn, index) in departments"
+                            :key="index"
+                            unelevated
+                            size="xs"
+                            :label="btn.name"
+                            :class="filterDepartment === btn.id ? 'bg-primary text-white' : 'bg-accent'"
+                            @click="filterDepartment = btn.id"
+                            />
+                    </div>
+                </q-card-section>
+            </q-card>
+        </div>
         <div class="card-grid">
             <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('EmployeeDialog') }" >
@@ -23,8 +40,8 @@
                     </q-card-section>
                 </q-card>
             </div>
-            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
-                <q-card @click="() => { EmployeeStore.component = 'ProfileComponent'; EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+            <div v-for="(data, index) in filteredEmployees" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section>
                         <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
                         <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
@@ -68,6 +85,7 @@
             </q-toolbar>
         </q-footer>
         <employee-dialog v-model="activeDialog" dialog-name="EmployeeDialog" @saved="() => { LoadAll(); }"/>
+        <menu-dialog v-model="activeDialog" dialog-name="MenuDialog"/>
         <transition name="glass-fade">
             <div id="glass-overlay" v-show="PageLoading">
                 <q-card class="no-shadow radius-md q-pa-md">
@@ -94,6 +112,7 @@ const AuthStore = useAuthStore();
 
 import { useEmployeeStore } from 'src/stores/employee-store';
 import EmployeeDialog from './EmployeeDialog.vue';
+import MenuDialog from './MenuDialog.vue';
 const EmployeeStore = useEmployeeStore();
 
 const rows = ref([]);
@@ -175,273 +194,7 @@ const formatName = (profile) => {
     return `${firstname} ${middlename} ${lastname}${suffix}`.trim();
 }
 
-onBeforeMount(() => {
-    LoadAll();
-});
-
-const modal = ref(false);
-const ApplicationSubmitting = ref(false);
-
-const applicant = ref(null);
-const firstname = ref('');
-const middlename = ref('');
-const lastname = ref('');
-const suffix = ref('');
-const sex = ref('');
-const civilstatus = ref('');
-const birthdate = ref(new Date().toISOString().split('T')[0]);
-const birthplace = ref('');
-const address = ref('');
-const email = ref('');
-const contactNo = ref('');
-
-const employeeNo = ref('');
-const dateHired = ref(new Date().toISOString().split('T')[0]);
-const employmentstatus = ref('');
-const departmentId = ref('');
-const positionId = ref('');
-const tin = ref('');
-const sssNo = ref('');
-const philhealthNo = ref('');
-const pagibigNo = ref('');
-const salarygroup = ref('');
-const payrollgroup = ref('');
-const taxstatus = ref('');
-
-const shiftId = ref('');
-const effectiveFrom = ref(new Date().toISOString().split('T')[0]);
-const effectiveTo = ref('');
-const notes = ref('');
-
-const Errors = reactive({
-    firstname: { type: null, msg: '' },
-    middlename: { type: null, msg: '' },
-    lastname: { type: null, msg: '' },
-    suffix: { type: null, msg: '' },
-    sex: { type: null, msg: '' },
-    civilstatus: { type: null, msg: '' },
-    birthdate: { type: null, msg: '' },
-    birthplace: { type: null, msg: '' },
-    address: { type: null, msg: '' },
-    email: { type: null, msg: '' },
-    contactNo: { type: null, msg: '' },
-
-    employeeNo: { type: null, msg: '' },
-    dateHired: { type: null, msg: '' },
-    employmentstatus: { type: null, msg: '' },
-    departmentId: { type: null, msg: '' },
-    positionId: { type: null, msg: '' },
-    tin: { type: null, msg: '' },
-    sssNo: { type: null, msg: '' },
-    philhealthNo: { type: null, msg: '' },
-    pagibigNo: { type: null, msg: '' },
-
-    salarygroup: { type: null, msg: '' },
-    payrollgroup: { type: null, msg: '' },
-    taxstatus: { type: null, msg: '' },
-    
-    shiftId: { type: null, msg: '' },
-    effectiveFrom: { type: null, msg: '' }
-});
-
-const failToast = () =>
-  Toast.fire({
-    icon: "error",
-    html: `
-      <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-      <div class="text-caption">Something went wrong.</div>
-    `
-  })
-
-const setErr = (key, msg = 'required') => (Errors[key].type = true, Errors[key].msg = msg, true)
-const clearErr = (key) => (Errors[key].type = null, Errors[key].msg = '', false)
-
-const req = (key, val) => (!val ? setErr(key, 'required') : clearErr(key))
-const maxLen = (key, val, n, msg = 'invalid') => (val && String(val).length > n ? setErr(key, msg) : clearErr(key))
-const match = (key, val, regex, msg = 'invalid') => (!val ? setErr(key, 'required') : (!regex.test(val) ? setErr(key, msg) : clearErr(key)))
-const isAtLeast15YearsOld = (birthdate) => {
-    if (!birthdate) return false;
-
-    const today = new Date();
-    const dob = new Date(birthdate);
-
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-        age--;
-    }
-
-    return age >= 15;
-};
-
-const ValidateEmployee = () => {
-    const allowedSuffixes = ['SR','JR','II','III','IV','V','VI','VII','VIII','IX','X']
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const phMobileRegex = /^09\d{9}$/
-
-    let isError = false
-
-    isError ||= req('firstname', firstname.value)
-    isError ||= req('middlename', middlename.value)
-    isError ||= req('lastname', lastname.value)
-
-    isError ||= (suffix.value && !allowedSuffixes.includes(suffix.value.trim().toUpperCase()))
-        ? setErr('suffix', 'invalid')
-        : clearErr('suffix')
-
-    isError ||= req('sex', sex.value)
-    isError ||= req('civilstatus', civilstatus.value)
-
-    if (!birthdate.value) isError ||= setErr('birthdate', 'required')
-    else if (!isAtLeast15YearsOld(birthdate.value))
-    isError ||= setErr('birthdate', 'invalid')
-    else clearErr('birthdate')
-
-    isError ||= req('birthplace', birthplace.value)
-
-    // email: required + format + max length
-    if (!email.value) isError ||= setErr('email', 'required')
-    else if (!emailRegex.test(email.value)) isError ||= setErr('email', 'invalid')
-    else if (email.value.length > 100) isError ||= setErr('email', 'invalid')
-    else clearErr('email')
-
-    // PH mobile number
-    if (!contactNo.value) isError ||= setErr('contactNo', 'required')
-    else if (!phMobileRegex.test(contactNo.value)) isError ||= setErr('contactNo', 'invalid')
-    else clearErr('contactNo')
-
-    isError ||= req('address', address.value)
-
-    if (isError) failToast()
-    return !isError
-}
-
-const ValidateEmployment = () => {
-  let isError = false
-
-  isError ||= req('positionId', positionId.value)
-  isError ||= req('employmentstatus', employmentstatus.value)
-  isError ||= req('departmentId', departmentId.value)
-  isError ||= req('dateHired', dateHired.value)
-
-  isError ||= maxLen('tin', tin.value, 15, 'invalid')
-  isError ||= maxLen('sssNo', sssNo.value, 15, 'invalid')
-  isError ||= maxLen('philhealthNo', philhealthNo.value, 15, 'invalid')
-  isError ||= maxLen('pagibigNo', pagibigNo.value, 15, 'invalid')
-
-  if (isError) failToast()
-  return !isError
-}
-
-const ValidateSalary = () => {
-  let isError = false
-
-  isError ||= req('payrollgroup', payrollgroup.value)
-  isError ||= req('salarygroup', salarygroup.value)
-  isError ||= req('taxstatus', taxstatus.value)
-
-  if (isError) failToast()
-  return !isError
-}
-
-const ValidateShift = () => {
-  let isError = false
-
-  isError ||= req('shiftId', shiftId.value)
-  isError ||= req('effectiveFrom', effectiveFrom.value)
-
-  if (isError) failToast()
-  return !isError
-}
-
-
-const ResetForm = () => {
-    /**Employee */
-    applicant.value = null;
-    firstname.value = '';
-    middlename.value = '';
-    lastname.value = '';
-    suffix.value = '';
-    sex.value = '';
-    civilstatus.value = '';
-    birthdate.value = new Date().toISOString().split('T')[0];
-    birthplace.value = '';
-    address.value = '';
-    email.value = '';
-    contactNo.value = '';
-    /**Employment */
-    employeeNo.value = '';
-    dateHired.value = new Date().toISOString().split('T')[0]; // today
-    employmentstatus.value = '';
-    departmentId.value = '';
-    positionId.value = '';
-    tin.value = '';
-    sssNo.value = '';
-    philhealthNo.value = '';
-    pagibigNo.value = '';
-    /**Salary */
-    salarygroup.value = '';
-    payrollgroup.value = '';
-    taxstatus.value = '';
-    /**Shift */
-    shiftId.value = '';
-    effectiveFrom.value = new Date().toISOString().split('T')[0];
-    effectiveTo.value = '';
-    notes.value = '';
-}
-
-const ResetAllErrors = () => {
-    Object.keys(Errors).forEach(key => {
-        Errors[key].type = null;
-        Errors[key].msg = '';
-    });
-}
-
-const ShowModal = () => {
-    LoadDepartments();
-    LoadShifts();
-    LoadPositions();
-    LoadApplicants();
-    ResetForm();
-    ResetAllErrors();
-}
-
-const applicants = ref([]);
-const sexes = ref(["Male","Female"]);
-const civilstatuses = ref(["Single","Married","Widowed","Divorced","Separated"]);
-const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporary","Intern"]);
-const positions = ref([]);
 const departments = ref([]);
-const shifts = ref([]);
-const salarygroups = ref([
-    { value: "HIRE", label: "Hiring Rate" },
-    { value: "PROMO", label: "Promotion Increase" },
-    { value: "MERIT", label: "Merit Increase" },
-    { value: "ANNUAL", label: "Annual Increase" },
-    { value: "COLA", label: "Cost of Living Allowance" },
-    { value: "PROB", label: "Probationary Increase" },
-    { value: "ADJUST", label: "Salary Adjustment" },
-    { value: "GOVT", label: "Government Mandated Increase" },
-]);
-const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
-const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);
-
-const filteredDepartments = ref([]);
-const filteredShifts = ref([]);
-
-const createFilterFn = (sourceRef, targetRef) => {
-    return (val, update) => {
-        if (val === '') {
-        update(() => { targetRef.value = sourceRef.value; });
-            return;
-        }
-        update(() => {
-            const needle = val.toLowerCase();
-            targetRef.value = sourceRef.value.filter(v => v.label.toLowerCase().includes(needle));
-        });
-    };
-};
 
 function formatCurrency(amountStr, currency = 'PHP') {
         if (!amountStr) return '';
@@ -460,197 +213,28 @@ function formatCurrency(amountStr, currency = 'PHP') {
         });
 }
 
-const filterDepartmentFn = createFilterFn(departments, filteredDepartments);
-const filterShiftFn = createFilterFn(shifts, filteredShifts);
-
-const LoadApplicants = async () => {
-    try {
-        const response = await api.get(`/employee/option/applicant`);
-        applicants.value = response.data;
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
 const LoadDepartments = async () => {
     try {
         const { data } = await api.get(`/employee/option/department`);
-        departments.value = (data || []).map(d => {
-            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
-            return {
-                label: baseLabel,
-                value: Number(d.value ?? d.id)
-            };
-        });
-        filteredDepartments.value = [...departments.value];
+        departments.value = [
+            {
+                name: 'ALL',
+                id: null
+            },
+            ...(data || []).map(d => ({
+                name: d.name,
+                id: Number(d.id)
+            }))
+        ];
     } catch (error) {
         console.error("Error fetching options:", error);
     }
 };
 
-const LoadShifts = async () => {
-    try {
-        const { data } = await api.get(`/employee/option/shift`);
-        shifts.value = (data || []).map(d => {
-            const baseLabel = d.label ?? d.name ?? String(d.text ?? d.value ?? '');
-            return {
-                label: baseLabel,
-                value: Number(d.value ?? d.id)
-            };
-        });
-        filteredShifts.value = [...shifts.value];
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const LoadPositions = async () => {
-    try {
-        const response = await api.get(`/employee/option/position`);
-        positions.value = response.data;
-    } catch (error) {
-        console.error("Error fetching options:", error);
-    }
-};
-
-const PopulateData = (app) => {
-    firstname.value = app.first_name;
-    middlename.value = app.middle_name;
-    lastname.value = app.last_name;
-    suffix.value = app.suffix;
-    sex.value = app.sex;
-    civilstatus.value = app.civil_status;
-    birthdate.value = app.birthdate;
-    birthplace.value = app.birthplace;
-    address.value = app.address;
-    email.value = app.email;
-    contactNo.value = app.contact_number;
-    employmentstatus.value = app.vacancy.employment_status;
-    departmentId.value = app.vacancy.department_id;
-    positionId.value = app.vacancy.position_id;
-    shiftId.value = app.vacancy.shift_id;
-}
-
-const Save = async () => {
-    ApplicationSubmitting.value = true;
-    const applicantId = applicant.value?.id ?? null;
-    try {
-        const response = await api.post('/employee', {
-            //employee
-            applicantId,
-            firstname: firstname.value,
-            middlename: middlename.value,
-            lastname: lastname.value,
-            suffix: suffix.value,
-            sex: sex.value,
-            civilstatus: civilstatus.value,
-            birthdate: birthdate.value,
-            birthplace: birthplace.value,
-            address: address.value,
-            email: email.value,
-            contactNo: contactNo.value,
-            //employment
-            employeeNo: employeeNo.value,
-            dateHired: dateHired.value,
-            tin: tin.value,
-            sssNo: sssNo.value,
-            philhealthNo: philhealthNo.value,
-            pagibigNo: pagibigNo.value,
-            positionId: positionId.value,
-            departmentId: departmentId.value,
-            employmentstatus: employmentstatus.value,
-            //salary
-            salarygroup: salarygroup.value,
-            payrollgroup: payrollgroup.value,
-            taxstatus: taxstatus.value,
-            //shift
-            shiftId: shiftId.value,
-            effectiveFrom: effectiveFrom.value,
-            effectiveTo: effectiveTo.value,
-            notes: notes.value
-        });
-        modal.value = false;
-        LoadAll()
-        Toast.fire({
-            icon: "success",
-            html: `
-                <div class="text-h6 text-bold text-uppercase">granted!</div>
-                <div class="text-caption text-capitalize;">${response.data.message}<div>
-            `
-        });
-    } catch (e) {
-        if (e.response && e.response.data) {
-            applyBackendErrors(e.response.data);
-            Toast.fire({
-                icon: "error",
-                html: `
-                    <div class="text-h6 text-bold text-uppercase">Request Failed</div>
-                    <div class="text-caption">Something went wrong.</div>
-                `
-            })
-        }
-    } finally {
-        ApplicationSubmitting.value = false;
-    }
-};
-
-const applyBackendErrors = (backendErrors) => {
-    const errorsArray = Array.isArray(backendErrors)
-        ? backendErrors
-        : backendErrors?.errors || []
-    Object.keys(Errors).forEach(key => {
-        Errors[key].type = null
-        Errors[key].messages = []
-    })
-    errorsArray.forEach(err => {
-        if (Errors[err.path] !== undefined) {
-            Errors[err.path].type = true
-            Errors[err.path].messages.push(err.msg)
-        }
-    })
-}
-
-const popup = ref(null);
-
-const searchPosition = ref('')
-
-const filteredPositions = computed(() => {
-    const q = searchPosition.value.trim().toLowerCase()
-
-    return positions.value
-        .filter(p => p.status === 'Vacant') // ✅ only Vacant
-        .filter(p =>
-        !q || String(p.label || '').toLowerCase().includes(q)
-        )
+onBeforeMount(() => {
+    LoadDepartments();
+    LoadAll();
 })
-
-const displayedPositions = computed(() =>
-  filteredPositions.value.slice(0, 5)
-)
-
-const displayCount = computed(() => displayedPositions.value.length)
-const totalCount = computed(() => filteredPositions.value.length)
-
-const step = ref(0)
-const totalSteps = 4;
-
-const validators = [
-    ValidateEmployee,
-    ValidateEmployment,
-    ValidateSalary,
-    ValidateShift
-]
-
-const NextStep = () => {
-  const validate = validators[step.value];
-  if (validate && !validate()) return;
-
-  step.value++;
-};
-
-const PreviousStep = () => {
-    if (step.value > 0) step.value--;
-};
 
 const activeDialog = ref(null)
 const OpenDialog = (dialogName) => {
@@ -664,12 +248,24 @@ onMounted(() => {
     }, 1000)
 })
 
+const filterDepartment = ref(null);
+
+const filteredEmployees = computed(() => {
+    if (filterDepartment.value === null) {
+        return rows.value
+    }
+
+    return rows.value.filter(employee => {
+        return employee.employment?.position?.department_id === filterDepartment.value
+    })
+})
+
 </script>
 
 <style lang="css" scoped>
 .card-menu
 {
-    width: 150px;
-    height: 175px;
+    width: 200px;
+    height: 75px;
 }
 </style>

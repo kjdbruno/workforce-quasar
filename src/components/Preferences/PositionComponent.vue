@@ -544,7 +544,7 @@ const Toggle = async () => {
             ? await api.post(`/position/${id.value}/disable`)
             : await api.post(`/position/${id.value}/enable`)
         dialog.value = false;
-        UpdateList(response.data.position)
+        UpdateList(response.data.data)
         Toast.fire({
             icon: "success",
             html: `

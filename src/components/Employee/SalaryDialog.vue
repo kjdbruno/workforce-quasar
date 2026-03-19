@@ -7,16 +7,16 @@
             <q-separator inset />
             <q-card-section class="col q-pa-lg scroll">
                 <div class="q-mb-md">
-                    <div class="text-caption text-uppercase text-grey" >position</div>
+                    <!-- <div class="text-caption text-uppercase text-grey" >position</div> -->
                     <div class="card-grid">
                         <div class="inner-card-anim-wrapper" :style="{ animationDelay: `100ms` }">
-                            <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!displayedPositions.length">
+                            <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-if="!positions.length">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">no record found</div>
                                 </q-card-section>
                             </q-card>
                         </div>
-                        <div v-for="(data, index) in displayedPositions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="displayedPositions.length">
+                        <div v-for="(data, index) in positions" :key="`data-${data.id}`" class="inner-card-anim-wrapper" :style="{ animationDelay: `${index * 100}ms` }" v-if="positions.length">
                             <q-card @click="() => { position = data; salarytype = data.salary_type; amount = data.amount }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" :class="{ 'card--active': position === data }">
                                 <q-card-section class="text-center">
                                     <div class="text-caption text-dark text-uppercase">{{ data.label }}</div>
@@ -160,16 +160,26 @@
             </q-card-section>
             
             <q-card-actions class="q-pa-lg bg">
-                <div class="row q-gutter-sm">
-                    <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
-                    <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }"/>
-                    <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
-                    <q-input outlined dense debounce="1000" v-model="searchPosition" placeholder="Search...">
-                        <template v-slot:prepend>
-                            <q-icon name="bi-search" style="font-size: 1rem;" />
+                <div class="row items-center justify-between full-width">
+                    <div class="row q-gutter-sm">
+                        <q-btn v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])" unelevated size="md" color="primary" class="btn text-capitalize" label="save" @click="Save()" />
+                        <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }"/>
+                        <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
+                    </div>
+                    <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                        <template v-slot:before>
+                            <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                         </template>
                         <template v-slot:after>
-                            <div class="text-caption text-uppercase text-grey">{{ displayCount }} of {{ totalCount }}</div>
+                            <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
+                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
+                            </q-btn>
+                            <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
+                                <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
+                            </q-btn>
+                        </template>
+                        <template v-slot:prepend>
+                            <q-icon name="bi-search" style="font-size: 1rem;" />
                         </template>
                     </q-input>
                 </div>
@@ -245,14 +255,45 @@ function formatCurrency(salaryRange, currency = 'PHP') {
         .join(' - ');
 }
 
+const meta = ref({});
+const page = ref(1);
+const limit = ref(2);
+const filter = ref('')
+
 const LoadPositions = async () => {
     try {
-        const response = await api.get(`/salary/option/position`);
-        positions.value = response.data
+        const { data } = await api.get(`/salary/option/position`, {
+            params: {
+                Page: page.value, 
+                Limit: limit.value,
+                Filter: filter.value || ''
+            }
+        });
+        meta.value = data.meta;
+        positions.value = data.data
     } catch (error) {
         console.error("Error fetching options:", error);
     }
 };
+
+const NextPage = () => {
+    if (page.value < meta.value.TotalPages) {
+        page.value++
+        LoadPositions()
+    }
+}
+
+const PreviousPage = () => {
+    if (page.value > 1) {
+        page.value--
+        LoadPositions()
+    }
+}
+
+watch(filter, () => {
+    page.value = 1;
+    LoadPositions();
+})
 
 const position = ref('');
 const datestart = ref(new Date().toISOString().split('T')[0]);
@@ -402,24 +443,24 @@ const ResetAllErrors = () => {
 
 const popup = ref(null);
 
-const searchPosition = ref('')
+// const searchPosition = ref('')
 
-const filteredPositions = computed(() => {
-    const q = searchPosition.value.trim().toLowerCase()
+// const filteredPositions = computed(() => {
+//     const q = searchPosition.value.trim().toLowerCase()
 
-    return positions.value
-        .filter(p => p.status === 'Vacant') // ✅ only Vacant
-        .filter(p =>
-        !q || String(p.label || '').toLowerCase().includes(q)
-        )
-})
+//     return positions.value
+//         .filter(p => p.status === 'Vacant') // ✅ only Vacant
+//         .filter(p =>
+//         !q || String(p.label || '').toLowerCase().includes(q)
+//         )
+// })
 
-const displayedPositions = computed(() =>
-  filteredPositions.value.slice(0, 5)
-)
+// const displayedPositions = computed(() =>
+//   filteredPositions.value.slice(0, 5)
+// )
 
-const displayCount = computed(() => displayedPositions.value.length)
-const totalCount = computed(() => filteredPositions.value.length)
+// const displayCount = computed(() => displayedPositions.value.length)
+// const totalCount = computed(() => filteredPositions.value.length)
 
 </script>
 
