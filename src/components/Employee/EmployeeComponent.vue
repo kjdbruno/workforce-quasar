@@ -11,7 +11,7 @@
                             size="xs"
                             :label="btn.name"
                             :class="filterDepartment === btn.id ? 'bg-primary text-white' : 'bg-accent'"
-                            @click="() => { filterDepartment = btn.id; LoadAll(); page = 1 }"
+                            @click="() => { filterDepartment = btn.id; page = 1; LoadAll(); }"
                             />
                     </div>
                 </q-card-section>
