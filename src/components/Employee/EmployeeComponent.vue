@@ -11,7 +11,7 @@
                             size="xs"
                             :label="btn.name"
                             :class="filterDepartment === btn.id ? 'bg-primary text-white' : 'bg-accent'"
-                            @click="filterDepartment = btn.id"
+                            @click="() => { filterDepartment = btn.id; LoadAll(); }"
                             />
                     </div>
                 </q-card-section>
@@ -40,7 +40,7 @@
                     </q-card-section>
                 </q-card>
             </div>
-            <div v-for="(data, index) in filteredEmployees" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
                 <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
                     <q-card-section>
                         <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
@@ -123,6 +123,7 @@ const limit = ref(10);
 const loading = ref(false);
 
 const filter = ref('');
+const filterDepartment = ref('');
 
 const LoadAll = async () => {
     loading.value = true;
@@ -131,7 +132,8 @@ const LoadAll = async () => {
             params: { 
                 Page: page.value, 
                 Limit: limit.value,
-                Filter: filter.value || ''
+                Filter: filter.value || '',
+                Department: filterDepartment.value || ''
             }
         });
         rows.value = data.data;
@@ -219,7 +221,7 @@ const LoadDepartments = async () => {
         departments.value = [
             {
                 name: 'ALL',
-                id: null
+                id: ''
             },
             ...(data || []).map(d => ({
                 name: d.name,
@@ -248,17 +250,15 @@ onMounted(() => {
     }, 1000)
 })
 
-const filterDepartment = ref(null);
+// const filteredEmployees = computed(() => {
+//     if (filterDepartment.value === null) {
+//         return rows.value
+//     }
 
-const filteredEmployees = computed(() => {
-    if (filterDepartment.value === null) {
-        return rows.value
-    }
-
-    return rows.value.filter(employee => {
-        return employee.employment?.position?.department_id === filterDepartment.value
-    })
-})
+//     return rows.value.filter(employee => {
+//         return employee.employment?.position?.department_id === filterDepartment.value
+//     })
+// })
 
 </script>
 

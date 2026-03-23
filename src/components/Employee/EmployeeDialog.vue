@@ -684,6 +684,7 @@ const salarygroups = ref([
     { value: "PROB", label: "Probationary Increase" },
     { value: "ADJUST", label: "Salary Adjustment" },
     { value: "GOVT", label: "Government Mandated Increase" },
+    { value: "DEMOTION", label: "Demotion" },
 ]);
 const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
 const taxstatuses = ref(['S', 'ME', 'S1', 'S2', 'S3', 'S4', 'ME1', 'ME2', 'ME3', 'ME4', 'Z']);

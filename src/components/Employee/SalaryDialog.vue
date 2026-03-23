@@ -166,7 +166,7 @@
                         <q-btn unelevated size="md" color="primary" class="btn text-capitalize" label="clear" @click="() => { ResetForm() }"/>
                         <q-btn unelevated size="md" color="secondary" class="btn text-capitalize" label="discard" @click="() => { emit('update:modelValue', null); }"/>
                     </div>
-                    <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                    <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search..." v-if="positions.length">
                         <template v-slot:before>
                             <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
                         </template>
@@ -233,6 +233,7 @@ const salarygroups = ref([
     { value: "PROB", label: "Probationary Increase" },
     { value: "ADJUST", label: "Salary Adjustment" },
     { value: "GOVT", label: "Government Mandated Increase" },
+    { value: "DEMOTION", label: "Demotion" },
 ]);
 const salarytypes = ref(["Monthly", "Daily", "Hourly"]);
 const payrollgroups = ref(["Monthly", "Semi-Monthly", "Weekly"]);
