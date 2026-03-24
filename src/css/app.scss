@@ -119,6 +119,8 @@ body {
   opacity: 0;
   transform: translateY(18px);
   animation: fadeSlideUp 0.52s cubic-bezier(.2,.8,.2,1) forwards;
+  width: 225px !important;
+  height: 250px !important;
 }
 .card-anim-wrapper .card {
   width: 225px;
