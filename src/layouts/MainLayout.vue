@@ -1,8 +1,9 @@
 <template>
     <q-layout view="lHh Lpr lFf">
 
-        <q-header class="bg-white no-shadow q-mx-lg q-mt-md q-py-sm radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
-            <q-toolbar class="header">
+        <q-header class="bg-accent no-shadow q-mx-lg q-py-md radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'">
+        <!-- <q-header class="bg-white no-shadow q-mx-lg q-mt-md q-py-sm radius-xs" v-if="authStore.isAuthenticated && router.currentRoute.value.name != 'login'"></q-header> -->
+            <q-toolbar class="header bg-white q-pt-md q-pb-md">
 
                 <q-btn flat round dense icon="bi-list" class="text-grey" @click="drawerClick"/>
 
@@ -166,7 +167,7 @@
         </q-drawer>
 
         <q-page-container>
-            <div class="q-mx-lg q-mt-lg">
+            <div class="q-mx-lg">
                 <router-view />
             </div>
                 

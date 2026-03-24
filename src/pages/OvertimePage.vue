@@ -58,6 +58,35 @@
                 </q-card>
             </div>
         </div>
+        <q-footer class="bg-accent no-shadow q-mx-lg q-py-md text-grey">
+            <q-toolbar class=" bg-white q-pt-md q-pb-md">
+                <q-toolbar-title class="text-caption text-uppercase">
+                    <div>© 2025 WORKFORCE. All Rights Reserved.</div>
+                </q-toolbar-title>
+                <q-input outlined dense debounce="1000" v-model="filter" placeholder="Search...">
+                    <template v-slot:before>
+                        <div class="text-caption text-uppercase">{{ `page ${meta.CurrentPage} of ${meta.TotalPages}` }}</div>
+                    </template>
+                    <template v-slot:after>
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-left" :disable="page <= 1" @click="FirstPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">First Page</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-left-short" :disable="page <= 1" @click="PreviousPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Previous</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-right-short" :disable="page >= meta.TotalPages" @click="NextPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Next</q-tooltip>
+                        </q-btn>
+                        <q-btn unelevated size="sm" round color="primary" icon="bi-arrow-bar-right" :disable="page >= meta.TotalPages" @click="LastPage">
+                            <q-tooltip anchor="top middle" self="top middle" transition-show="scale" transition-hide="scale" class="text-capitalize">Last Page</q-tooltip>
+                        </q-btn>
+                    </template>
+                    <template v-slot:prepend>
+                        <q-icon name="bi-search" style="font-size: 1rem;" />
+                    </template>
+                </q-input>
+            </q-toolbar>
+        </q-footer>
         <overtime-dialog v-model="activeDialog" dialog-name="OvertimeDialog" @saved="() => { LoadAll(); }"/>
         <overtime-info-dialog v-model="activeDialog" dialog-name="OvertimeInfoDialog" @saved="() => { LoadAll(); }"/>
         <transition name="glass-fade">
@@ -106,7 +135,7 @@ const submitLoading = ref(false);
 const rows = ref([]);
 const meta = ref({});
 const page = ref(1);
-const limit = ref(10);
+const limit = ref(20);
 const filter = ref('');
 
 const LoadAll = async () => {

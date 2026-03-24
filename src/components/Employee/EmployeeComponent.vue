@@ -17,7 +17,7 @@
                 </q-card-section>
             </q-card>
         </div>
-        <div class="card-grid scroll" style="height: 72vh; ">
+        <div class="card-grid">
             <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('EmployeeDialog') }" >
                     <q-card-section>
@@ -54,9 +54,205 @@
                     <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
                 </q-card>
             </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
+            <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }" >
+                <q-card @click="() => { OpenDialog('MenuDialog'); EmployeeStore.data = data; }" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" >
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.employee_no }}</div>
+                        <div class="text-subtitle2 text-uppercase">{{ formatName(data) }}</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <div class="text-caption text-uppercase">{{ data?.employment?.position?.name }}</div>
+                        <div class="text-caption text-grey">{{ data?.employment?.employment_status }}</div>
+                        <div class="text-caption text-grey text-italic">{{ formatCurrency(data?.employment?.position?.amount) }}</div>
+                    </q-card-section>
+                    <div class="absolute-top-left q-ma-sm" style="width: 7px; height: 7px; border-radius: 50%;" :class="data.status == 'Active' ? 'bg-positive' : 'bg-negative'"></div>
+                </q-card>
+            </div>
         </div>
-        <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
-            <q-toolbar>
+        <q-footer class="bg-accent no-shadow q-mx-lg q-py-md text-grey">
+            <q-toolbar class=" bg-white q-pt-md q-pb-md">
                 <q-toolbar-title class="text-caption text-uppercase">
                     <div>© 2025 WORKFORCE. All Rights Reserved.</div>
                 </q-toolbar-title>

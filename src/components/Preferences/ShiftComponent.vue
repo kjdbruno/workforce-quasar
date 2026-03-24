@@ -175,8 +175,8 @@
                 </q-inner-loading>
             </q-card>
         </q-dialog>
-        <q-footer class="bg-white no-shadow q-mx-lg q-mb-md q-py-sm radius-xs text-grey">
-            <q-toolbar>
+        <q-footer class="bg-accent no-shadow q-mx-lg q-py-md text-grey">
+            <q-toolbar class=" bg-white q-pt-md q-pb-md">
                 <q-toolbar-title class="text-caption text-uppercase">
                     <div>© 2025 WORKFORCE. All Rights Reserved.</div>
                 </q-toolbar-title>
@@ -299,7 +299,7 @@ const rows = ref([]);
 
 const meta = ref({});
 const page = ref(1);
-const limit = ref(10);
+const limit = ref(20);
 const loading = ref(false);
 
 const filter = ref('');
