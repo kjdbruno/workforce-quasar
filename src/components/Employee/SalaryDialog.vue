@@ -258,7 +258,7 @@ function formatCurrency(salaryRange, currency = 'PHP') {
 
 const meta = ref({});
 const page = ref(1);
-const limit = ref(2);
+const limit = ref(5);
 const filter = ref('')
 
 const LoadPositions = async () => {

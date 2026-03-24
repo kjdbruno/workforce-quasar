@@ -17,7 +17,7 @@
                 </q-card-section>
             </q-card>
         </div>
-        <div class="card-grid">
+        <div class="card-grid scroll" style="height: 72vh; ">
             <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
                 <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { OpenDialog('EmployeeDialog') }" >
                     <q-card-section>
@@ -119,7 +119,7 @@ const rows = ref([]);
 
 const meta = ref({});
 const page = ref(1);
-const limit = ref(10);
+const limit = ref(20);
 const loading = ref(false);
 
 const filter = ref('');
