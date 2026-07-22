@@ -1,6 +1,13 @@
 <template>
     <div class="dtr-wrapper">
         <div class="card-grid">
+            <div class="card-anim-wrapper" v-if="AuthStore.hasRole(['SuperAdmin', 'Admin', 'HR'])">
+                <q-card key="data-add" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple @click="() => { openDialog('ImportLogDialog') }" >
+                    <q-card-section>
+                        <q-icon name="bi-plus-circle" color="grey" size="xl" />
+                    </q-card-section>
+                </q-card>
+            </div>
             <div v-if="rows.length === 0" class="card-anim-wrapper" :style="{ animationDelay: `120ms` }">
                 <q-card class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" tag="label">
                     <q-card-section>
@@ -53,6 +60,7 @@
             </q-toolbar>
         </q-footer>
         <log-dialog v-model="activeDialog" dialog-name="LogDialog" />
+        <import-log-dialog v-model="activeDialog" dialog-name="ImportLogDialog"/>
         <transition name="glass-fade">
             <div id="glass-overlay" v-show="PageLoading">
                 <q-card class="no-shadow radius-md q-pa-md">
@@ -95,6 +103,7 @@ import {
 } from 'src/stores/auth-store';
 
 import LogDialog from './LogDialog.vue';
+import ImportLogDialog from './ImportLogDialog.vue';
 
 const AuthStore = useAuthStore();
 

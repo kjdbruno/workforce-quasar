@@ -26,6 +26,7 @@
             <div v-for="(data, index) in rows" :key="`data-${data.id}`" class="card-anim-wrapper" :style="{ animationDelay: `${index * 120}ms` }"  >
                 <q-card @click="ModifyDialog(data)" class="card card-hover-animate flex column justify-center items-center no-shadow cursor-pointer radius-sm" v-ripple>
                     <q-card-section>
+                        <div class="text-caption text-grey">{{ data.code }}</div>
                         <div class="text-subtitle2 text-uppercase">{{ data.name }}</div>
                         <div class="text-caption text-uppercase">{{ formatSalary(data) }}</div>
                     </q-card-section>

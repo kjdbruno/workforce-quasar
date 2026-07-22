@@ -3,6 +3,7 @@ import { usePreferenceStore } from 'src/stores/preference-store';
 import { useRecruitmentStore } from 'src/stores/recruitment-store';
 import { useEmployeeStore } from 'src/stores/employee-store';
 import { useDTRStore } from 'src/stores/dtr-store';
+import { usePayrollStore } from 'src/stores/payroll-store';
 
 const routes = [
   {
@@ -123,6 +124,23 @@ const routes = [
     },
     children: [
       { path: '', component: () => import('src/pages/OvertimePage.vue'), name: 'overtime' }
+    ]
+  },
+  {
+    path: '/payroll',
+    component: () => import('layouts/MainLayout.vue'),
+    beforeEnter: (to, from, next) => {
+      const auth = useAuthStore();
+      const payroll = usePayrollStore();
+      if (!auth.isAuthenticated) {
+        next('/')
+      } else {
+        payroll.component = payroll.component ?? 'SSSComponent'
+        next()
+      }
+    },
+    children: [
+      { path: '', component: () => import('src/pages/PayrollPage.vue'), name: 'payroll' }
     ]
   },
 
