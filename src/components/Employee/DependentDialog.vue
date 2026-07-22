@@ -349,7 +349,7 @@ const Validations = () => {
         } 
         const allowedSuffixes = ['SR', 'JR', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
         if (e.suffix) {
-            const suffixValue = suffix.value.trim().toUpperCase();
+            const suffixValue = e.suffix.trim().toUpperCase();
             if (!allowedSuffixes.includes(suffixValue)) {
                 Errors.dependents.suffix.type[index] = true;
                 Errors.dependents.suffix.msg = 'suffix is required';

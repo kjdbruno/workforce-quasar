@@ -186,7 +186,7 @@ const Validations = () => {
     initErrors()
     
     documents.value.forEach((e, index) => {
-        const maxSize = 5 * 1024 * 1024;
+        const maxSize = 10 * 1024 * 1024;
         if (!e.file) {
             Errors.documents.file.type[index] = true;
             Errors.documents.file.msg = 'file is required';
