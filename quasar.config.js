@@ -55,7 +55,7 @@ export default defineConfig((/* ctx */) => {
         VUE_APP_API_KEY: JSON.stringify('7fcb21ea7e5b4a2dbe30cb18730aeaf5d5e5c7ce45f962376355c1c4f07c8362'), // MUST MATCH BACKEND API_KEY
         // VUE_APP_BACKEND_URL: 'http://localhost:3000'
         // VUE_APP_BACKEND_URL: 'http://136.115.10.2:3000'
-        VUE_APP_BACKEND_URL: 'https://hris-ccmi.com'
+        VUE_APP_BACKEND_URL: 'https://api.hris-ccmi.com'
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
