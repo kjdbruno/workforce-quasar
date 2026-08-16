@@ -211,6 +211,16 @@
                                         :no-error-icon="true"
                                     />
                                 </div>
+                                <div class="col-2">
+                                    <div class="text-caption text-uppercase" :class="Errors.biometricNo.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.biometricNo.msg ? Errors.biometricNo.msg : 'biometric number' }}</div>
+                                    <q-input 
+                                        v-model="biometricNo" 
+                                        label="Enter Biometric No."
+                                        outlined 
+                                        :error="Errors.biometricNo.type"
+                                        :no-error-icon="true"
+                                    />
+                                </div>
                             </div>
                             <div class="row q-col-gutter-xs q-mb-md">
                                 <div class="col-2">
@@ -481,6 +491,7 @@ const email = ref('');
 const contactNo = ref('');
 
 const employeeNo = ref('');
+const biometricNo = ref('');
 const dateHired = ref(new Date().toISOString().split('T')[0]);
 const employmentstatus = ref('');
 const positionId = ref('');
@@ -511,6 +522,7 @@ const Errors = reactive({
     contactNo: { type: null, msg: '' },
 
     employeeNo: { type: null, msg: '' },
+    biometricNo: { type: null, msg: '' },
     dateHired: { type: null, msg: '' },
     employmentstatus: { type: null, msg: '' },
     positionId: { type: null, msg: '' },
@@ -654,6 +666,7 @@ const ResetForm = () => {
     contactNo.value = '';
     /**Employment */
     employeeNo.value = '';
+    biometricNo.value = '';
     dateHired.value = new Date().toISOString().split('T')[0]; // today
     employmentstatus.value = '';
     positionId.value = '';
@@ -844,6 +857,7 @@ const Save = async () => {
             contactNo: contactNo.value,
             //employment
             employeeNo: employeeNo.value,
+            biometricNo: biometricNo.value,
             dateHired: dateHired.value,
             tin: tin.value,
             sssNo: sssNo.value,

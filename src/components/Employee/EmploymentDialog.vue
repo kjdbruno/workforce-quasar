@@ -32,6 +32,16 @@
                             :no-error-icon="true"
                         />
                     </div>
+                    <div class="col-2">
+                        <div class="text-caption text-uppercase" :class="Errors.biometricNo.msg ? 'text-negative text-italic' : 'text-grey'">{{ Errors.biometricNo.msg ? Errors.biometricNo.msg : 'biometric number' }}</div>
+                        <q-input 
+                            v-model="biometricNo" 
+                            label="Enter Biometric No."
+                            outlined 
+                            :error="Errors.biometricNo.type"
+                            :no-error-icon="true"
+                        />
+                    </div>
                 </div>
                 <div class="row q-col-gutter-xs q-mb-md">
                     <div class="col-2">
@@ -133,6 +143,7 @@ const isOpen = computed({
 const SubmitLoading = ref(false);
 
 const employeeNo = ref('');
+const biometricNo = ref('');
 const dateHired = ref('');
 const employmentstatus = ref('');
 const tin = ref('');
@@ -142,6 +153,7 @@ const pagibigNo = ref('');
 
 const Errors = reactive({
     employeeNo: { type: null, msg: '' },
+    biometricNo: { type: null, msg: '' },
     dateHired: { type: null, msg: '' },
     employmentstatus: { type: null, msg: '' },
     tin: { type: null, msg: '' },
@@ -186,6 +198,7 @@ const employmentstatuses = ref(["Regular","Probationary","Contractual","Temporar
 const PopulateData = () => {
     const app = EmployeeStore.data;
     employeeNo.value = app.employment?.employee_no;
+    biometricNo.value = app.employment?.biometric_no;
     dateHired.value = app.employment?.date_hired;
     employmentstatus.value = app.employment.employment_status;
     tin.value = app.employment.tin;
@@ -200,6 +213,7 @@ const Save = async () => {
     try {
         const response = await api.post(`/employee/${EmployeeStore.data?.employment?.id}/employment`, {
             employeeNo: employeeNo.value,
+            biometricNo: biometricNo.value,
             dateHired: dateHired.value,
             employmentstatus: employmentstatus.value,
             tin: tin.value,
